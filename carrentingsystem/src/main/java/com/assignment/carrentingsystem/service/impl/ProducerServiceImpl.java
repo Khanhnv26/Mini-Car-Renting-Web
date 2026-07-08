@@ -46,7 +46,7 @@ public class ProducerServiceImpl implements ProducerService {
 
     @Override
     public void deleteById(Long id) {
-        if(carRepository.existsById(id)){
+        if(carRepository.existsByCarProducer_ProducerId(id)){
             throw new RuntimeException("Không thể xoá hãng xe đang có xe");
         }
         carProducerRepository.deleteById(id);

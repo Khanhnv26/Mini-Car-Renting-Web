@@ -82,7 +82,7 @@ public class CarRentalServiceImpl implements CarRentalService {
         if("Renting".equals(status)){
             car.setStatus("Rented");
         } else if ("Completed".equals(status) || "Cancelled".equals(status)){
-            car.setStatus("Avaliable");
+            car.setStatus("Available");
             carRepository.save(car);
         }
         carRentalRepository.save(carRental);
