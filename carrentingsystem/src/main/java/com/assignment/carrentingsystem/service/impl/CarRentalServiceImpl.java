@@ -10,6 +10,7 @@ import com.assignment.carrentingsystem.repository.CustomerRepository;
 import com.assignment.carrentingsystem.service.CarRentalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -51,26 +52,44 @@ public class CarRentalServiceImpl implements CarRentalService {
 
     @Override
     public List<CarRental> findAll() {
-        return List.of();
+        return carRentalRepository.findAll();
     }
 
     @Override
     public List<CarRental> findByCustomerId(Long customerId) {
-        return List.of();
+        return carRentalRepository.findByCustomerId(customerId);
     }
 
     @Override
     public CarRental findById(Long id) {
-        return null;
+        return carRentalRepository.findById(id).orElse(null);
     }
 
     @Override
+    @Transactional
     public void updateStatus(Long rentalId, String status) {
+        CarRental carRental = carRentalRepository.findById(rentalId)
+                .orElseThrow(() -> new RuntimeException("Giao dịch thuê không tồn tại"));
+        String currentStatus = carRental.getStatus();
 
+        if("Cancelled".equals(currentStatus) || "Completed".equals(currentStatus)){
+            throw new RuntimeException("Không thể đổi trạng thái giao dịch đã kết thúc");
+        }
+
+        carRental.setStatus(status);
+
+        Car car = carRental.getCar();
+        if("Renting".equals(status)){
+            car.setStatus("Rented");
+        } else if ("Completed".equals(status) || "Cancelled".equals(status)){
+            car.setStatus("Avaliable");
+            carRepository.save(car);
+        }
+        carRentalRepository.save(carRental);
     }
 
     @Override
     public List<CarRental> findByPickUpDateBetween(LocalDateTime start, LocalDateTime end) {
-        return List.of();
+        return carRentalRepository.findCarRentalByPickUpDate(start, end);
     }
 }
