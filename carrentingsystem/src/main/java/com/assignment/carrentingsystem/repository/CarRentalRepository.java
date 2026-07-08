@@ -1,0 +1,21 @@
+package com.assignment.carrentingsystem.repository;
+
+import com.assignment.carrentingsystem.entity.CarRental;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Repository
+public interface CarRentalRepository extends JpaRepository<CarRental, Long> {
+    @Query("from CarRental cr where cr.customer.customerId =:id")
+    List<CarRental> findByCustomerId(@Param("id") Long customerId);
+    boolean existsByCar_CarId(Long carId);
+    boolean existsByCustomer_CustomerId(Long customerId);
+    @Query("from CarRental cr where cr.pickUpDate between :start and :end order by cr.rentPrice desc")
+    List<CarRental> findCarRentalByPickUpDate(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+
+}

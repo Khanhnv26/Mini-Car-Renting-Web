@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Danh sách xe</title>
+</head>
+<body>
+    <h1>Danh sách xe</h1>
+    <table border = "1">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Tên xe</th>
+            <th>Năm</th>
+            <th>Màu</th>
+            <th>Giá thuê</th>
+            <th>Trạng thái</th>
+            <th>Hãng</th>
+        </tr>
+        </thead>
+        <tbody>
+            <tr th:each = "car : ${cars}">
+                <td th:text="${car.carId}"></td>
+                <td th:text="${car.carName}"></td>
+                <td th:text="${car.carModelYear}"></td>
+                <td th:text="${car.color}"></td>
+                <td th:text="${car.rentPrice}"></td>
+                <td th:text="${car.status}"></td>
+                <td th:text="${car.carProducer.producerName}"></td>
+            </tr>
+        </tbody>
+    </table>
+    <a th:href = "@{/admin/cars/new}">Add new car</a>
+</body>
+</html>

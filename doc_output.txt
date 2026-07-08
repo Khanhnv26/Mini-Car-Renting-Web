@@ -1,0 +1,310 @@
+Assignment 01 - Building Web Application Using Spring Boot
+1. Introduction
+A Car Rental Management System is a software solution that helps car rental companies manage  and streamline their business operations. It provides an end-to-end platform to handle various  aspects of the car rental process, from booking and reservation management to vehicle  maintenance, invoicing, and customer relationship management. Here are some key components  and functions of a Car Rental Management System:
+- Online Booking and Reservation: The system allows customers to make bookings and  reservations online through a user-friendly interface. It provides real-time availability of  vehicles, rental rates, and booking confirmations.
+- Vehicle/Car Management: The system keeps track of the available fleet of vehicles,  including their models, make, year, mileage, and condition. It helps manage vehicle  allocation, availability, and scheduling.
+- Customer Management: The system maintains a database of customer information,  including contact details, identification documents, and rental history. It enables easy  retrieval of customer records, communication, and personalized service.
+Imagine you're a developer of a FU Car Renting Management System named  FUCarRentingSystem. Your manager has asked you to develop a website with Spring Boot and Spring Data JPA for car information management, customer management, and renting transaction management. To implement a part of this system your tasks include:
+- Manage customer information.
+- Manage car information.
+- Manage car renting transaction.
+The application has to support adding, viewing, modifying, and removing students—a  standardized usage action verbs better known as Create, Read, Update, Delete (CRUD).
+1 | P a g e
+This assignment is required to create an application using Spring Data JPA, JSTL or Thymeleaf and Spring Boot. An SQL Server Database will be created to persist the product data that will be  used for reading and managing product data by Spring Data JPA.
+2. Database Design
+A part of Car Renting Management System database is described as the bellow  Table: CarProducer
+Field name
+Type
+Size
+Type of Entity attribute
+Mandatory
+Description
+ProducerID
+int
+NA
+Integer
+Yes
+Primary Key,
+Auto generated (Identity)
+ProducerName
+nvarchar
+100
+String
+Yes
+Name of the car manufacturer
+Address
+nvarchar
+200
+String
+Yes
+Address of the producer
+Country
+nvarchar
+100
+String
+Yes
+Country of the producer
+Table: Car
+Field name
+Type
+Size
+Type of Entity  attribute
+Mandatory
+Description
+CarID
+int
+NA
+Integer
+Yes
+Primary Key, Auto generated  (Identity)
+CarName
+nvarchar
+200
+String
+Yes
+Name/model of the car
+CarModelYear
+int
+NA
+Integer
+Yes
+Model year of the car
+Color
+nvarchar
+50
+String
+Yes
+Color of the car
+Capacity
+int
+NA
+Integer
+Yes
+Seating capacity
+Description
+nvarchar
+1000
+String
+Yes
+Detailed description
+ImportDate
+date
+NA
+LocalDate
+Yes
+Date the car was imported
+ProducerID
+int
+NA
+Integer
+Yes
+Foreign Key referencing
+CarProducer
+RentPrice
+decimal
+10
+BigDecimal
+Yes
+Rental price per day
+Status
+nvarchar
+10
+String
+Yes
+Status (e.g., Available, Rented)
+Table: Customer
+Field name
+Type
+Size
+Type of Entity  attribute
+Mandatory
+Description
+CustomerID
+int
+NA
+Integer
+Yes
+Primary Key, Auto generated  (Identity)
+FullName
+nvarchar
+200
+String
+Yes
+Full name of the customer
+2 | P a g e
+Mobile
+varchar
+15
+String
+Yes
+Mobile phone number
+Birthday
+date
+NA
+LocalDate
+Yes
+Date of birth
+IdentityCard
+varchar
+20
+String
+Yes
+National identity card number
+LicenceNumber
+varchar
+20
+String
+Yes
+Driving licence number
+LicenceDate
+date
+NA
+LocalDate
+Yes
+Issue date of driving licence
+AccountID
+int
+NA
+Integer
+Yes
+Foreign Key referencing  Account
+Table: CarRental
+Field name
+Type
+Size
+Type of Entity
+attribute
+Mandatory
+Description
+CarRenID
+int
+NA
+Integer
+Yes
+Primary Key, Auto generated  (Identity)
+CustomerID
+int
+NA
+Integer
+Yes
+Foreign Key referencing
+Customer
+CarID
+int
+NA
+Integer
+Yes
+Foreign Key referencing Car
+PickupDate
+date
+NA
+LocalDate
+Yes
+Pickup date
+ReturnDate
+date
+NA
+LocalDate
+Yes
+Return date (must be >
+PickupDate)
+RentPrice
+decimal
+10
+BigDecimal
+Yes
+Rental price for this transaction
+Status
+nvarchar
+10
+String
+Yes
+Rental status (e.g., Active,  Completed)
+Table: Review
+Field name
+Type
+Size
+Type of Entity
+attribute
+Mandatory
+Description
+ID
+int
+NA
+Integer
+Yes
+Primary Key, Auto generated  (Identity)
+CarRenID
+int
+NA
+Integer
+Yes
+Foreign Key referencing
+CarRental
+ReviewStar
+int
+NA
+int
+Yes
+Star rating (e.g., 1–5)
+Comment
+nvarchar
+500
+String
+Yes
+Customer feedback comment
+Table: Account
+Field name
+Type
+Size
+Type of Entity  attribute
+Mandatory
+Description
+AccountID
+int
+NA
+Integer
+Yes
+Primary Key, Auto generated  (Identity)
+AccountName
+nvarchar
+100
+String
+Yes
+Username for login
+Email
+varchar
+200
+String
+Yes
+Email address of the account
+Password
+varchar
+200
+String
+Yes
+Encrypted password
+3 | P a g e
+Role
+nvarchar
+10
+String
+Yes
+User role (e.g., Admin,
+Customer)
+3. Assignment Objectives
+In this assignment, you will:
+▪ Develop application using Spring Boot, JSTL/Thymeleaf, Spring Data JPA  ▪ Use Spring Data JPA to Create a SQL Server database named FUCarRentingSystemDB that has these tables: CarProducer, Car, Customer, CarRental, Review
+▪ Develop 3-Layer with Repository Pattern to perform CRUD actions using Spring Boot.
+4. Main Functions
+▪ If the user is an “Admin” then his/her is allowed to
+o Manage customer information.
+o Manage car information. (The delete action will delete car information in the case  this information is not belong to any renting transaction. If the car information is  already stored in a renting transaction, just change the status.)
+o Manage rental management.
+o Create a renting transaction report statistic by the period from StartDate to EndDate,  and sort data in descending order.
+▪ If user is a “Customer”, this customer role is allowed to:
+o Register an account.
+o Create an online renting tractions with one or many cars’ information.
+o Manage his/her the profile
+o View transaction history.
+4 | P a g e

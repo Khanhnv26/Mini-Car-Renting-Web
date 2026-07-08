@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Create New Car</title>
+</head>
+<body>
+    <form th:action="@{admin/cars/save}" th:object="${car}" method="post">
+        <input type = "hidden" th:field = "*{carId}"/>
+        <div>Tên xe: <input th:field = "*{carName}"/></div></br>
+        <div>Năm: <input th:field = "*{carModelYear}"/></div></br>
+        <div>Màu: <input th:field = "*{color}"/></div></br>
+        <div>Sức chứa: <input th:field = "*{capacity}"/></div></br>
+        <div>Mô tả: <input th:field = "*{description}"/></div></br>
+        <div>Ngày nhập: <input th:field = "*{importDate}"/></div></br>
+        <div>Giá thuê: <input th:field = "*{rentPrice}"/></div></br>
+        <div>Trạng thái: <input th:field = "*{status}"/></div></br>
+        <div>Hãng: <select th:field = "*{carProducer}">
+            <option th:each = "p: ${producers}" th:value = "${p.producerId}" th:text = "${p.producerName}"></option>
+        </select></div></br>
+        <button type="submit">Lưu</button>
+    </form>
+
+</body>
+</html>
