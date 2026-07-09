@@ -20,6 +20,38 @@ public class CarServiceImpl implements CarService {
     private final CarRentalRepository carRentalRepository;
     private final CarProducerRepository carProducerRepository;
 
+    private CarDTO toDTO(Car car) {
+        CarDTO carDTO = new CarDTO();
+        carDTO.setCarId(car.getCarId());
+        carDTO.setCarName(car.getCarName());
+        carDTO.setCarModelYear(car.getCarModelYear());
+        carDTO.setColor(car.getColor());
+        carDTO.setCapacity(car.getCapacity());
+        carDTO.setDescription(car.getDescription());
+        carDTO.setImportDate(car.getImportDate());
+        carDTO.setRentPrice(car.getRentPrice());
+        carDTO.setStatus(car.getStatus());
+        carDTO.setProducerId(car.getCarProducer().getProducerId());
+        return carDTO;
+    }
+
+    private Car toEntity(CarDTO carDTO, Car car) {
+        CarProducer carProducer = carProducerRepository.findById(carDTO.getProducerId())
+                .orElseThrow(() -> new RuntimeException("Hãng xe không tồn tại"));
+
+        car.setCarName(carDTO.getCarName());
+        car.setCarModelYear(carDTO.getCarModelYear());
+        car.setColor(carDTO.getColor());
+        car.setCapacity(carDTO.getCapacity());
+        car.setDescription(carDTO.getDescription());
+        car.setImportDate(carDTO.getImportDate());
+        car.setRentPrice(carDTO.getRentPrice());
+        car.setStatus(carDTO.getStatus());
+        car.setCarProducer(carProducer);
+
+        return car;
+    }
+
     @Override
     public List<Car> findAll() {
         return carRepository.findAll();
@@ -36,39 +68,33 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    public Car save(CarDTO  carDTO) {
-        CarProducer carProducer = carProducerRepository.findById(carDTO.getProducerId())
-                .orElseThrow(() -> new RuntimeException("Hãng xe không tồn tại"));
+    public Car save(CarDTO carDTO) {
         Car car;
-        if(carDTO.getCarId() != null){
+        if (carDTO.getCarId() != null) {
             car = carRepository.findById(carDTO.getCarId())
                     .orElseThrow(() -> new RuntimeException("Xe không tồn tại"));
-
         } else {
             car = new Car();
         }
-        car.setCarName(carDTO.getCarName());
-        car.setCarModelYear(carDTO.getCarModelYear());
-        car.setColor(carDTO.getColor());
-        car.setCapacity(carDTO.getCapacity());
-        car.setDescription(carDTO.getDescription());
-        car.setImportDate(carDTO.getImportDate());
-        car.setRentPrice(carDTO.getRentPrice());
-        car.setStatus(carDTO.getStatus());
-        car.setCarProducer(carProducer);
-        return carRepository.save(car);
+        return carRepository.save(toEntity(carDTO, car));
     }
 
     @Override
     public void deleteById(Long id) {
-        if(carRentalRepository.existsByCar_CarId(id)){
-            Car car =  carRepository.findById(id).orElseThrow(() -> new RuntimeException("Xe không tồn tại"));
-
+        if (carRentalRepository.existsById(id)) {
+            Car car = carRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Xe không tồn tại"));
             car.setStatus("Inactive");
             carRepository.save(car);
         } else {
-            carRepository.deleteById(id);
+            carRentalRepository.deleteById(id);
         }
     }
 
+    @Override
+    public CarDTO findDTOById(Long id) {
+        Car car = carRepository.findById(id).
+                orElseThrow(() -> new RuntimeException("Xe không tồn tại"));
+        return toDTO(car);
+    }
 }

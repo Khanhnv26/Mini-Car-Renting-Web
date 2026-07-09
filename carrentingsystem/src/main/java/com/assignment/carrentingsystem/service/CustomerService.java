@@ -8,9 +8,9 @@ import java.util.List;
 public interface CustomerService {
     List<Customer> findAll();
     Customer findById(Long id);
+    CustomerDTO findDTOById(Long id);
     Customer save(CustomerDTO customer);
     Customer saveDirect(Customer customer);
     void deteleById(Long id);
     Customer findByAccountId(Long accountId);
-
 }

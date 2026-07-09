@@ -8,6 +8,7 @@ import java.util.List;
 public interface ProducerService {
     List<CarProducer> findAll();
     CarProducer findById(Long id);
+    CarProducerDTO findDTOById(Long id);
     CarProducer save(CarProducerDTO carProducerDTO);
     void deleteById(Long id);
 }

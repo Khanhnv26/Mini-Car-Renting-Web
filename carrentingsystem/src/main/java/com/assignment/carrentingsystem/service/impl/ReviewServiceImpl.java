@@ -17,25 +17,28 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewRepository reviewRepository;
     private final CarRentalRepository carRentalRepository;
 
+    private Review toEntity(ReviewDTO dto) {
+        CarRental carRental = carRentalRepository.findById(dto.getCarRentalId())
+                .orElseThrow(() -> new RuntimeException("Giao dịch thuê không tồn tại"));
+        Review review = new Review();
+        review.setCarRental(carRental);
+        review.setReviewStar(dto.getReviewStar());
+        review.setComment(dto.getComment());
+        return review;
+    }
+
     @Override
     public Review save(ReviewDTO reviewDTO) {
         CarRental carRental = carRentalRepository.findById(reviewDTO.getCarRentalId())
                 .orElseThrow(() -> new RuntimeException("Giao dịch thuê không tồn tại"));
-
         if (!"Completed".equals(carRental.getStatus())) {
             throw new RuntimeException("Chỉ đánh giá được giao dịch đã hoàn thành");
         }
-
-        Review existingReview = reviewRepository.findByCarRental_CarRentID(reviewDTO.getCarRentalId());
-        if (existingReview != null) {
+        Review existing = reviewRepository.findByCarRental_CarRentID(reviewDTO.getCarRentalId());
+        if (existing != null) {
             throw new RuntimeException("Giao dịch này đã được đánh giá");
         }
-
-        Review review = new Review();
-        review.setCarRental(carRental);
-        review.setReviewStar(reviewDTO.getReviewStar());
-        review.setComment(reviewDTO.getComment());
-        return reviewRepository.save(review);
+        return reviewRepository.save(toEntity(reviewDTO));
     }
 
     @Override
