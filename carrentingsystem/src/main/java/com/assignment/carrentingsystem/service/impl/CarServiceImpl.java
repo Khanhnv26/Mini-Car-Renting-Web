@@ -9,6 +9,7 @@ import com.assignment.carrentingsystem.repository.CarRepository;
 import com.assignment.carrentingsystem.service.CarService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -68,6 +69,7 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
+    @Transactional
     public Car save(CarDTO carDTO) {
         Car car;
         if (carDTO.getCarId() != null) {
@@ -80,6 +82,7 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
+    @Transactional
     public void deleteById(Long id) {
         if (carRentalRepository.existsByCar_CarId(id)) {
             Car car = carRepository.findById(id)

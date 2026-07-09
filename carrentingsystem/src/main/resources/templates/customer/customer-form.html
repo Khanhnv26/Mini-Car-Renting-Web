@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Form khách hàng</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
 </head>
 <body>
 <h1 th:text="${customerDTO.customerId != null} ? 'Sửa khách hàng' : 'Thêm khách hàng'"></h1>

@@ -178,10 +178,10 @@ GO
 ----------------------------------------------------------------------------
 -- 8.1 Accounts  (1 admin + 3 customers).  Plain-text passwords for dev only.
 INSERT INTO dbo.Account (AccountName, Email, Password, Role) VALUES
-    ('admin',  'admin@fucar.vn',  'admin123', N'Admin'),
-    ('john',   'john@example.com','john123',  N'Customer'),
-    ('mary',   'mary@example.com','mary123',  N'Customer'),
-    ('david',  'david@example.com','david123',N'Customer');
+    ('admin',  'admin@fucar.vn',  '$2a$10$ADlZpyC9pD1agBnGcZN94eQXuQAJrIAB02Ej6wmllrmtoKPkCR4oa', N'Admin'),
+    ('john',   'john@example.com','$2a$10$PDIFiCXYtF5VTlVkiDq9f.GziURR2aH74Cm4sKCOnOo66sTclcIg2',  N'Customer'),
+    ('mary',   'mary@example.com','$2a$10$c4FMI.8tMUBdAhnngwVcUuNYJHaNv784kGdqyJSJP55CKpWDh.85W',  N'Customer'),
+    ('david',  'david@example.com','$2a$10$1W.BlCn0lOSO.2Aokvl69OFV0rPG97rNqW.j6k06uPzUeLAdUIgRK',N'Customer');
 GO
 
 -- 8.2 Car producers

@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -66,15 +67,25 @@ public class CarRentalServiceImpl implements CarRentalService {
         return carRentalRepository.findById(id).orElse(null);
     }
 
+    private static final Set<String> VALID_STATUSES = Set.of("Pending", "Renting", "Completed", "Cancelled");
+
     @Override
     @Transactional
     public void updateStatus(Long rentalId, String status) {
+        if (status == null || !VALID_STATUSES.contains(status)) {
+            throw new RuntimeException("Trạng thái không hợp lệ");
+        }
+
         CarRental carRental = carRentalRepository.findById(rentalId)
                 .orElseThrow(() -> new RuntimeException("Giao dịch thuê không tồn tại"));
         String currentStatus = carRental.getStatus();
 
         if("Cancelled".equals(currentStatus) || "Completed".equals(currentStatus)){
             throw new RuntimeException("Không thể đổi trạng thái giao dịch đã kết thúc");
+        }
+
+        if ("Pending".equals(currentStatus) && !"Renting".equals(status) && !"Cancelled".equals(status)) {
+            throw new RuntimeException("Giao dịch đang chờ chỉ có thể chuyển sang Renting hoặc Cancelled");
         }
 
         carRental.setStatus(status);

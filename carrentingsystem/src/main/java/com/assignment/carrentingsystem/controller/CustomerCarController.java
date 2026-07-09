@@ -69,6 +69,7 @@ public class CustomerCarController {
     public String history(Model model, Authentication authentication) {
         Customer customer = getCurrentCustomer(authentication);
         model.addAttribute("rentals", carRentalService.findByCustomerId(customer.getCustomerId()));
+        model.addAttribute("reviewDTO", new ReviewDTO());
         return "customer/history";
     }
 
@@ -89,6 +90,9 @@ public class CustomerCarController {
     @PostMapping("/profile/edit")
     public String saveProfile(@ModelAttribute("customer") Customer customer,
                               Authentication authentication) {
+        if (customer.getFullName() == null || customer.getFullName().isBlank()) {
+            return "redirect:/customer/profile/edit?error=Tên không được để trống";
+        }
         customerService.updateProfile(authentication.getName(), customer);
         return "redirect:/customer/profile";
     }

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequiredArgsConstructor
@@ -58,13 +59,11 @@ public class CustomerController {
     }
 
     @GetMapping("/delete/{id}")
-    public String delete(@PathVariable("id") Long id, Model model) {
+    public String delete(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
         try {
             customerService.deleteById(id);
         } catch (Exception e) {
-            model.addAttribute("error", e.getMessage());
-            model.addAttribute("accounts", accountService.findAllCustomers());
-            return "customer/customer-form";
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
         return "redirect:/admin/customers";
     }

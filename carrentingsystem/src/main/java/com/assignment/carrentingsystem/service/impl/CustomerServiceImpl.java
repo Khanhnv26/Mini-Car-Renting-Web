@@ -9,6 +9,7 @@ import com.assignment.carrentingsystem.repository.CustomerRepository;
 import com.assignment.carrentingsystem.service.CustomerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -61,6 +62,7 @@ public class CustomerServiceImpl implements CustomerService {
         return toDTO(c);
     }
     @Override
+    @Transactional
     public Customer save(CustomerDTO customerDTO) {
         Customer customer;
         if (customerDTO.getCustomerId() != null) {
@@ -82,6 +84,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    @Transactional
     public void updateProfile(String email, Customer updatedData) {
         Customer current = findByEmail(email);
         current.setFullName(updatedData.getFullName());
@@ -93,6 +96,7 @@ public class CustomerServiceImpl implements CustomerService {
         customerRepository.save(current);
     }
     @Override
+    @Transactional
     public void deleteById(Long id) {
         if (carRentalRepository.existsByCustomer_CustomerId(id)) {
             throw new RuntimeException("Không thể xoá khách hàng đang có giao dịch thuê");

@@ -5,6 +5,7 @@ import com.assignment.carrentingsystem.repository.AccountRepository;
 import com.assignment.carrentingsystem.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,6 +20,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    @Transactional
     public Account save(Account account) {
         return accountRepository.save(account);
     }

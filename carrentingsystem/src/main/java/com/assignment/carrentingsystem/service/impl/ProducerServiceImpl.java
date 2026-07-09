@@ -8,6 +8,7 @@ import com.assignment.carrentingsystem.repository.CarRepository;
 import com.assignment.carrentingsystem.service.ProducerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -48,6 +49,7 @@ public class ProducerServiceImpl implements ProducerService {
         return toDTO(p);
     }
     @Override
+    @Transactional
     public CarProducer save(CarProducerDTO carProducerDTO) {
         CarProducer producer;
         if (carProducerDTO.getProducerId() != null) {
@@ -60,6 +62,7 @@ public class ProducerServiceImpl implements ProducerService {
         return carProducerRepository.save(toEntity(carProducerDTO, producer));
     }
     @Override
+    @Transactional
     public void deleteById(Long id) {
         if (carRepository.existsByCarProducer_ProducerId(id)) {
             throw new RuntimeException("Không thể xoá hãng xe đang có xe");
