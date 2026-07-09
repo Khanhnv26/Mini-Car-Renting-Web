@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Sửa Profile</title>
+</head>
+<body>
+<h1>Sửa thông tin cá nhân</h1>
+<a th:href="@{/customer/profile}">← Quay lại</a><br/><br/>
+
+<form th:action="@{/customer/profile/edit}" th:object="${customer}" method="post">
+    <div>Họ tên: <input th:field="*{fullName}"/></div><br/>
+    <div>SĐT: <input th:field="*{mobile}"/></div><br/>
+    <div>Ngày sinh: <input type="date" th:field="*{birthday}"/></div><br/>
+    <div>CCCD: <input th:field="*{identityCard}"/></div><br/>
+    <div>Bằng lái: <input th:field="*{licenceNumber}"/></div><br/>
+    <div>Ngày cấp: <input type="date" th:field="*{licenceDate}"/></div><br/>
+    <button type="submit">Lưu</button>
+</form>
+</body>
+</html>

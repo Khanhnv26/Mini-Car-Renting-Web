@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Thuê xe</title>
+</head>
+<body>
+<h1>Thuê xe</h1>
+<a th:href="@{/customer/cars}">← Quay lại</a><br/><br/>
+<div th:if="${error}" style="color:red;" th:text="${error}"></div>
+
+<form th:action="@{/customer/rent}" th:object="${carRentalDTO}" method="post">
+    <div>Chọn xe:
+        <select th:field="*{carId}">
+            <option value="">-- Chọn xe --</option>
+            <option th:each="car : ${cars}"
+                    th:value="${car.carId}"
+                    th:text="${car.carName + ' - ' + car.rentPrice + '$/ngày'}"></option>
+        </select>
+        <span th:errors="*{carId}" style="color:red;"></span></div><br/>
+    <div>Ngày nhận: <input type="datetime-local" th:field="*{pickupDate}"/>
+        <span th:errors="*{pickupDate}" style="color:red;"></span></div><br/>
+    <div>Ngày trả: <input type="datetime-local" th:field="*{returnDate}"/>
+        <span th:errors="*{returnDate}" style="color:red;"></span></div><br/>
+    <button type="submit">Đặt thuê</button>
+</form>
+</body>
+</html>

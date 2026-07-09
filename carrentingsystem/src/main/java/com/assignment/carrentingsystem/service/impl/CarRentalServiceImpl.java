@@ -27,6 +27,7 @@ public class CarRentalServiceImpl implements CarRentalService {
 
 
     @Override
+    @Transactional
     public void createCarRental(Long customerId, CarRentalDTO carRentalDTO) {
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new RuntimeException("Khách hàng không tồn tại"));
@@ -81,6 +82,7 @@ public class CarRentalServiceImpl implements CarRentalService {
         Car car = carRental.getCar();
         if("Renting".equals(status)){
             car.setStatus("Rented");
+            carRepository.save(car);
         } else if ("Completed".equals(status) || "Cancelled".equals(status)){
             car.setStatus("Available");
             carRepository.save(car);

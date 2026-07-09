@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Lịch sử thuê xe</title>
+</head>
+<body>
+<h1>Lịch sử thuê xe</h1>
+<a th:href="@{/customer/cars}">Xe</a> |
+<a th:href="@{/customer/rent}">Thuê xe</a> |
+<a th:href="@{/customer/profile}">Profile</a> |
+<a th:href="@{/logout}">Đăng xuất</a>
+<hr/>
+<div th:if="${error}" style="color:red;" th:text="${error}"></div>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Xe</th>
+        <th>Ngày nhận</th>
+        <th>Ngày trả</th>
+        <th>Giá</th>
+        <th>Trạng thái</th>
+        <th>Đánh giá</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="r : ${rentals}">
+        <td th:text="${r.carRentID}"></td>
+        <td th:text="${r.car.carName}"></td>
+        <td th:text="${r.pickUpDate}"></td>
+        <td th:text="${r.returnDate}"></td>
+        <td th:text="${r.rentPrice}"></td>
+        <td th:text="${r.status}"></td>
+        <td>
+            <div th:if="${r.status == 'Completed'}">
+                <form th:action="@{/customer/review}" method="post">
+                    <input type="hidden" name="carRentalId" th:value="${r.carRentID}"/>
+                    <select name="reviewStar">
+                        <option value="1">1⭐</option>
+                        <option value="2">2⭐</option>
+                        <option value="3">3⭐</option>
+                        <option value="4">4⭐</option>
+                        <option value="5" selected>5⭐</option>
+                    </select>
+                    <input type="text" name="comment" placeholder="Nhận xét..." required/>
+                    <button type="submit">Gửi</button>
+                </form>
+            </div>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

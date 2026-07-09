@@ -81,13 +81,13 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public void deleteById(Long id) {
-        if (carRentalRepository.existsById(id)) {
+        if (carRentalRepository.existsByCar_CarId(id)) {
             Car car = carRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Xe không tồn tại"));
             car.setStatus("Inactive");
             carRepository.save(car);
         } else {
-            carRentalRepository.deleteById(id);
+            carRepository.deleteById(id);
         }
     }
 

@@ -8,6 +8,7 @@ import com.assignment.carrentingsystem.repository.ReviewRepository;
 import com.assignment.carrentingsystem.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -17,9 +18,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewRepository reviewRepository;
     private final CarRentalRepository carRentalRepository;
 
-    private Review toEntity(ReviewDTO dto) {
-        CarRental carRental = carRentalRepository.findById(dto.getCarRentalId())
-                .orElseThrow(() -> new RuntimeException("Giao dịch thuê không tồn tại"));
+    private Review toEntity(ReviewDTO dto, CarRental carRental) {
         Review review = new Review();
         review.setCarRental(carRental);
         review.setReviewStar(dto.getReviewStar());
@@ -28,6 +27,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    @Transactional
     public Review save(ReviewDTO reviewDTO) {
         CarRental carRental = carRentalRepository.findById(reviewDTO.getCarRentalId())
                 .orElseThrow(() -> new RuntimeException("Giao dịch thuê không tồn tại"));
@@ -38,7 +38,7 @@ public class ReviewServiceImpl implements ReviewService {
         if (existing != null) {
             throw new RuntimeException("Giao dịch này đã được đánh giá");
         }
-        return reviewRepository.save(toEntity(reviewDTO));
+        return reviewRepository.save(toEntity(reviewDTO, carRental));
     }
 
     @Override

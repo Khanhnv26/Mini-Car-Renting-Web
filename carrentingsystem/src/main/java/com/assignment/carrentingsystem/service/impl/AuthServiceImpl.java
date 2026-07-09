@@ -7,6 +7,8 @@ import com.assignment.carrentingsystem.repository.AccountRepository;
 import com.assignment.carrentingsystem.repository.CustomerRepository;
 import com.assignment.carrentingsystem.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -42,5 +44,17 @@ public class AuthServiceImpl implements AuthService {
         customer.setLicenceDate(user.getLicenceDate());
         customer.setAccount(newAccount);
         customerRepository.save(customer);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Account account = accountRepository.findByEmail(email);
+        if(account == null) {
+            throw new UsernameNotFoundException("Email không tồn tại: " + email);
+        }
+        return User.withUsername(account.getEmail())
+                   .password(account.getPassword())
+                   .roles(account.getRole())
+                   .build();
     }
 }

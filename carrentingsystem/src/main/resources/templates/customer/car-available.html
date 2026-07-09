@@ -2,45 +2,34 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Quản lý xe</title>
+    <title>Xe sẵn sàng</title>
 </head>
 <body>
-<h1>Danh sách xe</h1>
-<a th:href="@{/admin/cars/new}">Thêm xe mới</a> |
-<a th:href="@{/admin/customers}">Khách hàng</a> |
-<a th:href="@{/admin/rentals}">Giao dịch</a> |
-<a th:href="@{/admin/rentals/report}">Báo cáo</a> |
+<h1>Danh sách xe có thể thuê</h1>
+<a th:href="@{/customer/rent}">Thuê xe</a> |
+<a th:href="@{/customer/history}">Lịch sử</a> |
+<a th:href="@{/customer/profile}">Profile</a> |
 <a th:href="@{/logout}">Đăng xuất</a>
 <hr/>
 <table border="1">
     <thead>
     <tr>
-        <th>ID</th>
         <th>Tên xe</th>
         <th>Năm</th>
         <th>Màu</th>
         <th>Sức chứa</th>
-        <th>Giá thuê</th>
-        <th>Trạng thái</th>
+        <th>Giá/ngày</th>
         <th>Hãng</th>
-        <th>Hành động</th>
     </tr>
     </thead>
     <tbody>
     <tr th:each="car : ${cars}">
-        <td th:text="${car.carId}"></td>
         <td th:text="${car.carName}"></td>
         <td th:text="${car.carModelYear}"></td>
         <td th:text="${car.color}"></td>
         <td th:text="${car.capacity}"></td>
         <td th:text="${car.rentPrice}"></td>
-        <td th:text="${car.status}"></td>
         <td th:text="${car.carProducer.producerName}"></td>
-        <td>
-            <a th:href="@{/admin/cars/edit/{id}(id=${car.carId})}">Sửa</a>
-            <a th:href="@{/admin/cars/delete/{id}(id=${car.carId})}"
-               onclick="return confirm('Bạn chắc chắn?')">Xóa</a>
-        </td>
     </tr>
     </tbody>
 </table>

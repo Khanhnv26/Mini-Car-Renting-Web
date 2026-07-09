@@ -1,25 +1,44 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/html">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Create New Car</title>
+    <title>Form xe</title>
 </head>
 <body>
-    <form th:action="@{admin/cars/save}" th:object="${car}" method="post">
-        <input type = "hidden" th:field = "*{carId}"/>
-        <div>Tên xe: <input th:field = "*{carName}"/></div></br>
-        <div>Năm: <input th:field = "*{carModelYear}"/></div></br>
-        <div>Màu: <input th:field = "*{color}"/></div></br>
-        <div>Sức chứa: <input th:field = "*{capacity}"/></div></br>
-        <div>Mô tả: <input th:field = "*{description}"/></div></br>
-        <div>Ngày nhập: <input th:field = "*{importDate}"/></div></br>
-        <div>Giá thuê: <input th:field = "*{rentPrice}"/></div></br>
-        <div>Trạng thái: <input th:field = "*{status}"/></div></br>
-        <div>Hãng: <select th:field = "*{carProducer}">
-            <option th:each = "p: ${producers}" th:value = "${p.producerId}" th:text = "${p.producerName}"></option>
-        </select></div></br>
-        <button type="submit">Lưu</button>
-    </form>
+<h1 th:text="${carDTO.carId != null} ? 'Sửa xe' : 'Thêm xe mới'"></h1>
+<a th:href="@{/admin/cars}">← Quay lại</a><br/><br/>
 
+<form th:action="@{/admin/cars/save}" th:object="${carDTO}" method="post">
+    <input type="hidden" th:field="*{carId}"/>
+    <div>Tên xe: <input th:field="*{carName}"/>
+        <span th:errors="*{carName}" style="color:red;"></span></div><br/>
+    <div>Năm: <input type="number" th:field="*{carModelYear}"/>
+        <span th:errors="*{carModelYear}" style="color:red;"></span></div><br/>
+    <div>Màu: <input th:field="*{color}"/>
+        <span th:errors="*{color}" style="color:red;"></span></div><br/>
+    <div>Sức chứa: <input type="number" th:field="*{capacity}"/>
+        <span th:errors="*{capacity}" style="color:red;"></span></div><br/>
+    <div>Mô tả: <textarea th:field="*{description}"></textarea>
+        <span th:errors="*{description}" style="color:red;"></span></div><br/>
+    <div>Ngày nhập: <input type="date" th:field="*{importDate}"/>
+        <span th:errors="*{importDate}" style="color:red;"></span></div><br/>
+    <div>Giá thuê: <input type="number" step="0.01" th:field="*{rentPrice}"/>
+        <span th:errors="*{rentPrice}" style="color:red;"></span></div><br/>
+    <div>Trạng thái:
+        <select th:field="*{status}">
+            <option value="Available">Available</option>
+            <option value="Rented">Rented</option>
+            <option value="Inactive">Inactive</option>
+        </select></div><br/>
+    <div>Hãng:
+        <select th:field="*{producerId}">
+            <option value="">-- Chọn hãng --</option>
+            <option th:each="p : ${producers}"
+                    th:value="${p.producerId}"
+                    th:text="${p.producerName}"></option>
+        </select>
+        <span th:errors="*{producerId}" style="color:red;"></span></div><br/>
+    <button type="submit">Lưu</button>
+</form>
 </body>
 </html>

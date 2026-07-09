@@ -2,7 +2,7 @@ package com.assignment.carrentingsystem.service;
 
 import com.assignment.carrentingsystem.dto.CarDTO;
 import com.assignment.carrentingsystem.entity.Car;
-import org.springframework.stereotype.Service;
+
 
 import java.util.List;
 

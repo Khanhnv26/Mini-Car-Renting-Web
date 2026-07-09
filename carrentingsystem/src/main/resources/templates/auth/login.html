@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng nhập</title>
+</head>
+<body>
+<h1>Đăng nhập</h1>
+<div th:if="${param.error}" style="color:red;">Sai email hoặc mật khẩu!</div>
+<div th:if="${param.logout}" style="color:green;">Đã đăng xuất!</div>
+<div th:if="${param.registered}" style="color:green;">Đăng ký thành công!</div>
+
+<form th:action="@{/login}" method="post">
+    <div>Email: <input type="email" name="username" required/></div><br/>
+    <div>Mật khẩu: <input type="password" name="password" required/></div><br/>
+    <button type="submit">Đăng nhập</button>
+</form>
+<p><a th:href="@{/register}">Chưa có tài khoản? Đăng ký</a></p>
+</body>
+</html>

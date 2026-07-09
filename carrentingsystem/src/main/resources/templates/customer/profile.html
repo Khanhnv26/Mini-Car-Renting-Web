@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Profile</title>
+</head>
+<body>
+<h1>Thông tin cá nhân</h1>
+<a th:href="@{/customer/cars}">Xe</a> |
+<a th:href="@{/customer/history}">Lịch sử</a> |
+<a th:href="@{/logout}">Đăng xuất</a>
+<hr/>
+<p>Họ tên: <strong th:text="${customer.fullName}"></strong></p>
+<p>SĐT: <strong th:text="${customer.mobile}"></strong></p>
+<p>Ngày sinh: <strong th:text="${customer.birthday}"></strong></p>
+<p>CCCD: <strong th:text="${customer.identityCard}"></strong></p>
+<p>Bằng lái: <strong th:text="${customer.licenceNumber}"></strong></p>
+<p>Ngày cấp: <strong th:text="${customer.licenceDate}"></strong></p>
+<p>Email: <strong th:text="${customer.account.email}"></strong></p>
+<a th:href="@{/customer/profile/edit}">Sửa thông tin</a>
+</body>
+</html>

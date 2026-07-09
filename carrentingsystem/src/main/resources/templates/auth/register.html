@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng ký</title>
+</head>
+<body>
+<h1>Đăng ký tài khoản</h1>
+<div th:if="${error}" style="color:red;" th:text="${error}"></div>
+
+<form th:action="@{/register}" th:object="${registerDTO}" method="post">
+    <h3>Thông tin tài khoản</h3>
+    <div>Tên tài khoản: <input th:field="*{accountName}"/>
+        <span th:errors="*{accountName}" style="color:red;"></span></div><br/>
+    <div>Email: <input type="email" th:field="*{email}"/>
+        <span th:errors="*{email}" style="color:red;"></span></div><br/>
+    <div>Mật khẩu: <input type="password" th:field="*{password}"/>
+        <span th:errors="*{password}" style="color:red;"></span></div><br/>
+
+    <h3>Thông tin cá nhân</h3>
+    <div>Họ tên: <input th:field="*{fullName}"/>
+        <span th:errors="*{fullName}" style="color:red;"></span></div><br/>
+    <div>SĐT: <input th:field="*{mobile}"/>
+        <span th:errors="*{mobile}" style="color:red;"></span></div><br/>
+    <div>Ngày sinh: <input type="date" th:field="*{birthDate}"/>
+        <span th:errors="*{birthDate}" style="color:red;"></span></div><br/>
+    <div>Số CCCD: <input th:field="*{identityCard}"/>
+        <span th:errors="*{identityCard}" style="color:red;"></span></div><br/>
+    <div>Số bằng lái: <input th:field="*{licenceNumber}"/>
+        <span th:errors="*{licenceNumber}" style="color:red;"></span></div><br/>
+    <div>Ngày cấp bằng: <input type="date" th:field="*{licenceDate}"/>
+        <span th:errors="*{licenceDate}" style="color:red;"></span></div><br/>
+
+    <button type="submit">Đăng ký</button>
+</form>
+<p><a th:href="@{/login}">Đã có tài khoản? Đăng nhập</a></p>
+</body>
+</html>

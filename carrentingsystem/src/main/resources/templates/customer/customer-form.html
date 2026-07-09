@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Form khách hàng</title>
+</head>
+<body>
+<h1 th:text="${customerDTO.customerId != null} ? 'Sửa khách hàng' : 'Thêm khách hàng'"></h1>
+<a th:href="@{/admin/customers}">← Quay lại</a><br/><br/>
+<div th:if="${error}" style="color:red;" th:text="${error}"></div>
+
+<form th:action="@{/admin/customers/save}" th:object="${customerDTO}" method="post">
+    <input type="hidden" th:field="*{customerId}"/>
+    <div>Họ tên: <input th:field="*{fullName}"/>
+        <span th:errors="*{fullName}" style="color:red;"></span></div><br/>
+    <div>SĐT: <input th:field="*{mobile}"/>
+        <span th:errors="*{mobile}" style="color:red;"></span></div><br/>
+    <div>Ngày sinh: <input type="date" th:field="*{birthDate}"/>
+        <span th:errors="*{birthDate}" style="color:red;"></span></div><br/>
+    <div>Số CCCD: <input th:field="*{identityCard}"/>
+        <span th:errors="*{identityCard}" style="color:red;"></span></div><br/>
+    <div>Số bằng lái: <input th:field="*{licenceNumber}"/>
+        <span th:errors="*{licenceNumber}" style="color:red;"></span></div><br/>
+    <div>Ngày cấp bằng: <input type="date" th:field="*{licenceDate}"/>
+        <span th:errors="*{licenceDate}" style="color:red;"></span></div><br/>
+    <div>Tài khoản:
+        <select th:field="*{accountId}">
+            <option value="">-- Chọn tài khoản --</option>
+            <option th:each="a : ${accounts}"
+                    th:value="${a.accountId}"
+                    th:text="${a.email}"></option>
+        </select>
+        <span th:errors="*{accountId}" style="color:red;"></span></div><br/>
+    <button type="submit">Lưu</button>
+</form>
+</body>
+</html>

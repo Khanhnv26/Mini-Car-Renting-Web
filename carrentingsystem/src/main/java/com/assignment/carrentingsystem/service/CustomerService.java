@@ -10,7 +10,8 @@ public interface CustomerService {
     Customer findById(Long id);
     CustomerDTO findDTOById(Long id);
     Customer save(CustomerDTO customer);
-    Customer saveDirect(Customer customer);
-    void deteleById(Long id);
+    void deleteById(Long id);
     Customer findByAccountId(Long accountId);
+    Customer findByEmail(String email);
+    void updateProfile(String email, Customer data);
 }

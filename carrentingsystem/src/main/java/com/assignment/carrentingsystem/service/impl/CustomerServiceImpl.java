@@ -71,12 +71,29 @@ public class CustomerServiceImpl implements CustomerService {
         }
         return customerRepository.save(toEntity(customerDTO, customer));
     }
+
     @Override
-    public Customer saveDirect(Customer customer) {
-        return customerRepository.save(customer);
+    public Customer findByEmail(String email) {
+        Account account = accountRepository.findByEmail(email);
+        if (account == null) {
+            throw new RuntimeException("Tài khoản không tồn tại với email: " + email);
+        }
+        return customerRepository.findByAccountId(account.getAccountId());
+    }
+
+    @Override
+    public void updateProfile(String email, Customer updatedData) {
+        Customer current = findByEmail(email);
+        current.setFullName(updatedData.getFullName());
+        current.setMobile(updatedData.getMobile());
+        current.setBirthday(updatedData.getBirthday());
+        current.setIdentityCard(updatedData.getIdentityCard());
+        current.setLicenceNumber(updatedData.getLicenceNumber());
+        current.setLicenceDate(updatedData.getLicenceDate());
+        customerRepository.save(current);
     }
     @Override
-    public void deteleById(Long id) {
+    public void deleteById(Long id) {
         if (carRentalRepository.existsByCustomer_CustomerId(id)) {
             throw new RuntimeException("Không thể xoá khách hàng đang có giao dịch thuê");
         }
