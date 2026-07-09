@@ -1,50 +1,43 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Quản lý xe</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}"/>
-</head>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/admin-layout :: layout(title='Quản lý xe', content=~{::content})}">
 <body>
-<h1>Danh sách xe</h1>
-<a th:href="@{/admin/cars/new}">Thêm xe mới</a> |
-<a th:href="@{/admin/producers}">Hãng xe</a> |
-<a th:href="@{/admin/customers}">Khách hàng</a> |
-<a th:href="@{/admin/rentals}">Giao dịch</a> |
-<a th:href="@{/admin/rentals/report}">Báo cáo</a> |
-<a th:href="@{/logout}">Đăng xuất</a>
-<hr/>
-<table border="1">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Tên xe</th>
-        <th>Năm</th>
-        <th>Màu</th>
-        <th>Sức chứa</th>
-        <th>Giá thuê</th>
-        <th>Trạng thái</th>
-        <th>Hãng</th>
-        <th>Hành động</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="car : ${cars}">
-        <td th:text="${car.carId}"></td>
-        <td th:text="${car.carName}"></td>
-        <td th:text="${car.carModelYear}"></td>
-        <td th:text="${car.color}"></td>
-        <td th:text="${car.capacity}"></td>
-        <td th:text="${car.rentPrice}"></td>
-        <td th:text="${car.status}"></td>
-        <td th:text="${car.carProducer.producerName}"></td>
-        <td>
-            <a th:href="@{/admin/cars/edit/{id}(id=${car.carId})}">Sửa</a>
-            <a th:href="@{/admin/cars/delete/{id}(id=${car.carId})}"
-               onclick="return confirm('Bạn chắc chắn?')">Xóa</a>
-        </td>
-    </tr>
-    </tbody>
-</table>
+<div th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h4">Danh sách xe</h1>
+        <a th:href="@{/admin/cars/new}" class="btn btn-primary btn-sm">+ Thêm xe mới</a>
+    </div>
+    <table class="table table-bordered table-hover">
+        <thead class="table-light">
+        <tr>
+            <th>ID</th>
+            <th>Tên xe</th>
+            <th>Năm</th>
+            <th>Màu</th>
+            <th>Sức chứa</th>
+            <th>Giá thuê</th>
+            <th>Trạng thái</th>
+            <th>Hãng</th>
+            <th>Hành động</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="car : ${cars}">
+            <td th:text="${car.carId}"></td>
+            <td th:text="${car.carName}"></td>
+            <td th:text="${car.carModelYear}"></td>
+            <td th:text="${car.color}"></td>
+            <td th:text="${car.capacity}"></td>
+            <td th:text="${car.rentPrice}"></td>
+            <td><span class="badge bg-success" th:text="${car.status}"></span></td>
+            <td th:text="${car.carProducer.producerName}"></td>
+            <td>
+                <a th:href="@{/admin/cars/edit/{id}(id=${car.carId})}" class="btn btn-sm btn-outline-primary">Sửa</a>
+                <a th:href="@{/admin/cars/delete/{id}(id=${car.carId})}" class="btn btn-sm btn-outline-danger"
+                   onclick="return confirm('Bạn chắc chắn?')">Xóa</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
 </body>
 </html>

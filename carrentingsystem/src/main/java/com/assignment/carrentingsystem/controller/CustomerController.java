@@ -35,7 +35,7 @@ public class CustomerController {
     }
 
     @PostMapping("/save")
-    public String save(@Valid @ModelAttribute("customerDTO") CustomerDTO customerDTO, BindingResult bindingResult, Model model) {
+    public String save(@Valid @ModelAttribute("customerDTO") CustomerDTO customerDTO, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("accounts", accountService.findAllCustomers());
             return "customer/customer-form";
@@ -43,6 +43,8 @@ public class CustomerController {
 
         try {
             customerService.save(customerDTO);
+            redirectAttributes.addFlashAttribute("toastMessage", "Lưu khách hàng thành công!");
+            redirectAttributes.addFlashAttribute("toastType", "success");
             return "redirect:/admin/customers";
         } catch (Exception e) {
             model.addAttribute("accounts", accountService.findAllCustomers());
@@ -62,8 +64,11 @@ public class CustomerController {
     public String delete(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
         try {
             customerService.deleteById(id);
+            redirectAttributes.addFlashAttribute("toastMessage", "Xóa khách hàng thành công!");
+            redirectAttributes.addFlashAttribute("toastType", "success");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute("toastMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("toastType", "error");
         }
         return "redirect:/admin/customers";
     }

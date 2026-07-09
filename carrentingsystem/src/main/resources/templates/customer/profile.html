@@ -1,23 +1,45 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Profile</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}"/>
-</head>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/customer-layout :: layout(title='Hồ sơ', content=~{::content})}">
 <body>
-<h1>Thông tin cá nhân</h1>
-<a th:href="@{/customer/cars}">Xe</a> |
-<a th:href="@{/customer/history}">Lịch sử</a> |
-<a th:href="@{/logout}">Đăng xuất</a>
-<hr/>
-<p>Họ tên: <strong th:text="${customer.fullName}"></strong></p>
-<p>SĐT: <strong th:text="${customer.mobile}"></strong></p>
-<p>Ngày sinh: <strong th:text="${customer.birthday}"></strong></p>
-<p>CCCD: <strong th:text="${customer.identityCard}"></strong></p>
-<p>Bằng lái: <strong th:text="${customer.licenceNumber}"></strong></p>
-<p>Ngày cấp: <strong th:text="${customer.licenceDate}"></strong></p>
-<p>Email: <strong th:text="${customer.account.email}"></strong></p>
-<a th:href="@{/customer/profile/edit}">Sửa thông tin</a>
+<div th:fragment="content">
+    <div class="card border">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Thông tin cá nhân</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-borderless mb-0">
+                <tr>
+                    <th style="width: 140px;">Họ tên</th>
+                    <td th:text="${customer.fullName}"></td>
+                </tr>
+                <tr>
+                    <th>Số điện thoại</th>
+                    <td th:text="${customer.mobile}"></td>
+                </tr>
+                <tr>
+                    <th>Ngày sinh</th>
+                    <td th:text="${customer.birthday}"></td>
+                </tr>
+                <tr>
+                    <th>CCCD</th>
+                    <td th:text="${customer.identityCard}"></td>
+                </tr>
+                <tr>
+                    <th>Bằng lái</th>
+                    <td th:text="${customer.licenceNumber}"></td>
+                </tr>
+                <tr>
+                    <th>Ngày cấp</th>
+                    <td th:text="${customer.licenceDate}"></td>
+                </tr>
+                <tr>
+                    <th>Email</th>
+                    <td th:text="${customer.account.email}"></td>
+                </tr>
+            </table>
+            <a th:href="@{/customer/profile/edit}" class="btn btn-primary btn-sm mt-3">Sửa thông tin</a>
+        </div>
+    </div>
+</div>
 </body>
 </html>

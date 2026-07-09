@@ -1,47 +1,42 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Quản lý khách hàng</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}"/>
-</head>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/admin-layout :: layout(title='Quản lý khách hàng', content=~{::content})}">
 <body>
-<h1>Danh sách khách hàng</h1>
-<a th:href="@{/admin/customers/new}">Thêm mới</a> |
-<a th:href="@{/admin/cars}">Xe</a> |
-<a th:href="@{/admin/rentals}">Giao dịch</a> |
-<a th:href="@{/logout}">Đăng xuất</a>
-<hr/>
-<div th:if="${error}" style="color:red;" th:text="${error}"></div>
-<table border="1">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Họ tên</th>
-        <th>SĐT</th>
-        <th>Ngày sinh</th>
-        <th>CCCD</th>
-        <th>Bằng lái</th>
-        <th>Email</th>
-        <th>Hành động</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="c : ${customers}">
-        <td th:text="${c.customerId}"></td>
-        <td th:text="${c.fullName}"></td>
-        <td th:text="${c.mobile}"></td>
-        <td th:text="${c.birthday}"></td>
-        <td th:text="${c.identityCard}"></td>
-        <td th:text="${c.licenceNumber}"></td>
-        <td th:text="${c.account.email}"></td>
-        <td>
-            <a th:href="@{/admin/customers/edit/{id}(id=${c.customerId})}">Sửa</a>
-            <a th:href="@{/admin/customers/delete/{id}(id=${c.customerId})}"
-               onclick="return confirm('Bạn chắc chắn?')">Xóa</a>
-        </td>
-    </tr>
-    </tbody>
-</table>
+<div th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h4">Danh sách khách hàng</h1>
+        <a th:href="@{/admin/customers/new}" class="btn btn-primary btn-sm">+ Thêm mới</a>
+    </div>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+    <table class="table table-bordered table-hover">
+        <thead class="table-light">
+        <tr>
+            <th>ID</th>
+            <th>Họ tên</th>
+            <th>Số điện thoại</th>
+            <th>Ngày sinh</th>
+            <th>CCCD</th>
+            <th>Bằng lái</th>
+            <th>Email</th>
+            <th>Hành động</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="c : ${customers}">
+            <td th:text="${c.customerId}"></td>
+            <td th:text="${c.fullName}"></td>
+            <td th:text="${c.mobile}"></td>
+            <td th:text="${c.birthday}"></td>
+            <td th:text="${c.identityCard}"></td>
+            <td th:text="${c.licenceNumber}"></td>
+            <td th:text="${c.account.email}"></td>
+            <td>
+                <a th:href="@{/admin/customers/edit/{id}(id=${c.customerId})}" class="btn btn-sm btn-outline-primary">Sửa</a>
+                <a th:href="@{/admin/customers/delete/{id}(id=${c.customerId})}" class="btn btn-sm btn-outline-danger"
+                   onclick="return confirm('Bạn chắc chắn?')">Xóa</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
 </body>
 </html>

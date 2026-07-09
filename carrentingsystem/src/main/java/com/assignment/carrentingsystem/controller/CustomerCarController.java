@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequiredArgsConstructor
@@ -48,7 +49,7 @@ public class CustomerCarController {
     }
 
     @PostMapping("/rent")
-    public String rent(@Valid @ModelAttribute("carRentalDTO") CarRentalDTO carRentalDTO, BindingResult bindingResult, Model model, Authentication authentication) {
+    public String rent(@Valid @ModelAttribute("carRentalDTO") CarRentalDTO carRentalDTO, BindingResult bindingResult, Model model, Authentication authentication, RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("cars", carService.findByStatus("Available"));
             return "customer/rent-form";
@@ -57,6 +58,8 @@ public class CustomerCarController {
         try {
             Customer customer = getCurrentCustomer(authentication);
             carRentalService.createCarRental(customer.getCustomerId(), carRentalDTO);
+            redirectAttributes.addFlashAttribute("toastMessage", "Đặt thuê xe thành công!");
+            redirectAttributes.addFlashAttribute("toastType", "success");
             return "redirect:/customer/history";
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
@@ -89,16 +92,20 @@ public class CustomerCarController {
 
     @PostMapping("/profile/edit")
     public String saveProfile(@ModelAttribute("customer") Customer customer,
-                              Authentication authentication) {
+                              Authentication authentication, RedirectAttributes redirectAttributes) {
         if (customer.getFullName() == null || customer.getFullName().isBlank()) {
-            return "redirect:/customer/profile/edit?error=Tên không được để trống";
+            redirectAttributes.addFlashAttribute("toastMessage", "Tên không được để trống");
+            redirectAttributes.addFlashAttribute("toastType", "error");
+            return "redirect:/customer/profile/edit";
         }
         customerService.updateProfile(authentication.getName(), customer);
+        redirectAttributes.addFlashAttribute("toastMessage", "Cập nhật hồ sơ thành công!");
+        redirectAttributes.addFlashAttribute("toastType", "success");
         return "redirect:/customer/profile";
     }
 
     @PostMapping("/review")
-    public String review(@Valid @ModelAttribute("reviewDTO") ReviewDTO reviewDTO, BindingResult bindingResult, Model model, Authentication authentication) {
+    public String review(@Valid @ModelAttribute("reviewDTO") ReviewDTO reviewDTO, BindingResult bindingResult, Model model, Authentication authentication, RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             Customer customer = getCurrentCustomer(authentication);
             model.addAttribute("rentals", carRentalService.findByCustomerId(customer.getCustomerId()));
@@ -107,6 +114,8 @@ public class CustomerCarController {
 
         try {
             reviewService.save(reviewDTO);
+            redirectAttributes.addFlashAttribute("toastMessage", "Gửi đánh giá thành công!");
+            redirectAttributes.addFlashAttribute("toastType", "success");
             return "redirect:/customer/history";
         } catch (Exception e) {
             Customer customer = getCurrentCustomer(authentication);

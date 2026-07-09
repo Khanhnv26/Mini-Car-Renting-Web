@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import jakarta.validation.Valid;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequiredArgsConstructor
@@ -29,13 +30,15 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public String register(@Valid @ModelAttribute("registerDTO") RegisterDTO registerDTO, BindingResult bindingResult, Model model) {
+    public String register(@Valid @ModelAttribute("registerDTO") RegisterDTO registerDTO, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             return "auth/register";
         }
 
         try {
             authService.register(registerDTO);
+            redirectAttributes.addFlashAttribute("toastMessage", "Đăng ký tài khoản thành công!");
+            redirectAttributes.addFlashAttribute("toastType", "success");
             return "redirect:/login?registered";
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());

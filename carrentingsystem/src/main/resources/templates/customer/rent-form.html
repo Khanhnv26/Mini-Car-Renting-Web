@@ -1,29 +1,34 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Thuê xe</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}"/>
-</head>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/customer-layout :: layout(title='Thuê xe', content=~{::content})}">
 <body>
-<h1>Thuê xe</h1>
-<a th:href="@{/customer/cars}">← Quay lại</a><br/><br/>
-<div th:if="${error}" style="color:red;" th:text="${error}"></div>
+<div th:fragment="content">
+    <h1 class="h4 mb-3">Thuê xe</h1>
+    <a th:href="@{/customer/cars}" class="btn btn-outline-secondary btn-sm mb-3">&larr; Quay lại</a>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
-<form th:action="@{/customer/rent}" th:object="${carRentalDTO}" method="post">
-    <div>Chọn xe:
-        <select th:field="*{carId}">
-            <option value="">-- Chọn xe --</option>
-            <option th:each="car : ${cars}"
-                    th:value="${car.carId}"
-                    th:text="${car.carName + ' - ' + car.rentPrice + '$/ngày'}"></option>
-        </select>
-        <span th:errors="*{carId}" style="color:red;"></span></div><br/>
-    <div>Ngày nhận: <input type="datetime-local" th:field="*{pickupDate}"/>
-        <span th:errors="*{pickupDate}" style="color:red;"></span></div><br/>
-    <div>Ngày trả: <input type="datetime-local" th:field="*{returnDate}"/>
-        <span th:errors="*{returnDate}" style="color:red;"></span></div><br/>
-    <button type="submit">Đặt thuê</button>
-</form>
+    <form th:action="@{/customer/rent}" th:object="${carRentalDTO}" method="post" class="row g-3">
+        <div class="col-12">
+            <label class="form-label">Chọn xe</label>
+            <select th:field="*{carId}" class="form-select">
+                <option value="">-- Chọn xe --</option>
+                <option th:each="car : ${cars}" th:value="${car.carId}" th:text="${car.carName + ' - ' + car.rentPrice + '$/ngày'}"></option>
+            </select>
+            <div th:errors="*{carId}" class="text-danger small"></div>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Ngày nhận</label>
+            <input type="datetime-local" th:field="*{pickupDate}" class="form-control">
+            <div th:errors="*{pickupDate}" class="text-danger small"></div>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Ngày trả</label>
+            <input type="datetime-local" th:field="*{returnDate}" class="form-control">
+            <div th:errors="*{returnDate}" class="text-danger small"></div>
+        </div>
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Đặt thuê</button>
+        </div>
+    </form>
+</div>
 </body>
 </html>

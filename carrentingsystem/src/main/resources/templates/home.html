@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/customer-layout :: layout(title='Trang chủ', content=~{::content})}">
 <body>
-
+<div th:fragment="content" class="text-center py-5">
+    <h1 class="display-4 text-secondary">Chào mừng đến CarRenting</h1>
+    <p class="lead text-muted">Hệ thống cho thuê xe cao cấp</p>
+</div>
 </body>
 </html>

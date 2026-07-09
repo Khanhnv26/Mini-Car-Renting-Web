@@ -1,38 +1,28 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Xe sẵn sàng</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}"/>
-</head>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/customer-layout :: layout(title='Xe sẵn sàng', content=~{::content})}">
 <body>
-<h1>Danh sách xe có thể thuê</h1>
-<a th:href="@{/customer/rent}">Thuê xe</a> |
-<a th:href="@{/customer/history}">Lịch sử</a> |
-<a th:href="@{/customer/profile}">Profile</a> |
-<a th:href="@{/logout}">Đăng xuất</a>
-<hr/>
-<table border="1">
-    <thead>
-    <tr>
-        <th>Tên xe</th>
-        <th>Năm</th>
-        <th>Màu</th>
-        <th>Sức chứa</th>
-        <th>Giá/ngày</th>
-        <th>Hãng</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="car : ${cars}">
-        <td th:text="${car.carName}"></td>
-        <td th:text="${car.carModelYear}"></td>
-        <td th:text="${car.color}"></td>
-        <td th:text="${car.capacity}"></td>
-        <td th:text="${car.rentPrice}"></td>
-        <td th:text="${car.carProducer.producerName}"></td>
-    </tr>
-    </tbody>
-</table>
+<div th:fragment="content">
+    <h1 class="h4 mb-4">Danh sách xe có thể thuê</h1>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        <div th:each="car : ${cars}" class="col">
+            <div class="card h-100 border">
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${car.carName}"></h5>
+                    <p class="card-text">
+                        <span class="d-block"><strong>Năm:</strong> <span th:text="${car.carModelYear}"></span></span>
+                        <span class="d-block"><strong>Màu:</strong> <span th:text="${car.color}"></span></span>
+                        <span class="d-block"><strong>Sức chứa:</strong> <span th:text="${car.capacity}"></span></span>
+                        <span class="d-block"><strong>Hãng:</strong> <span th:text="${car.carProducer.producerName}"></span></span>
+                    </p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="h5 text-primary" th:text="${car.rentPrice + '$/ngày'}"></span>
+                        <span class="badge bg-success" th:text="${car.status}"></span>
+                    </div>
+                    <a th:href="@{/customer/rent}" class="btn btn-outline-primary w-100 mt-3">Thuê ngay</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

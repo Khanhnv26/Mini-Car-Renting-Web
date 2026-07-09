@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequiredArgsConstructor
@@ -32,12 +33,14 @@ public class CarController {
     }
 
     @PostMapping("/save")
-    public String saveForm(@Valid @ModelAttribute("carDTO") CarDTO car, BindingResult bindingResult, Model model) {
+    public String saveForm(@Valid @ModelAttribute("carDTO") CarDTO car, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("producers", producerService.findAll());
             return "car/car-form";
         }
         carService.save(car);
+        redirectAttributes.addFlashAttribute("toastMessage", "Lưu xe thành công!");
+        redirectAttributes.addFlashAttribute("toastType", "success");
         return "redirect:/admin/cars";
     }
 
@@ -49,8 +52,10 @@ public class CarController {
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteForm(@PathVariable("id") Long id, Model model) {
+    public String deleteForm(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
         carService.deleteById(id);
+        redirectAttributes.addFlashAttribute("toastMessage", "Xóa xe thành công!");
+        redirectAttributes.addFlashAttribute("toastType", "success");
         return "redirect:/admin/cars";
     }
 

@@ -1,44 +1,51 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Báo cáo giao dịch</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}"/>
-</head>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/admin-layout :: layout(title='Báo cáo giao dịch', content=~{::content})}">
 <body>
-<h1>Báo cáo giao dịch theo khoảng thời gian</h1>
-<a th:href="@{/admin/rentals}">← Quay lại</a><br/><br/>
+<div th:fragment="content">
+    <h1 class="h4 mb-3">Báo cáo giao dịch theo khoảng thời gian</h1>
+    <a th:href="@{/admin/rentals}" class="btn btn-outline-secondary btn-sm mb-3">&larr; Quay lại</a>
 
-<form th:action="@{/admin/rentals/report}" method="post">
-    <div>Từ ngày: <input type="date" name="startDate" th:value="${startDate}"/></div><br/>
-    <div>Đến ngày: <input type="date" name="endDate" th:value="${endDate}"/></div><br/>
-    <button type="submit">Xem báo cáo</button>
-</form>
-<hr/>
-<table border="1" th:if="${rentals != null and !rentals.isEmpty()}">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Khách hàng</th>
-        <th>Xe</th>
-        <th>Ngày nhận</th>
-        <th>Ngày trả</th>
-        <th>Giá (giảm dần)</th>
-        <th>Trạng thái</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="r : ${rentals}">
-        <td th:text="${r.carRentID}"></td>
-        <td th:text="${r.customer.fullName}"></td>
-        <td th:text="${r.car.carName}"></td>
-        <td th:text="${r.pickUpDate}"></td>
-        <td th:text="${r.returnDate}"></td>
-        <td th:text="${r.rentPrice}"></td>
-        <td th:text="${r.status}"></td>
-    </tr>
-    </tbody>
-</table>
-<p th:if="${rentals != null and rentals.isEmpty()}">Không có giao dịch trong khoảng thời gian này.</p>
+    <form th:action="@{/admin/rentals/report}" method="post" class="row g-3 align-items-end border p-3 mb-4 rounded bg-light">
+        <div class="col-md-4">
+            <label class="form-label">Từ ngày</label>
+            <input type="date" name="startDate" class="form-control" th:value="${startDate}">
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Đến ngày</label>
+            <input type="date" name="endDate" class="form-control" th:value="${endDate}">
+        </div>
+        <div class="col-md-4">
+            <button type="submit" class="btn btn-primary">Xem báo cáo</button>
+        </div>
+    </form>
+
+    <div th:if="${rentals != null and !rentals.isEmpty()}">
+        <table class="table table-bordered table-hover">
+            <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>Khách hàng</th>
+                <th>Xe</th>
+                <th>Ngày nhận</th>
+                <th>Ngày trả</th>
+                <th>Giá</th>
+                <th>Trạng thái</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="r : ${rentals}">
+                <td th:text="${r.carRentID}"></td>
+                <td th:text="${r.customer.fullName}"></td>
+                <td th:text="${r.car.carName}"></td>
+                <td th:text="${r.pickUpDate}"></td>
+                <td th:text="${r.returnDate}"></td>
+                <td th:text="${r.rentPrice}"></td>
+                <td th:text="${r.status}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <p th:if="${rentals != null and rentals.isEmpty()}" class="text-muted">Không có giao dịch trong khoảng thời gian này.</p>
+</div>
 </body>
 </html>

@@ -1,54 +1,46 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Quản lý giao dịch thuê</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}"/>
-</head>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/admin-layout :: layout(title='Quản lý giao dịch', content=~{::content})}">
 <body>
-<h1>Danh sách giao dịch thuê</h1>
-<a th:href="@{/admin/cars}">Xe</a> |
-<a th:href="@{/admin/customers}">Khách hàng</a> |
-<a th:href="@{/admin/rentals/report}">Báo cáo</a> |
-<a th:href="@{/logout}">Đăng xuất</a>
-<hr/>
-<table border="1">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Khách hàng</th>
-        <th>Xe</th>
-        <th>Ngày nhận</th>
-        <th>Ngày trả</th>
-        <th>Giá</th>
-        <th>Trạng thái</th>
-        <th>Đổi trạng thái</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="r : ${rentals}">
-        <td th:text="${r.carRentID}"></td>
-        <td th:text="${r.customer.fullName}"></td>
-        <td th:text="${r.car.carName}"></td>
-        <td th:text="${r.pickUpDate}"></td>
-        <td th:text="${r.returnDate}"></td>
-        <td th:text="${r.rentPrice}"></td>
-        <td th:text="${r.status}"></td>
-        <td>
-            <div th:if="${r.status != 'Completed' and r.status != 'Cancelled'}">
-                <form th:action="@{/admin/rentals/status/{id}(id=${r.carRentID})}" method="post" style="display:inline;">
-                    <select name="status">
-                        <option value="Pending">Pending</option>
-                        <option value="Renting">Renting</option>
-                        <option value="Completed">Completed</option>
-                        <option value="Cancelled">Cancelled</option>
-                    </select>
-                    <button type="submit">Cập nhật</button>
-                </form>
-            </div>
-        </td>
-    </tr>
-    </tbody>
-</table>
+<div th:fragment="content">
+    <h1 class="h4 mb-3">Danh sách giao dịch thuê</h1>
+    <table class="table table-bordered table-hover">
+        <thead class="table-light">
+        <tr>
+            <th>ID</th>
+            <th>Khách hàng</th>
+            <th>Xe</th>
+            <th>Ngày nhận</th>
+            <th>Ngày trả</th>
+            <th>Giá</th>
+            <th>Trạng thái</th>
+            <th>Đổi trạng thái</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="r : ${rentals}">
+            <td th:text="${r.carRentID}"></td>
+            <td th:text="${r.customer.fullName}"></td>
+            <td th:text="${r.car.carName}"></td>
+            <td th:text="${r.pickUpDate}"></td>
+            <td th:text="${r.returnDate}"></td>
+            <td th:text="${r.rentPrice}"></td>
+            <td><span class="badge bg-info text-dark" th:text="${r.status}"></span></td>
+            <td>
+                <div th:if="${r.status != 'Completed' and r.status != 'Cancelled'}">
+                    <form th:action="@{/admin/rentals/status/{id}(id=${r.carRentID})}" method="post" class="d-flex gap-1">
+                        <select name="status" class="form-select form-select-sm" style="width: auto;">
+                            <option value="Pending">Pending</option>
+                            <option value="Renting">Renting</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-primary">Cập nhật</button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
 </body>
 </html>

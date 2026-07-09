@@ -1,39 +1,61 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Đăng ký</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}"/>
-</head>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/auth-layout :: layout(title='Đăng ký', content=~{::content})}">
 <body>
-<h1>Đăng ký tài khoản</h1>
-<div th:if="${error}" style="color:red;" th:text="${error}"></div>
+<div th:fragment="content">
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
-<form th:action="@{/register}" th:object="${registerDTO}" method="post">
-    <h3>Thông tin tài khoản</h3>
-    <div>Tên tài khoản: <input th:field="*{accountName}"/>
-        <span th:errors="*{accountName}" style="color:red;"></span></div><br/>
-    <div>Email: <input type="email" th:field="*{email}"/>
-        <span th:errors="*{email}" style="color:red;"></span></div><br/>
-    <div>Mật khẩu: <input type="password" th:field="*{password}"/>
-        <span th:errors="*{password}" style="color:red;"></span></div><br/>
+    <form th:action="@{/register}" th:object="${registerDTO}" method="post">
+        <h5 class="mb-3 text-secondary">Thông tin tài khoản</h5>
+        <div class="mb-3">
+            <label class="form-label">Tên tài khoản</label>
+            <input th:field="*{accountName}" class="form-control">
+            <div th:errors="*{accountName}" class="text-danger small"></div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" th:field="*{email}" class="form-control">
+            <div th:errors="*{email}" class="text-danger small"></div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Mật khẩu</label>
+            <input type="password" th:field="*{password}" class="form-control">
+            <div th:errors="*{password}" class="text-danger small"></div>
+        </div>
 
-    <h3>Thông tin cá nhân</h3>
-    <div>Họ tên: <input th:field="*{fullName}"/>
-        <span th:errors="*{fullName}" style="color:red;"></span></div><br/>
-    <div>SĐT: <input th:field="*{mobile}"/>
-        <span th:errors="*{mobile}" style="color:red;"></span></div><br/>
-    <div>Ngày sinh: <input type="date" th:field="*{birthDate}"/>
-        <span th:errors="*{birthDate}" style="color:red;"></span></div><br/>
-    <div>Số CCCD: <input th:field="*{identityCard}"/>
-        <span th:errors="*{identityCard}" style="color:red;"></span></div><br/>
-    <div>Số bằng lái: <input th:field="*{licenceNumber}"/>
-        <span th:errors="*{licenceNumber}" style="color:red;"></span></div><br/>
-    <div>Ngày cấp bằng: <input type="date" th:field="*{licenceDate}"/>
-        <span th:errors="*{licenceDate}" style="color:red;"></span></div><br/>
-
-    <button type="submit">Đăng ký</button>
-</form>
-<p><a th:href="@{/login}">Đã có tài khoản? Đăng nhập</a></p>
+        <h5 class="mb-3 text-secondary">Thông tin cá nhân</h5>
+        <div class="mb-3">
+            <label class="form-label">Họ tên</label>
+            <input th:field="*{fullName}" class="form-control">
+            <div th:errors="*{fullName}" class="text-danger small"></div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Số điện thoại</label>
+            <input th:field="*{mobile}" class="form-control">
+            <div th:errors="*{mobile}" class="text-danger small"></div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Ngày sinh</label>
+            <input type="date" th:field="*{birthDate}" class="form-control">
+            <div th:errors="*{birthDate}" class="text-danger small"></div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Số CCCD</label>
+            <input th:field="*{identityCard}" class="form-control">
+            <div th:errors="*{identityCard}" class="text-danger small"></div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Số bằng lái</label>
+            <input th:field="*{licenceNumber}" class="form-control">
+            <div th:errors="*{licenceNumber}" class="text-danger small"></div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Ngày cấp bằng</label>
+            <input type="date" th:field="*{licenceDate}" class="form-control">
+            <div th:errors="*{licenceDate}" class="text-danger small"></div>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Đăng ký</button>
+    </form>
+    <p class="text-center mt-3"><a th:href="@{/login}">Đã có tài khoản? Đăng nhập</a></p>
+</div>
 </body>
 </html>

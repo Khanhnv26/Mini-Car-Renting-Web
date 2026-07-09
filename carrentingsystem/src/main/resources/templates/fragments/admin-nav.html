@@ -1,0 +1,12 @@
+<nav th:fragment="sidebar" class="d-flex flex-column vh-100 p-3 position-fixed top-0 start-0 border-end bg-light"
+     style="width: 220px;">
+    <h5 class="mb-4 text-secondary">CarRenting</h5>
+    <ul class="nav flex-column">
+        <li class="nav-item"><a th:href="@{/admin/cars}" class="nav-link link-dark">Xe</a></li>
+        <li class="nav-item"><a th:href="@{/admin/producers}" class="nav-link link-dark">Hãng xe</a></li>
+        <li class="nav-item"><a th:href="@{/admin/customers}" class="nav-link link-dark">Khách hàng</a></li>
+        <li class="nav-item"><a th:href="@{/admin/rentals}" class="nav-link link-dark">Giao dịch</a></li>
+        <li class="nav-item"><a th:href="@{/admin/rentals/report}" class="nav-link link-dark">Báo cáo</a></li>
+        <li class="nav-item mt-4"><a th:href="@{/logout}" class="nav-link link-danger">Đăng xuất</a></li>
+    </ul>
+</nav>

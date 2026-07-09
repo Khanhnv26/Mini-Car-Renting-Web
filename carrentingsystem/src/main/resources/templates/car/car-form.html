@@ -1,45 +1,67 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Form xe</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}"/>
-</head>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/admin-layout :: layout(title='Form xe', content=~{::content})}">
 <body>
-<h1 th:text="${carDTO.carId != null} ? 'Sửa xe' : 'Thêm xe mới'"></h1>
-<a th:href="@{/admin/cars}">← Quay lại</a><br/><br/>
+<div th:fragment="content">
+    <h1 class="h4 mb-3" th:text="${carDTO.carId != null} ? 'Sửa xe' : 'Thêm xe mới'"></h1>
+    <a th:href="@{/admin/cars}" class="btn btn-outline-secondary btn-sm mb-3">&larr; Quay lại</a>
 
-<form th:action="@{/admin/cars/save}" th:object="${carDTO}" method="post">
-    <input type="hidden" th:field="*{carId}"/>
-    <div>Tên xe: <input th:field="*{carName}"/>
-        <span th:errors="*{carName}" style="color:red;"></span></div><br/>
-    <div>Năm: <input type="number" th:field="*{carModelYear}"/>
-        <span th:errors="*{carModelYear}" style="color:red;"></span></div><br/>
-    <div>Màu: <input th:field="*{color}"/>
-        <span th:errors="*{color}" style="color:red;"></span></div><br/>
-    <div>Sức chứa: <input type="number" th:field="*{capacity}"/>
-        <span th:errors="*{capacity}" style="color:red;"></span></div><br/>
-    <div>Mô tả: <textarea th:field="*{description}"></textarea>
-        <span th:errors="*{description}" style="color:red;"></span></div><br/>
-    <div>Ngày nhập: <input type="date" th:field="*{importDate}"/>
-        <span th:errors="*{importDate}" style="color:red;"></span></div><br/>
-    <div>Giá thuê: <input type="number" step="0.01" th:field="*{rentPrice}"/>
-        <span th:errors="*{rentPrice}" style="color:red;"></span></div><br/>
-    <div>Trạng thái:
-        <select th:field="*{status}">
-            <option value="Available">Available</option>
-            <option value="Rented">Rented</option>
-            <option value="Inactive">Inactive</option>
-        </select></div><br/>
-    <div>Hãng:
-        <select th:field="*{producerId}">
-            <option value="">-- Chọn hãng --</option>
-            <option th:each="p : ${producers}"
-                    th:value="${p.producerId}"
-                    th:text="${p.producerName}"></option>
-        </select>
-        <span th:errors="*{producerId}" style="color:red;"></span></div><br/>
-    <button type="submit">Lưu</button>
-</form>
+    <form th:action="@{/admin/cars/save}" th:object="${carDTO}" method="post" class="row g-3">
+        <input type="hidden" th:field="*{carId}">
+        <div class="col-md-6">
+            <label class="form-label">Tên xe</label>
+            <input th:field="*{carName}" class="form-control">
+            <div th:errors="*{carName}" class="text-danger small"></div>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Năm</label>
+            <input type="number" th:field="*{carModelYear}" class="form-control">
+            <div th:errors="*{carModelYear}" class="text-danger small"></div>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Màu</label>
+            <input th:field="*{color}" class="form-control">
+            <div th:errors="*{color}" class="text-danger small"></div>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Sức chứa</label>
+            <input type="number" th:field="*{capacity}" class="form-control">
+            <div th:errors="*{capacity}" class="text-danger small"></div>
+        </div>
+        <div class="col-md-9">
+            <label class="form-label">Mô tả</label>
+            <textarea th:field="*{description}" class="form-control" rows="3"></textarea>
+            <div th:errors="*{description}" class="text-danger small"></div>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Ngày nhập</label>
+            <input type="date" th:field="*{importDate}" class="form-control">
+            <div th:errors="*{importDate}" class="text-danger small"></div>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Giá thuê</label>
+            <input type="number" step="0.01" th:field="*{rentPrice}" class="form-control">
+            <div th:errors="*{rentPrice}" class="text-danger small"></div>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Trạng thái</label>
+            <select th:field="*{status}" class="form-select">
+                <option value="Available">Available</option>
+                <option value="Rented">Rented</option>
+                <option value="Inactive">Inactive</option>
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Hãng</label>
+            <select th:field="*{producerId}" class="form-select">
+                <option value="">-- Chọn hãng --</option>
+                <option th:each="p : ${producers}" th:value="${p.producerId}" th:text="${p.producerName}"></option>
+            </select>
+            <div th:errors="*{producerId}" class="text-danger small"></div>
+        </div>
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Lưu</button>
+        </div>
+    </form>
+</div>
 </body>
 </html>

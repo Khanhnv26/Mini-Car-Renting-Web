@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="layout(title, content)">
+<head th:replace="~{fragments/head :: head(title=${title})}"></head>
+<body class="d-flex justify-content-center align-items-center min-vh-100 bg-light">
+    <div class="text-center">
+        <div th:replace="${content}"></div>
+    </div>
+<div th:replace="~{fragments/toast :: toast}"></div>
+</body>
+</html>

@@ -1,22 +1,39 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Sửa Profile</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}"/>
-</head>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/customer-layout :: layout(title='Sửa hồ sơ', content=~{::content})}">
 <body>
-<h1>Sửa thông tin cá nhân</h1>
-<a th:href="@{/customer/profile}">← Quay lại</a><br/><br/>
+<div th:fragment="content">
+    <h1 class="h4 mb-3">Sửa thông tin cá nhân</h1>
+    <a th:href="@{/customer/profile}" class="btn btn-outline-secondary btn-sm mb-3">&larr; Quay lại</a>
 
-<form th:action="@{/customer/profile/edit}" th:object="${customer}" method="post">
-    <div>Họ tên: <input th:field="*{fullName}"/></div><br/>
-    <div>SĐT: <input th:field="*{mobile}"/></div><br/>
-    <div>Ngày sinh: <input type="date" th:field="*{birthday}"/></div><br/>
-    <div>CCCD: <input th:field="*{identityCard}"/></div><br/>
-    <div>Bằng lái: <input th:field="*{licenceNumber}"/></div><br/>
-    <div>Ngày cấp: <input type="date" th:field="*{licenceDate}"/></div><br/>
-    <button type="submit">Lưu</button>
-</form>
+    <form th:action="@{/customer/profile/edit}" th:object="${customer}" method="post" class="row g-3">
+        <div class="col-md-6">
+            <label class="form-label">Họ tên</label>
+            <input th:field="*{fullName}" class="form-control">
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Số điện thoại</label>
+            <input th:field="*{mobile}" class="form-control">
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Ngày sinh</label>
+            <input type="date" th:field="*{birthday}" class="form-control">
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">CCCD</label>
+            <input th:field="*{identityCard}" class="form-control">
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Bằng lái</label>
+            <input th:field="*{licenceNumber}" class="form-control">
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Ngày cấp</label>
+            <input type="date" th:field="*{licenceDate}" class="form-control">
+        </div>
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Lưu</button>
+        </div>
+    </form>
+</div>
 </body>
 </html>

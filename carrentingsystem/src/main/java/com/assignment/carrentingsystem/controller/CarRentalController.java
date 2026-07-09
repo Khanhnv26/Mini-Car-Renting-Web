@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequiredArgsConstructor
@@ -23,8 +24,10 @@ public class CarRentalController {
     }
 
     @PostMapping("/status/{id}")
-    public String updateStatus(@PathVariable("id") Long id, @RequestParam("status") String status) {
+    public String updateStatus(@PathVariable("id") Long id, @RequestParam("status") String status, RedirectAttributes redirectAttributes) {
         carRentalService.updateStatus(id, status);
+        redirectAttributes.addFlashAttribute("toastMessage", "Cập nhật trạng thái thành công!");
+        redirectAttributes.addFlashAttribute("toastType", "success");
         return "redirect:/admin/rentals";
     }
 

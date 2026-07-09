@@ -1,21 +1,23 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Đăng nhập</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}"/>
-</head>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/auth-layout :: layout(title='Đăng nhập', content=~{::content})}">
 <body>
-<h1>Đăng nhập</h1>
-<div th:if="${param.error}" style="color:red;">Sai email hoặc mật khẩu!</div>
-<div th:if="${param.logout}" style="color:green;">Đã đăng xuất!</div>
-<div th:if="${param.registered}" style="color:green;">Đăng ký thành công!</div>
+<div th:fragment="content">
+    <div th:if="${param.error}" class="alert alert-danger">Sai email hoặc mật khẩu!</div>
+    <div th:if="${param.logout}" class="alert alert-success">Đã đăng xuất!</div>
+    <div th:if="${param.registered}" class="alert alert-success">Đăng ký thành công!</div>
 
-<form th:action="@{/login}" method="post">
-    <div>Email: <input type="email" name="username" required/></div><br/>
-    <div>Mật khẩu: <input type="password" name="password" required/></div><br/>
-    <button type="submit">Đăng nhập</button>
-</form>
-<p><a th:href="@{/register}">Chưa có tài khoản? Đăng ký</a></p>
+    <form th:action="@{/login}" method="post">
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" name="username" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Mật khẩu</label>
+            <input type="password" name="password" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Đăng nhập</button>
+    </form>
+    <p class="text-center mt-3"><a th:href="@{/register}">Chưa có tài khoản? Đăng ký</a></p>
+</div>
 </body>
 </html>

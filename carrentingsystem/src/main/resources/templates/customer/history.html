@@ -1,58 +1,50 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Lịch sử thuê xe</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}"/>
-</head>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/customer-layout :: layout(title='Lịch sử thuê xe', content=~{::content})}">
 <body>
-<h1>Lịch sử thuê xe</h1>
-<a th:href="@{/customer/cars}">Xe</a> |
-<a th:href="@{/customer/rent}">Thuê xe</a> |
-<a th:href="@{/customer/profile}">Profile</a> |
-<a th:href="@{/logout}">Đăng xuất</a>
-<hr/>
-<div th:if="${error}" style="color:red;" th:text="${error}"></div>
+<div th:fragment="content">
+    <h1 class="h4 mb-3">Lịch sử thuê xe</h1>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
-<table border="1">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Xe</th>
-        <th>Ngày nhận</th>
-        <th>Ngày trả</th>
-        <th>Giá</th>
-        <th>Trạng thái</th>
-        <th>Đánh giá</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="r : ${rentals}">
-        <td th:text="${r.carRentID}"></td>
-        <td th:text="${r.car.carName}"></td>
-        <td th:text="${r.pickUpDate}"></td>
-        <td th:text="${r.returnDate}"></td>
-        <td th:text="${r.rentPrice}"></td>
-        <td th:text="${r.status}"></td>
-        <td>
-            <div th:if="${r.status == 'Completed'}">
-                <form th:action="@{/customer/review}" th:object="${reviewDTO}" method="post">
-                    <input type="hidden" th:field="*{carRentalId}" th:value="${r.carRentID}"/>
-                    <select th:field="*{reviewStar}">
-                        <option value="1">1⭐</option>
-                        <option value="2">2⭐</option>
-                        <option value="3">3⭐</option>
-                        <option value="4">4⭐</option>
-                        <option value="5" selected>5⭐</option>
-                    </select>
-                    <input type="text" th:field="*{comment}" placeholder="Nhận xét..."/>
-                    <span th:errors="*{comment}" style="color:red;"></span>
-                    <button type="submit">Gửi</button>
-                </form>
-            </div>
-        </td>
-    </tr>
-    </tbody>
-</table>
+    <table class="table table-bordered table-hover">
+        <thead class="table-light">
+        <tr>
+            <th>ID</th>
+            <th>Xe</th>
+            <th>Ngày nhận</th>
+            <th>Ngày trả</th>
+            <th>Giá</th>
+            <th>Trạng thái</th>
+            <th>Đánh giá</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="r : ${rentals}">
+            <td th:text="${r.carRentID}"></td>
+            <td th:text="${r.car.carName}"></td>
+            <td th:text="${r.pickUpDate}"></td>
+            <td th:text="${r.returnDate}"></td>
+            <td th:text="${r.rentPrice}"></td>
+            <td><span class="badge bg-info text-dark" th:text="${r.status}"></span></td>
+            <td>
+                <div th:if="${r.status == 'Completed'}">
+                    <form th:action="@{/customer/review}" th:object="${reviewDTO}" method="post" class="d-flex gap-1">
+                        <input type="hidden" th:field="*{carRentalId}" th:value="${r.carRentID}">
+                        <select th:field="*{reviewStar}" class="form-select form-select-sm" style="width: auto;">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5" selected>5</option>
+                        </select>
+                        <input type="text" th:field="*{comment}" class="form-control form-control-sm" placeholder="Nhận xét..." style="width: auto;">
+                        <div th:errors="*{comment}" class="text-danger small"></div>
+                        <button type="submit" class="btn btn-sm btn-primary">Gửi</button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
 </body>
 </html>

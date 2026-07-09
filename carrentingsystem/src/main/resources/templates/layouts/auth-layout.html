@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="layout(title, content)">
+<head th:replace="~{fragments/head :: head(title=${title})}"></head>
+<body class="bg-light">
+    <div class="container d-flex justify-content-center align-items-center min-vh-100">
+        <div class="card border" style="width: 100%; max-width: 460px;">
+            <div class="card-body p-4">
+                <div class="text-center mb-4">
+                    <h4 class="text-secondary">CarRenting</h4>
+                </div>
+                <div th:replace="${content}"></div>
+            </div>
+        </div>
+    </div>
+<div th:replace="~{fragments/toast :: toast}"></div>
+</body>
+</html>
