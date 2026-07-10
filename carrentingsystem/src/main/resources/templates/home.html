@@ -1,9 +1,27 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/customer-layout :: layout(title='Trang chủ', content=~{::content})}">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/public-layout :: layout(title='Trang chủ', content=~{::content})}">
 <body>
-<div th:fragment="content" class="text-center py-5">
-    <h1 class="display-4 text-secondary">Chào mừng đến CarRenting</h1>
-    <p class="lead text-muted">Hệ thống cho thuê xe cao cấp</p>
+<div th:fragment="content" class="d-flex flex-column justify-content-center align-items-center min-vh-100 text-center" style="margin-top: -80px;">
+    <div class="mb-5">
+        <h1 class="hero-slogan mb-3">Hành trình thanh lịch bắt đầu từ đây</h1>
+        <p class="text-muted fs-5">Trải nghiệm dịch vụ thuê xe cao cấp, tối giản và tinh tế.</p>
+    </div>
+    
+    <div class="card card-flat p-4" style="width: 100%; max-width: 800px;">
+        <form th:action="@{/login}" method="get" class="row g-3 align-items-end">
+            <div class="col-md-4 text-start">
+                <label class="form-label text-muted small">Ngày nhận</label>
+                <input type="date" class="form-control input-minimal py-2" required>
+            </div>
+            <div class="col-md-4 text-start">
+                <label class="form-label text-muted small">Ngày trả</label>
+                <input type="date" class="form-control input-minimal py-2" required>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-minimal w-100 py-2">Tìm kiếm xe</button>
+            </div>
+        </form>
+    </div>
 </div>
 </body>
 </html>

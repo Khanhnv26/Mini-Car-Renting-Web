@@ -3,9 +3,9 @@
 <head th:replace="~{fragments/head :: head(title=${title})}"></head>
 <body class="bg-white">
     <div th:replace="~{fragments/admin-nav :: sidebar}"></div>
-    <main class="p-4" style="margin-left: 220px; min-height: 100vh;">
+    <main class="p-4" style="margin-left: 240px; min-height: 100vh; background-color: #fbfbfb;">
         <div th:replace="${content}"></div>
     </main>
-<div th:replace="~{fragments/toast :: toast}"></div>
+    <div th:replace="~{fragments/toast :: toast}"></div>
 </body>
 </html>

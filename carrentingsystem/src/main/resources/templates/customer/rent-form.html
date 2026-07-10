@@ -1,34 +1,37 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/customer-layout :: layout(title='Thuê xe', content=~{::content})}">
 <body>
-<div th:fragment="content">
-    <h1 class="h4 mb-3">Thuê xe</h1>
-    <a th:href="@{/customer/cars}" class="btn btn-outline-secondary btn-sm mb-3">&larr; Quay lại</a>
-    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
-
-    <form th:action="@{/customer/rent}" th:object="${carRentalDTO}" method="post" class="row g-3">
-        <div class="col-12">
-            <label class="form-label">Chọn xe</label>
-            <select th:field="*{carId}" class="form-select">
-                <option value="">-- Chọn xe --</option>
-                <option th:each="car : ${cars}" th:value="${car.carId}" th:text="${car.carName + ' - ' + car.rentPrice + '$/ngày'}"></option>
-            </select>
-            <div th:errors="*{carId}" class="text-danger small"></div>
-        </div>
-        <div class="col-md-6">
-            <label class="form-label">Ngày nhận</label>
-            <input type="datetime-local" th:field="*{pickupDate}" class="form-control">
-            <div th:errors="*{pickupDate}" class="text-danger small"></div>
-        </div>
-        <div class="col-md-6">
-            <label class="form-label">Ngày trả</label>
-            <input type="datetime-local" th:field="*{returnDate}" class="form-control">
-            <div th:errors="*{returnDate}" class="text-danger small"></div>
-        </div>
-        <div class="col-12">
-            <button type="submit" class="btn btn-primary">Đặt thuê</button>
-        </div>
-    </form>
+<div th:fragment="content" class="max-w-4xl mx-auto">
+    <div class="mb-4">
+        <a th:href="@{/customer/cars}" class="btn btn-ghost px-0">&larr; Quay lại danh sách xe</a>
+    </div>
+    <div class="card card-flat p-4">
+        <h4 class="fw-light mb-4">Đăng ký thuê xe</h4>
+        <div th:if="${error}" class="alert alert-danger border-0 rounded-1 text-center small" th:text="${error}"></div>
+        <form th:action="@{/customer/rent}" th:object="${carRentalDTO}" method="post" class="row g-4">
+            <div class="col-12">
+                <label class="form-label text-muted small mb-1">Chọn xe</label>
+                <select th:field="*{carId}" class="form-select input-minimal py-2">
+                    <option value="">-- Chọn xe --</option>
+                    <option th:each="car : ${cars}" th:value="${car.carId}" th:text="${car.carName + ' - ' + car.rentPrice + '$/ngày'}"></option>
+                </select>
+                <div th:errors="*{carId}" class="text-danger small mt-1"></div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label text-muted small mb-1">Ngày nhận xe</label>
+                <input type="datetime-local" th:field="*{pickupDate}" class="form-control input-minimal py-2">
+                <div th:errors="*{pickupDate}" class="text-danger small mt-1"></div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label text-muted small mb-1">Ngày trả xe</label>
+                <input type="datetime-local" th:field="*{returnDate}" class="form-control input-minimal py-2">
+                <div th:errors="*{returnDate}" class="text-danger small mt-1"></div>
+            </div>
+            <div class="col-12 mt-4">
+                <button type="submit" class="btn btn-minimal py-2 px-5">Xác nhận đặt thuê</button>
+            </div>
+        </form>
+    </div>
 </div>
 </body>
 </html>

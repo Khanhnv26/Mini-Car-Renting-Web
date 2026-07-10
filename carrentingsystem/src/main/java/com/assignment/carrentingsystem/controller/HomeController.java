@@ -14,7 +14,7 @@ public class HomeController {
     @GetMapping("/")
     public String home(Authentication authentication) {
         if (authentication == null) {
-            return "redirect:/login";
+            return "home";
         }
 
         if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_Admin"))) {

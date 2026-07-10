@@ -1,2 +1,63 @@
-.badge { font-weight: 500; }
-.table th { white-space: nowrap; }
+:root {
+    --gold: #d4a04a;
+    --gold-light: #f5e6c8;
+    --gold-bg: #faf6f0;
+    --text-muted: #8c8c8c;
+}
+.form-control, .form-select {
+    border: 1px solid #e5e5e5;
+    border-radius: 0;
+    font-size: 0.9rem;
+    transition: border-color 0.2s;
+}
+.form-control:focus, .form-select:focus {
+    border-color: var(--gold);
+    box-shadow: none;
+}
+.input-minimal { border-radius: 0; border: 1px solid #e5e5e5; }
+.input-minimal:focus { border-color: var(--gold); box-shadow: none; }
+.btn-minimal {
+    background: var(--gold);
+    color: #fff;
+    border: none;
+    border-radius: 0;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+}
+.btn-minimal:hover { background: #c49430; color: #fff; }
+.btn-ghost { background: none; border: none; color: var(--text-muted); padding: 0; opacity: 1; }
+.btn-ghost:hover { color: var(--gold); opacity: 1; }
+.card-flat { border: 1px solid #eee; border-radius: 0; background: #fff; }
+.text-gold { color: var(--gold); }
+.border-top-gold { border-top: 3px solid var(--gold) !important; }
+.badge-soft-gold { background: var(--gold-light); color: #8a6d2b; font-weight: 400; }
+.badge-soft-gray { background: #f0f0f0; color: #666; font-weight: 400; }
+.table-minimal { border-collapse: collapse; }
+.table-minimal thead th {
+    border-bottom: 1px solid #e5e5e5;
+    color: var(--text-muted);
+    font-weight: 400;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 1rem 1.5rem;
+    border-top: none;
+    background: none;
+}
+.table-minimal tbody td { border-bottom: 1px solid #f0f0f0; padding: 1.25rem 1.5rem; border-top: none; }
+.table-minimal tbody tr:hover { background: #faf6f0; }
+.tab-minimal { border: none; color: var(--text-muted); padding: 0.5rem 1rem; font-weight: 400; }
+.tab-minimal.active { color: #333; border-bottom: 2px solid var(--gold); background: none; }
+.tab-minimal:hover { border-bottom: 2px solid var(--gold-light); }
+.sidebar-brand { color: var(--gold); font-weight: 400; letter-spacing: 1px; font-size: 1.1rem; padding: 0.5rem 1rem; }
+.sidebar-link { color: #666; padding: 0.5rem 1rem; font-size: 0.9rem; transition: color 0.2s; display: block; text-decoration: none; }
+.sidebar-link:hover { color: var(--gold); background: none; }
+.sidebar-link.active { color: var(--gold); border-left: 2px solid var(--gold); }
+.toast-gold { background: var(--gold); color: #fff; }
+.hero-slogan { font-size: 2.5rem; font-weight: 300; letter-spacing: -0.5px; color: #333; }
+.max-w-4xl { max-width: 56rem; }
+a { color: var(--gold); text-decoration: none; }
+.empty-state { padding: 3rem 1rem; text-align: center; color: #999; }
+.empty-state-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.5; }
+.modal-glass .modal-content { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: none; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+.modal-backdrop.show { backdrop-filter: blur(4px); background-color: rgba(0, 0, 0, 0.3); }

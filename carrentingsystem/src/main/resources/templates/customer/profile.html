@@ -2,42 +2,19 @@
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/customer-layout :: layout(title='Hồ sơ', content=~{::content})}">
 <body>
 <div th:fragment="content">
-    <div class="card border">
-        <div class="card-header bg-light">
-            <h5 class="mb-0">Thông tin cá nhân</h5>
-        </div>
-        <div class="card-body">
-            <table class="table table-borderless mb-0">
-                <tr>
-                    <th style="width: 140px;">Họ tên</th>
-                    <td th:text="${customer.fullName}"></td>
-                </tr>
-                <tr>
-                    <th>Số điện thoại</th>
-                    <td th:text="${customer.mobile}"></td>
-                </tr>
-                <tr>
-                    <th>Ngày sinh</th>
-                    <td th:text="${customer.birthday}"></td>
-                </tr>
-                <tr>
-                    <th>CCCD</th>
-                    <td th:text="${customer.identityCard}"></td>
-                </tr>
-                <tr>
-                    <th>Bằng lái</th>
-                    <td th:text="${customer.licenceNumber}"></td>
-                </tr>
-                <tr>
-                    <th>Ngày cấp</th>
-                    <td th:text="${customer.licenceDate}"></td>
-                </tr>
-                <tr>
-                    <th>Email</th>
-                    <td th:text="${customer.account.email}"></td>
-                </tr>
+    <div class="card card-flat">
+        <div class="card-body p-4">
+            <h5 class="fw-normal mb-4">Thông tin cá nhân</h5>
+            <table class="table table-borderless mb-0" style="max-width: 400px;">
+                <tr><td class="text-muted small" style="width: 120px;">Họ tên</td><td th:text="${customer.fullName}"></td></tr>
+                <tr><td class="text-muted small">SĐT</td><td th:text="${customer.mobile}"></td></tr>
+                <tr><td class="text-muted small">Ngày sinh</td><td th:text="${customer.birthday}"></td></tr>
+                <tr><td class="text-muted small">CCCD</td><td th:text="${customer.identityCard}"></td></tr>
+                <tr><td class="text-muted small">Bằng lái</td><td th:text="${customer.licenceNumber}"></td></tr>
+                <tr><td class="text-muted small">Ngày cấp</td><td th:text="${customer.licenceDate}"></td></tr>
+                <tr><td class="text-muted small">Email</td><td th:text="${customer.account.email}"></td></tr>
             </table>
-            <a th:href="@{/customer/profile/edit}" class="btn btn-primary btn-sm mt-3">Sửa thông tin</a>
+            <a th:href="@{/customer/profile/edit}" class="btn btn-minimal btn-sm py-1 px-3 mt-3">Sửa thông tin</a>
         </div>
     </div>
 </div>

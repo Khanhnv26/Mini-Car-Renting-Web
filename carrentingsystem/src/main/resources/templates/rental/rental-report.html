@@ -2,26 +2,28 @@
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/admin-layout :: layout(title='Báo cáo giao dịch', content=~{::content})}">
 <body>
 <div th:fragment="content">
-    <h1 class="h4 mb-3">Báo cáo giao dịch theo khoảng thời gian</h1>
-    <a th:href="@{/admin/rentals}" class="btn btn-outline-secondary btn-sm mb-3">&larr; Quay lại</a>
+    <h1 class="h5 fw-normal mb-3">Báo cáo giao dịch</h1>
+    <a th:href="@{/admin/rentals}" class="btn-ghost mb-3 d-inline-block">&larr; Quay lại</a>
 
-    <form th:action="@{/admin/rentals/report}" method="post" class="row g-3 align-items-end border p-3 mb-4 rounded bg-light">
-        <div class="col-md-4">
-            <label class="form-label">Từ ngày</label>
-            <input type="date" name="startDate" class="form-control" th:value="${startDate}">
-        </div>
-        <div class="col-md-4">
-            <label class="form-label">Đến ngày</label>
-            <input type="date" name="endDate" class="form-control" th:value="${endDate}">
-        </div>
-        <div class="col-md-4">
-            <button type="submit" class="btn btn-primary">Xem báo cáo</button>
-        </div>
-    </form>
+    <div class="card card-flat p-4 mb-4">
+        <form th:action="@{/admin/rentals/report}" method="post" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label text-muted small mb-1">Từ ngày</label>
+                <input type="date" name="startDate" class="form-control input-minimal py-2" th:value="${startDate}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label text-muted small mb-1">Đến ngày</label>
+                <input type="date" name="endDate" class="form-control input-minimal py-2" th:value="${endDate}">
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-minimal py-2 px-4">Xem báo cáo</button>
+            </div>
+        </form>
+    </div>
 
     <div th:if="${rentals != null and !rentals.isEmpty()}">
-        <table class="table table-bordered table-hover">
-            <thead class="table-light">
+        <table class="table table-minimal">
+            <thead>
             <tr>
                 <th>ID</th>
                 <th>Khách hàng</th>
@@ -39,13 +41,13 @@
                 <td th:text="${r.car.carName}"></td>
                 <td th:text="${r.pickUpDate}"></td>
                 <td th:text="${r.returnDate}"></td>
-                <td th:text="${r.rentPrice}"></td>
+                <td class="text-gold" th:text="${r.rentPrice}"></td>
                 <td th:text="${r.status}"></td>
             </tr>
             </tbody>
         </table>
     </div>
-    <p th:if="${rentals != null and rentals.isEmpty()}" class="text-muted">Không có giao dịch trong khoảng thời gian này.</p>
+    <p th:if="${rentals != null and rentals.isEmpty()}" class="text-muted small">Không có giao dịch trong khoảng thời gian này.</p>
 </div>
 </body>
 </html>

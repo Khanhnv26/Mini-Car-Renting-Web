@@ -1,43 +1,89 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/admin-layout :: layout(title='Quản lý xe', content=~{::content})}">
 <body>
-<div th:fragment="content">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="h4">Danh sách xe</h1>
-        <a th:href="@{/admin/cars/new}" class="btn btn-primary btn-sm">+ Thêm xe mới</a>
+<div th:fragment="content" class="px-2">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-light mb-0">Quản lý Xe</h4>
+        <a th:href="@{/admin/cars/new}" class="btn btn-minimal py-2 px-4">+ Thêm xe mới</a>
     </div>
-    <table class="table table-bordered table-hover">
-        <thead class="table-light">
-        <tr>
-            <th>ID</th>
-            <th>Tên xe</th>
-            <th>Năm</th>
-            <th>Màu</th>
-            <th>Sức chứa</th>
-            <th>Giá thuê</th>
-            <th>Trạng thái</th>
-            <th>Hãng</th>
-            <th>Hành động</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="car : ${cars}">
-            <td th:text="${car.carId}"></td>
-            <td th:text="${car.carName}"></td>
-            <td th:text="${car.carModelYear}"></td>
-            <td th:text="${car.color}"></td>
-            <td th:text="${car.capacity}"></td>
-            <td th:text="${car.rentPrice}"></td>
-            <td><span class="badge bg-success" th:text="${car.status}"></span></td>
-            <td th:text="${car.carProducer.producerName}"></td>
-            <td>
-                <a th:href="@{/admin/cars/edit/{id}(id=${car.carId})}" class="btn btn-sm btn-outline-primary">Sửa</a>
-                <a th:href="@{/admin/cars/delete/{id}(id=${car.carId})}" class="btn btn-sm btn-outline-danger"
-                   onclick="return confirm('Bạn chắc chắn?')">Xóa</a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+    
+    <div class="card card-flat p-0 overflow-hidden">
+        <div th:if="${#lists.isEmpty(cars)}" class="empty-state">
+            <h5 class="fw-light">Chưa có xe nào</h5>
+            <p class="text-muted small mb-0">Hãy bấm "Thêm xe mới" để tạo dữ liệu đầu tiên.</p>
+        </div>
+        
+        <div th:unless="${#lists.isEmpty(cars)}" class="table-responsive">
+            <table class="table table-minimal mb-0">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tên xe</th>
+                    <th>Năm</th>
+                    <th>Sức chứa</th>
+                    <th>Giá thuê</th>
+                    <th>Trạng thái</th>
+                    <th>Hãng</th>
+                    <th class="text-end">Hành động</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="car : ${cars}">
+                    <td class="text-muted" th:text="${car.carId}"></td>
+                    <td th:text="${car.carName}"></td>
+                    <td th:text="${car.carModelYear}"></td>
+                    <td th:text="${car.capacity} + ' chỗ'"></td>
+                    <td class="text-gold" th:text="${car.rentPrice} + '$'"></td>
+                    <td>
+                        <span th:if="${car.status == 'Available'}" class="badge badge-soft-gold py-2 px-3 rounded-pill">Sẵn sàng</span>
+                        <span th:if="${car.status == 'Rented'}" class="badge badge-soft-gray py-2 px-3 rounded-pill">Đang thuê</span>
+                        <span th:if="${car.status == 'Maintenance'}" class="badge badge-soft-gray py-2 px-3 rounded-pill">Bảo trì</span>
+                        <span th:if="${car.status == 'Inactive'}" class="badge badge-soft-gray py-2 px-3 rounded-pill">Ngừng hoạt động</span>
+                    </td>
+                    <td th:text="${car.carProducer.producerName}"></td>
+                    <td class="text-end">
+                        <a th:href="@{/admin/cars/edit/{id}(id=${car.carId})}" class="btn btn-ghost px-2 text-muted">Sửa</a>
+                        <button type="button" class="btn btn-ghost px-2 text-danger" 
+                                data-bs-toggle="modal" data-bs-target="#deleteModal" 
+                                th:attr="data-delete-url=@{/admin/cars/delete/{id}(id=${car.carId})}">
+                            Xóa
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal Xác nhận Xóa -->
+    <div class="modal fade modal-glass" id="deleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content p-3 text-center">
+                <div class="modal-body">
+                    <h5 class="fw-light mb-3">Xóa dữ liệu?</h5>
+                    <p class="text-muted small">Hành động này không thể hoàn tác. Bạn có chắc chắn muốn xóa?</p>
+                </div>
+                <div class="d-flex justify-content-center gap-2 pb-2">
+                    <button type="button" class="btn btn-ghost px-4" data-bs-dismiss="modal">Hủy</button>
+                    <a href="#" id="confirmDeleteBtn" class="btn btn-minimal px-4 bg-danger">Xóa luôn</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var deleteModal = document.getElementById('deleteModal');
+            if(deleteModal) {
+                deleteModal.addEventListener('show.bs.modal', function (event) {
+                    var button = event.relatedTarget;
+                    var url = button.getAttribute('data-delete-url');
+                    var confirmBtn = deleteModal.querySelector('#confirmDeleteBtn');
+                    confirmBtn.setAttribute('href', url);
+                });
+            }
+        });
+    </script>
 </div>
 </body>
 </html>

@@ -23,7 +23,7 @@ public class SecurityConfig {
                 .requestMatchers("/customer/**").hasRole("Customer")
                 .anyRequest().authenticated())
                 .formLogin(f -> f.loginPage("/login").defaultSuccessUrl("/", true).permitAll())
-                .logout(l -> l.logoutSuccessUrl("/login?logout").permitAll())
+                .logout(l -> l.logoutSuccessUrl("/").permitAll())
                 .csrf(c -> c.disable())
                 .userDetailsService(authService);
         return http.build();

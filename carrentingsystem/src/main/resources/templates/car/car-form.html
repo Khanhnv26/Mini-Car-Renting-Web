@@ -2,66 +2,68 @@
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/admin-layout :: layout(title='Form xe', content=~{::content})}">
 <body>
 <div th:fragment="content">
-    <h1 class="h4 mb-3" th:text="${carDTO.carId != null} ? 'Sửa xe' : 'Thêm xe mới'"></h1>
-    <a th:href="@{/admin/cars}" class="btn btn-outline-secondary btn-sm mb-3">&larr; Quay lại</a>
+    <h1 class="h5 fw-normal mb-3" th:text="${carDTO.carId != null} ? 'Sửa xe' : 'Thêm xe mới'"></h1>
+    <a th:href="@{/admin/cars}" class="btn-ghost mb-3 d-inline-block">&larr; Quay lại</a>
 
-    <form th:action="@{/admin/cars/save}" th:object="${carDTO}" method="post" class="row g-3">
-        <input type="hidden" th:field="*{carId}">
-        <div class="col-md-6">
-            <label class="form-label">Tên xe</label>
-            <input th:field="*{carName}" class="form-control">
-            <div th:errors="*{carName}" class="text-danger small"></div>
-        </div>
-        <div class="col-md-3">
-            <label class="form-label">Năm</label>
-            <input type="number" th:field="*{carModelYear}" class="form-control">
-            <div th:errors="*{carModelYear}" class="text-danger small"></div>
-        </div>
-        <div class="col-md-3">
-            <label class="form-label">Màu</label>
-            <input th:field="*{color}" class="form-control">
-            <div th:errors="*{color}" class="text-danger small"></div>
-        </div>
-        <div class="col-md-3">
-            <label class="form-label">Sức chứa</label>
-            <input type="number" th:field="*{capacity}" class="form-control">
-            <div th:errors="*{capacity}" class="text-danger small"></div>
-        </div>
-        <div class="col-md-9">
-            <label class="form-label">Mô tả</label>
-            <textarea th:field="*{description}" class="form-control" rows="3"></textarea>
-            <div th:errors="*{description}" class="text-danger small"></div>
-        </div>
-        <div class="col-md-4">
-            <label class="form-label">Ngày nhập</label>
-            <input type="date" th:field="*{importDate}" class="form-control">
-            <div th:errors="*{importDate}" class="text-danger small"></div>
-        </div>
-        <div class="col-md-4">
-            <label class="form-label">Giá thuê</label>
-            <input type="number" step="0.01" th:field="*{rentPrice}" class="form-control">
-            <div th:errors="*{rentPrice}" class="text-danger small"></div>
-        </div>
-        <div class="col-md-4">
-            <label class="form-label">Trạng thái</label>
-            <select th:field="*{status}" class="form-select">
-                <option value="Available">Available</option>
-                <option value="Rented">Rented</option>
-                <option value="Inactive">Inactive</option>
-            </select>
-        </div>
-        <div class="col-md-6">
-            <label class="form-label">Hãng</label>
-            <select th:field="*{producerId}" class="form-select">
-                <option value="">-- Chọn hãng --</option>
-                <option th:each="p : ${producers}" th:value="${p.producerId}" th:text="${p.producerName}"></option>
-            </select>
-            <div th:errors="*{producerId}" class="text-danger small"></div>
-        </div>
-        <div class="col-12">
-            <button type="submit" class="btn btn-primary">Lưu</button>
-        </div>
-    </form>
+    <div class="card card-flat p-4">
+        <form th:action="@{/admin/cars/save}" th:object="${carDTO}" method="post" class="row g-3">
+            <input type="hidden" th:field="*{carId}">
+            <div class="col-md-6">
+                <label class="form-label text-muted small mb-1">Tên xe</label>
+                <input th:field="*{carName}" class="form-control input-minimal py-2">
+                <div th:errors="*{carName}" class="text-danger small mt-1"></div>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-muted small mb-1">Năm</label>
+                <input type="number" th:field="*{carModelYear}" class="form-control input-minimal py-2">
+                <div th:errors="*{carModelYear}" class="text-danger small mt-1"></div>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-muted small mb-1">Màu</label>
+                <input th:field="*{color}" class="form-control input-minimal py-2">
+                <div th:errors="*{color}" class="text-danger small mt-1"></div>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-muted small mb-1">Sức chứa</label>
+                <input type="number" th:field="*{capacity}" class="form-control input-minimal py-2">
+                <div th:errors="*{capacity}" class="text-danger small mt-1"></div>
+            </div>
+            <div class="col-md-9">
+                <label class="form-label text-muted small mb-1">Mô tả</label>
+                <textarea th:field="*{description}" class="form-control input-minimal py-2" rows="3"></textarea>
+                <div th:errors="*{description}" class="text-danger small mt-1"></div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label text-muted small mb-1">Ngày nhập</label>
+                <input type="date" th:field="*{importDate}" class="form-control input-minimal py-2">
+                <div th:errors="*{importDate}" class="text-danger small mt-1"></div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label text-muted small mb-1">Giá thuê</label>
+                <input type="number" step="0.01" th:field="*{rentPrice}" class="form-control input-minimal py-2">
+                <div th:errors="*{rentPrice}" class="text-danger small mt-1"></div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label text-muted small mb-1">Trạng thái</label>
+                <select th:field="*{status}" class="form-select input-minimal py-2">
+                    <option value="Available">Available</option>
+                    <option value="Rented">Rented</option>
+                    <option value="Inactive">Inactive</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label text-muted small mb-1">Hãng</label>
+                <select th:field="*{producerId}" class="form-select input-minimal py-2">
+                    <option value="">-- Chọn hãng --</option>
+                    <option th:each="p : ${producers}" th:value="${p.producerId}" th:text="${p.producerName}"></option>
+                </select>
+                <div th:errors="*{producerId}" class="text-danger small mt-1"></div>
+            </div>
+            <div class="col-12 mt-4">
+                <button type="submit" class="btn btn-minimal py-2 px-5">Lưu</button>
+            </div>
+        </form>
+    </div>
 </div>
 </body>
 </html>
