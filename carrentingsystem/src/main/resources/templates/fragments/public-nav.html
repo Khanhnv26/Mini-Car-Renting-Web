@@ -1,0 +1,42 @@
+<nav th:fragment="topbar" id="publicNavbar" class="navbar navbar-expand-lg navbar-transparent sticky-top">
+    <div class="container d-flex justify-content-between align-items-center">
+        <a class="navbar-brand brand-minimal" th:href="@{/}">CarRenting</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarPublic" aria-controls="navbarPublic" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-center" id="navbarPublic">
+            <ul class="navbar-nav mb-2 mb-lg-0 gap-4">
+                <li class="nav-item">
+                    <a class="nav-link nav-link-minimal active" aria-current="page" th:href="@{/}">Trang chủ</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link nav-link-minimal" th:href="@{/customer/cars}">Dịch vụ xe</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link nav-link-minimal" th:href="@{/#}">Về chúng tôi</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link nav-link-minimal" th:href="@{/#}">Liên hệ</a>
+                </li>
+            </ul>
+        </div>
+        <div class="d-none d-lg-flex gap-3 align-items-center">
+            <a th:href="@{/login}" class="btn btn-ghost">Đăng nhập</a>
+            <a th:href="@{/register}" class="btn btn-outline-minimal">Đăng ký</a>
+        </div>
+    </div>
+</nav>
+<script th:fragment="navscript">
+    document.addEventListener("DOMContentLoaded", function() {
+        const navbar = document.getElementById('publicNavbar');
+        if(navbar) {
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+        }
+    });
+</script>

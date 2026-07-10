@@ -54,10 +54,90 @@
 .sidebar-link:hover { color: var(--gold); background: none; }
 .sidebar-link.active { color: var(--gold); border-left: 2px solid var(--gold); }
 .toast-gold { background: var(--gold); color: #fff; }
-.hero-slogan { font-size: 2.5rem; font-weight: 300; letter-spacing: -0.5px; color: #333; }
+.hero-slogan { font-size: 2.5rem; font-weight: 500; letter-spacing: -0.5px; }
 .max-w-4xl { max-width: 56rem; }
 a { color: var(--gold); text-decoration: none; }
 .empty-state { padding: 3rem 1rem; text-align: center; color: #999; }
 .empty-state-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.5; }
 .modal-glass .modal-content { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: none; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+.card-flat {
+    border: none;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+}
+
+.card-glass {
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+}
 .modal-backdrop.show { backdrop-filter: blur(4px); background-color: rgba(0, 0, 0, 0.3); }
+
+.glass-nav {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.navbar-transparent {
+    background: transparent;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+.navbar-transparent .brand-minimal, 
+.navbar-transparent .nav-link-minimal,
+.navbar-transparent .btn-ghost {
+    color: rgba(255, 255, 255, 0.9) !important;
+    transition: color 0.3s ease;
+}
+.navbar-transparent .nav-link-minimal:hover,
+.navbar-transparent .btn-ghost:hover {
+    color: #fff !important;
+}
+.navbar-transparent .btn-outline-minimal {
+    color: #fff !important;
+    border-color: rgba(255, 255, 255, 0.5) !important;
+    transition: all 0.3s ease;
+}
+.navbar-transparent .btn-outline-minimal:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #fff !important;
+}
+
+.navbar-transparent.scrolled {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+.navbar-transparent.scrolled .brand-minimal {
+    color: var(--gold) !important;
+}
+.navbar-transparent.scrolled .nav-link-minimal,
+.navbar-transparent.scrolled .btn-ghost {
+    color: var(--text-muted) !important;
+}
+.navbar-transparent.scrolled .nav-link-minimal.active,
+.navbar-transparent.scrolled .nav-link-minimal:hover,
+.navbar-transparent.scrolled .btn-ghost:hover {
+    color: var(--gold) !important;
+}
+.navbar-transparent.scrolled .btn-outline-minimal {
+    color: var(--gold) !important;
+    border-color: var(--gold) !important;
+}
+.navbar-transparent.scrolled .btn-outline-minimal:hover {
+    background: var(--gold);
+    color: #fff !important;
+}
+
+.bg-cinematic {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)), url('../images/bg.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
