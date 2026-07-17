@@ -20,7 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -155,8 +157,8 @@ public class CarRentalServiceImpl implements CarRentalService {
     }
 
     @Override
-    public java.util.Map<String, Long> countByStatusFiltered(LocalDateTime start, LocalDateTime end, String status, String keyword) {
-        java.util.Map<String, Long> result = new java.util.HashMap<>();
+    public Map<String, Long> countByStatusFiltered(LocalDateTime start, LocalDateTime end, String status, String keyword) {
+        Map<String, Long> result = new HashMap<>();
         result.put("Pending", 0L);
         result.put("Renting", 0L);
         result.put("Completed", 0L);

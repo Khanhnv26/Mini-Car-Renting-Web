@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -96,7 +97,7 @@ public class CarRentalController {
         BigDecimal totalRevenue = carRentalService.sumRentPriceFiltered(start, end, cleanStatus, cleanKeyword);
         long totalItems = reportPage.getTotalElements();
         BigDecimal averageRevenue = totalItems > 0
-                ? totalRevenue.divide(BigDecimal.valueOf(totalItems), 2, java.math.RoundingMode.HALF_UP)
+                ? totalRevenue.divide(BigDecimal.valueOf(totalItems), 2, RoundingMode.HALF_UP)
                 : BigDecimal.ZERO;
         var statusCounts = carRentalService.countByStatusFiltered(start, end, cleanStatus, cleanKeyword);
 

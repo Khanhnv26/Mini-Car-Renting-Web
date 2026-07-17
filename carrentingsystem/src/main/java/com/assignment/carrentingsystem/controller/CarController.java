@@ -13,6 +13,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.math.BigDecimal;
+
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/admin/cars")
@@ -26,8 +28,8 @@ public class CarController {
             @RequestParam(name = "name", required = false) String name,
             @RequestParam(name = "producerId", required = false) Long producerId,
             @RequestParam(name = "status", required = false) String status,
-            @RequestParam(name = "minPrice", required = false) java.math.BigDecimal minPrice,
-            @RequestParam(name = "maxPrice", required = false) java.math.BigDecimal maxPrice,
+            @RequestParam(name = "minPrice", required = false) BigDecimal minPrice,
+            @RequestParam(name = "maxPrice", required = false) BigDecimal maxPrice,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "sortBy", defaultValue = "carId") String sortBy,
             @RequestParam(name = "sortDir", defaultValue = "asc") String sortDir,

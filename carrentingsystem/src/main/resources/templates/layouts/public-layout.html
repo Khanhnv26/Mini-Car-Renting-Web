@@ -7,6 +7,6 @@
         <div th:replace="${content}"></div>
     </div>
     <div th:replace="~{fragments/toast :: toast}"></div>
-    <div th:replace="~{fragments/public-nav :: navscript}"></div>
+    <script th:src="@{/js/public-nav.js?v=8}"></script>
 </body>
 </html>

@@ -6,6 +6,7 @@ import com.assignment.carrentingsystem.service.AccountService;
 import com.assignment.carrentingsystem.service.CustomerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -27,8 +28,7 @@ public class CustomerController {
             @RequestParam(name = "sortBy", defaultValue = "customerId") String sortBy,
             @RequestParam(name = "sortDir", defaultValue = "asc") String sortDir,
             Model model) {
-        org.springframework.data.domain.Page<com.assignment.carrentingsystem.entity.Customer> customerPage = 
-            customerService.findPaginated(keyword, page, 5, sortBy, sortDir);
+        Page<Customer> customerPage = customerService.findPaginated(keyword, page, 5, sortBy, sortDir);
         model.addAttribute("customers", customerPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", customerPage.getTotalPages());

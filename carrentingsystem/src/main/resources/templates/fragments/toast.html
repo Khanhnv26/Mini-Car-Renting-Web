@@ -16,12 +16,4 @@
             </div>
         </div>
     </div>
-
-    <script th:if="${toastMessage}">
-        document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('.toast-app').forEach(function (el) {
-                bootstrap.Toast.getOrCreateInstance(el).show();
-            });
-        });
-    </script>
 </div>

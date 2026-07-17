@@ -1,22 +1,39 @@
 package com.assignment.carrentingsystem.controller;
 
 import com.assignment.carrentingsystem.dto.RentalRequest;
-import com.assignment.carrentingsystem.dto.CustomerDTO;
 import com.assignment.carrentingsystem.dto.ReviewDTO;
 import com.assignment.carrentingsystem.entity.Account;
+import com.assignment.carrentingsystem.entity.Car;
+import com.assignment.carrentingsystem.entity.CarRental;
 import com.assignment.carrentingsystem.entity.Customer;
-import com.assignment.carrentingsystem.service.*;
+import com.assignment.carrentingsystem.entity.Review;
+import com.assignment.carrentingsystem.service.AccountService;
+import com.assignment.carrentingsystem.service.CarRentalService;
+import com.assignment.carrentingsystem.service.CarService;
+import com.assignment.carrentingsystem.service.CustomerService;
+import com.assignment.carrentingsystem.service.ProducerService;
+import com.assignment.carrentingsystem.service.ReviewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -38,16 +55,16 @@ public class CustomerCarController {
 
     @GetMapping("/cars")
     public String listCars(
-            @org.springframework.web.bind.annotation.RequestParam(name = "name", required = false) String name,
-            @org.springframework.web.bind.annotation.RequestParam(name = "producerId", required = false) Long producerId,
-            @org.springframework.web.bind.annotation.RequestParam(name = "minPrice", required = false) java.math.BigDecimal minPrice,
-            @org.springframework.web.bind.annotation.RequestParam(name = "maxPrice", required = false) java.math.BigDecimal maxPrice,
-            @org.springframework.web.bind.annotation.RequestParam(name = "page", defaultValue = "0") int page,
-            @org.springframework.web.bind.annotation.RequestParam(name = "sortBy", defaultValue = "carId") String sortBy,
-            @org.springframework.web.bind.annotation.RequestParam(name = "sortDir", defaultValue = "asc") String sortDir,
+            @RequestParam(name = "name", required = false) String name,
+            @RequestParam(name = "producerId", required = false) Long producerId,
+            @RequestParam(name = "minPrice", required = false) BigDecimal minPrice,
+            @RequestParam(name = "maxPrice", required = false) BigDecimal maxPrice,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "sortBy", defaultValue = "carId") String sortBy,
+            @RequestParam(name = "sortDir", defaultValue = "asc") String sortDir,
             Model model) {
-        org.springframework.data.domain.Page<com.assignment.carrentingsystem.entity.Car> carPage = 
-            carService.findPaginated(name, producerId, "Available", minPrice, maxPrice, page, 6, sortBy, sortDir);
+        Page<Car> carPage = carService.findPaginated(
+                name, producerId, "Available", minPrice, maxPrice, page, 6, sortBy, sortDir);
         model.addAttribute("cars", carPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", carPage.getTotalPages());
@@ -64,10 +81,10 @@ public class CustomerCarController {
     }
 
     @GetMapping("/rent")
-    public String rentForm(@org.springframework.web.bind.annotation.RequestParam(name = "carId", required = false) Long carId, Model model) {
+    public String rentForm(@RequestParam(name = "carId", required = false) Long carId, Model model) {
         RentalRequest req = new RentalRequest();
         if (carId != null) {
-            req.setCarIds(java.util.List.of(carId));
+            req.setCarIds(List.of(carId));
         }
         model.addAttribute("rentalRequest", req);
         model.addAttribute("cars", carService.findByStatus("Available"));
@@ -75,7 +92,11 @@ public class CustomerCarController {
     }
 
     @PostMapping("/rent")
-    public String rent(@Valid @ModelAttribute("rentalRequest") RentalRequest request, BindingResult bindingResult, Model model, Authentication authentication, RedirectAttributes redirectAttributes) {
+    public String rent(@Valid @ModelAttribute("rentalRequest") RentalRequest request,
+                       BindingResult bindingResult,
+                       Model model,
+                       Authentication authentication,
+                       RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("cars", carService.findByStatus("Available"));
             return "customer/rent-form";
@@ -96,24 +117,25 @@ public class CustomerCarController {
 
     @GetMapping("/history")
     public String history(
-            @org.springframework.web.bind.annotation.RequestParam(name = "status", required = false) String status,
-            @org.springframework.web.bind.annotation.RequestParam(name = "startDate", required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate startDate,
-            @org.springframework.web.bind.annotation.RequestParam(name = "endDate", required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate endDate,
-            @org.springframework.web.bind.annotation.RequestParam(name = "page", defaultValue = "0") int page,
-            @org.springframework.web.bind.annotation.RequestParam(name = "sortBy", defaultValue = "carRentID") String sortBy,
-            @org.springframework.web.bind.annotation.RequestParam(name = "sortDir", defaultValue = "desc") String sortDir,
+            @RequestParam(name = "status", required = false) String status,
+            @RequestParam(name = "startDate", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(name = "endDate", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "sortBy", defaultValue = "carRentID") String sortBy,
+            @RequestParam(name = "sortDir", defaultValue = "desc") String sortDir,
             Model model,
             Authentication authentication) {
         Customer customer = getCurrentCustomer(authentication);
-        java.time.LocalDateTime start = (startDate != null) ? startDate.atStartOfDay() : null;
-        java.time.LocalDateTime end = (endDate != null) ? endDate.atTime(23, 59, 59) : null;
-        org.springframework.data.domain.Page<com.assignment.carrentingsystem.entity.CarRental> rentalPage =
-            carRentalService.findRentalsPaginated(customer.getCustomerId(), status, start, end, page, 5, sortBy, sortDir);
-        java.util.List<Long> rentalIds = rentalPage.getContent().stream()
-                .map(com.assignment.carrentingsystem.entity.CarRental::getCarRentID)
+        LocalDateTime start = (startDate != null) ? startDate.atStartOfDay() : null;
+        LocalDateTime end = (endDate != null) ? endDate.atTime(23, 59, 59) : null;
+        Page<CarRental> rentalPage = carRentalService.findRentalsPaginated(
+                customer.getCustomerId(), status, start, end, page, 5, sortBy, sortDir);
+        List<Long> rentalIds = rentalPage.getContent().stream()
+                .map(CarRental::getCarRentID)
                 .toList();
-        java.util.Map<Long, com.assignment.carrentingsystem.entity.Review> reviewsByRentalId =
-                reviewService.findByCarRentalIds(rentalIds);
+        Map<Long, Review> reviewsByRentalId = reviewService.findByCarRentalIds(rentalIds);
         model.addAttribute("rentals", rentalPage.getContent());
         model.addAttribute("reviewedRentalIds", reviewsByRentalId.keySet());
         model.addAttribute("reviewsByRentalId", reviewsByRentalId);
@@ -134,12 +156,11 @@ public class CustomerCarController {
 
     @GetMapping("/reviews")
     public String myReviews(
-            @org.springframework.web.bind.annotation.RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "page", defaultValue = "0") int page,
             Model model,
             Authentication authentication) {
         Customer customer = getCurrentCustomer(authentication);
-        org.springframework.data.domain.Page<com.assignment.carrentingsystem.entity.Review> reviewPage =
-                reviewService.findByCustomerIdPaginated(customer.getCustomerId(), page, 6);
+        Page<Review> reviewPage = reviewService.findByCustomerIdPaginated(customer.getCustomerId(), page, 6);
         model.addAttribute("reviews", reviewPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", reviewPage.getTotalPages());
@@ -160,10 +181,10 @@ public class CustomerCarController {
         return "customer/profile-form";
     }
 
-
     @PostMapping("/profile/edit")
     public String saveProfile(@ModelAttribute("customer") Customer customer,
-                              Authentication authentication, RedirectAttributes redirectAttributes) {
+                              Authentication authentication,
+                              RedirectAttributes redirectAttributes) {
         if (customer.getFullName() == null || customer.getFullName().isBlank()) {
             redirectAttributes.addFlashAttribute("toastMessage", "Tên không được để trống");
             redirectAttributes.addFlashAttribute("toastType", "error");
@@ -176,11 +197,14 @@ public class CustomerCarController {
     }
 
     @PostMapping("/review")
-    public String review(@Valid @ModelAttribute("reviewDTO") ReviewDTO reviewDTO, BindingResult bindingResult, Authentication authentication, RedirectAttributes redirectAttributes) {
+    public String review(@Valid @ModelAttribute("reviewDTO") ReviewDTO reviewDTO,
+                         BindingResult bindingResult,
+                         Authentication authentication,
+                         RedirectAttributes redirectAttributes) {
         Customer customer = getCurrentCustomer(authentication);
         if (bindingResult.hasErrors()) {
             String msg = bindingResult.getFieldErrors().stream()
-                    .map(org.springframework.validation.FieldError::getDefaultMessage)
+                    .map(FieldError::getDefaultMessage)
                     .filter(m -> m != null && !m.isBlank())
                     .findFirst()
                     .orElse("Dữ liệu đánh giá không hợp lệ");
@@ -200,8 +224,4 @@ public class CustomerCarController {
             return "redirect:/customer/history";
         }
     }
-
-
-
-
 }

@@ -27,17 +27,3 @@
         </div>
     </div>
 </nav>
-<script th:fragment="navscript">
-    document.addEventListener("DOMContentLoaded", function() {
-        const navbar = document.getElementById('publicNavbar');
-        if (navbar) {
-            window.addEventListener('scroll', function() {
-                if (window.scrollY > 50) {
-                    navbar.classList.add('scrolled');
-                } else {
-                    navbar.classList.remove('scrolled');
-                }
-            });
-        }
-    });
-</script>
