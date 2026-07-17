@@ -1,9 +1,11 @@
 package com.assignment.carrentingsystem.controller;
 
 import com.assignment.carrentingsystem.dto.CarProducerDTO;
+import com.assignment.carrentingsystem.entity.CarProducer;
 import com.assignment.carrentingsystem.service.ProducerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -18,8 +20,24 @@ public class ProducerController {
     private final ProducerService producerService;
 
     @GetMapping
-    public String listAll(Model model) {
-        model.addAttribute("producers", producerService.findAll());
+    public String listAll(
+            @RequestParam(name = "keyword", required = false) String keyword,
+            @RequestParam(name = "country", required = false) String country,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "sortBy", defaultValue = "producerId") String sortBy,
+            @RequestParam(name = "sortDir", defaultValue = "asc") String sortDir,
+            Model model) {
+        Page<CarProducer> producerPage = producerService.findPaginated(keyword, country, page, 5, sortBy, sortDir);
+        model.addAttribute("producers", producerPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", producerPage.getTotalPages());
+        model.addAttribute("totalItems", producerPage.getTotalElements());
+        model.addAttribute("sortBy", sortBy);
+        model.addAttribute("sortDir", sortDir);
+        model.addAttribute("reverseSortDir", "asc".equals(sortDir) ? "desc" : "asc");
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("selectedCountry", country);
+        model.addAttribute("countries", producerService.findCountries());
         return "producer/producer-list";
     }
 

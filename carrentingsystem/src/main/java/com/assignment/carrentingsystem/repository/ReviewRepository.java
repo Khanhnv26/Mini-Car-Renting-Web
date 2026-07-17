@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -18,4 +20,10 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @EntityGraph(attributePaths = {"carRental", "carRental.car", "carRental.customer"})
     Page<Review> findAllBy(Pageable pageable);
+
+    @EntityGraph(attributePaths = {"carRental", "carRental.car", "carRental.customer"})
+    Page<Review> findByCarRental_Customer_CustomerId(Long customerId, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"carRental", "carRental.car", "carRental.customer"})
+    List<Review> findByCarRental_CarRentIDIn(Collection<Long> carRentIds);
 }

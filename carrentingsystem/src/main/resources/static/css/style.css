@@ -508,12 +508,15 @@ a:hover {
 }
 
 .pagination-minimal .page-link {
-    color: rgba(255, 255, 255, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 6px;
-    background: rgba(255, 255, 255, 0.04);
-    padding: 0.375rem 0.75rem;
+    color: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.4rem 0.8rem;
+    min-width: 2.25rem;
+    text-align: center;
     font-size: 0.85rem;
+    font-weight: 500;
     transition: all 0.2s;
 }
 
@@ -527,17 +530,58 @@ a:hover {
     background: var(--gold);
     border-color: var(--gold);
     color: #fff !important;
+    box-shadow: 0 2px 10px rgba(212, 160, 74, 0.35);
 }
 
 .pagination-minimal .page-item.disabled .page-link {
-    color: rgba(255, 255, 255, 0.2);
-    background: rgba(255, 255, 255, 0.01);
-    border-color: rgba(255, 255, 255, 0.03);
+    color: rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.08);
     pointer-events: none;
 }
 
 .pagination-minimal .page-link:focus {
-    box-shadow: none;
+    box-shadow: 0 0 0 0.15rem rgba(212, 160, 74, 0.25);
+}
+
+.fleet-pagination {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.9rem 1.15rem;
+    border-radius: 12px;
+    background: rgba(18, 18, 18, 0.82);
+    border: 1px solid rgba(212, 160, 74, 0.28);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(12px);
+}
+
+.fleet-pagination-meta {
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 0.9rem;
+}
+
+.fleet-pagination-meta strong {
+    color: #fff;
+    font-weight: 600;
+}
+
+.fleet-pagination-dot {
+    margin: 0 0.35rem;
+    opacity: 0.45;
+}
+
+.fleet-page-nav {
+    margin-bottom: 0;
+}
+
+@media (max-width: 576px) {
+    .fleet-pagination {
+        flex-direction: column;
+        text-align: center;
+    }
 }
 
 body.bg-cinematic table,
@@ -722,8 +766,164 @@ select:-webkit-autofill:focus {
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
+.public-page-title {
+    font-size: clamp(1.5rem, 2.6vw, 1.9rem);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: #fff;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+}
+
+.public-page-sub {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.5;
+}
+
 .public-filter-bar {
-    border-color: rgba(212, 160, 74, 0.18) !important;
+    border-color: rgba(212, 160, 74, 0.32) !important;
+    background: rgba(18, 18, 18, 0.78) !important;
+    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.4);
+    padding: 1.15rem 1.25rem !important;
+}
+
+.public-filter-bar .public-filter-label,
+.public-filter-bar .form-label {
+    font-size: 0.92rem !important;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.88) !important;
+    letter-spacing: 0.02em;
+    margin-bottom: 0.4rem !important;
+}
+
+.public-filter-bar .form-control,
+.public-filter-bar .form-select,
+.public-filter-bar .input-minimal {
+    font-size: 0.98rem !important;
+    min-height: 2.65rem;
+    padding: 0.55rem 0.85rem !important;
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.public-filter-bar .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.45) !important;
+    font-size: 0.95rem;
+}
+
+.public-filter-bar .btn-minimal {
+    font-size: 0.98rem;
+    font-weight: 600;
+    min-height: 2.65rem;
+    padding: 0.55rem 1.1rem;
+    letter-spacing: 0.04em;
+}
+
+.public-filter-bar .price-filter-group {
+    min-height: 2.65rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.public-filter-bar .price-prefix {
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.public-filter-bar .price-filter-group .form-control {
+    min-height: 2.5rem;
+    font-size: 0.98rem !important;
+}
+
+.public-meta-row {
+    font-size: 0.98rem;
+}
+
+.public-meta-row .public-result-count {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.98rem;
+}
+
+.public-meta-row .public-result-count strong {
+    color: #fff;
+    font-weight: 600;
+}
+
+.public-meta-row .sort-label {
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 0.92rem;
+    font-weight: 500;
+}
+
+.public-meta-row .sort-chip {
+    font-size: 0.9rem !important;
+    padding: 0.4rem 0.85rem !important;
+    font-weight: 500;
+}
+
+.public-meta-row .btn-outline-minimal {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.9rem;
+}
+
+body.bg-cinematic .car-card .card-title {
+    font-size: 1.15rem;
+    font-weight: 500;
+}
+
+body.bg-cinematic .car-card .car-meta {
+    font-size: 0.92rem;
+    color: rgba(255, 255, 255, 0.72);
+}
+
+body.bg-cinematic .car-card .car-desc {
+    font-size: 0.92rem;
+}
+
+body.bg-cinematic .car-card .text-gold.fs-5 {
+    font-size: 1.3rem !important;
+    font-weight: 600;
+}
+
+.home-search-card .form-label {
+    font-size: 0.95rem !important;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.88) !important;
+}
+
+.home-search-card .form-control,
+.home-search-card .input-minimal {
+    font-size: 1rem !important;
+    min-height: 2.7rem;
+}
+
+.home-search-card .btn-minimal {
+    font-size: 1rem;
+    font-weight: 600;
+    min-height: 2.7rem;
+}
+
+body.bg-cinematic .hero-slogan {
+    font-size: clamp(2rem, 5vw, 2.75rem);
+    font-weight: 500;
+}
+
+body.bg-cinematic .navbar .brand-minimal {
+    font-size: 1.25rem;
+    font-weight: 500;
+}
+
+body.bg-cinematic .navbar .nav-link-minimal {
+    font-size: 0.98rem;
+    font-weight: 500;
+}
+
+body.bg-cinematic .review-comment {
+    font-size: 1rem;
+}
+
+body.bg-cinematic .review-card .small {
+    font-size: 0.92rem !important;
 }
 
 .price-filter {
@@ -850,4 +1050,127 @@ select:-webkit-autofill:focus {
     background: rgba(212, 160, 74, 0.15);
     color: #fff;
     border-color: var(--gold);
+}
+
+.app-page-title {
+    font-size: clamp(1.35rem, 2.2vw, 1.65rem);
+    font-weight: 500;
+    color: #fff;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.25rem;
+}
+
+.app-page-sub {
+    font-size: 0.98rem;
+    color: rgba(255, 255, 255, 0.78);
+    line-height: 1.5;
+}
+
+.app-shell .form-label,
+.app-shell label.form-label {
+    font-size: 0.92rem !important;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.app-shell .form-control,
+.app-shell .form-select,
+.app-shell .input-minimal {
+    font-size: 0.95rem !important;
+    min-height: 2.5rem;
+}
+
+.app-shell .form-control-sm,
+.app-shell .form-select-sm {
+    min-height: 2.45rem;
+    padding: 0.45rem 0.75rem;
+    font-size: 0.95rem !important;
+}
+
+.app-shell .table-minimal thead th {
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.65);
+}
+
+.app-shell .table-minimal tbody td {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.app-shell .text-muted,
+.app-shell .text-muted.small {
+    color: rgba(255, 255, 255, 0.72) !important;
+    font-size: 0.95rem !important;
+}
+
+.app-shell .empty-state h5,
+.app-shell .empty-state .fw-light {
+    font-size: 1.15rem;
+    font-weight: 500;
+    color: #fff;
+}
+
+.app-shell .sidebar-link {
+    font-size: 0.95rem;
+}
+
+.app-shell-customer .sidebar-link {
+    font-size: 0.98rem;
+}
+
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+@media (max-width: 992px) {
+    .stat-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 576px) {
+    .stat-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.stat-card {
+    border: 1px solid rgba(212, 160, 74, 0.28);
+    border-radius: 12px;
+    background: rgba(18, 18, 18, 0.78);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    padding: 1.1rem 1.2rem;
+    min-height: 110px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.stat-label {
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 0.5rem;
+    line-height: 1.35;
+}
+
+.stat-value {
+    font-size: clamp(1.35rem, 2.2vw, 1.7rem);
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.2;
+}
+
+.stat-value.stat-value-gold {
+    color: var(--gold);
+}
+
+.stat-hint {
+    margin-top: 0.45rem;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.55);
 }

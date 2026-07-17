@@ -3,7 +3,7 @@
 <head th:replace="~{fragments/head :: head(title=${title})}"></head>
 <body class="bg-cinematic-blur">
     <div th:replace="~{fragments/admin-nav :: sidebar}"></div>
-    <main class="p-4" style="margin-left: 240px; min-height: 100vh;">
+    <main class="app-shell app-shell-admin p-4" style="margin-left: 240px; min-height: 100vh;">
         <div th:replace="${content}"></div>
     </main>
     <div th:replace="~{fragments/toast :: toast}"></div>

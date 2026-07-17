@@ -3,8 +3,10 @@
 <body>
 <div th:fragment="content" class="max-w-5xl mx-auto py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="fw-light mb-0 text-white">Lịch sử thuê xe</h4>
-        <span class="text-muted small">Xem và đánh giá các giao dịch thuê xe của bạn</span>
+        <div>
+            <h1 class="app-page-title mb-1">Lịch sử thuê xe</h1>
+            <p class="app-page-sub mb-0">Xem và đánh giá các giao dịch thuê xe của bạn</p>
+        </div>
     </div>
     
     <div class="card card-flat p-4 mb-4">
@@ -62,12 +64,21 @@
                     <td>
                         <button type="button" class="btn btn-minimal btn-sm py-1 px-3"
                                 th:if="${r.status == 'Completed' and !#sets.contains(reviewedRentalIds, r.carRentID)}"
-                                data-bs-toggle="modal" data-bs-target="#reviewModal"
-                                th:attr="data-rental-id=${r.carRentID}">
+                                data-bs-toggle="modal"
+                                data-bs-target="#reviewModal"
+                                th:attr="data-rental-id=${r.carRentID}, onclick=|setReviewRentalId(${r.carRentID})|">
                             Viết đánh giá
                         </button>
-                        <span th:if="${r.status == 'Completed' and #sets.contains(reviewedRentalIds, r.carRentID)}"
-                              class="text-muted small">Đã đánh giá</span>
+                        <button type="button" class="btn btn-outline-minimal btn-sm py-1 px-3"
+                                th:if="${r.status == 'Completed' and #sets.contains(reviewedRentalIds, r.carRentID)}"
+                                data-bs-toggle="modal"
+                                data-bs-target="#viewReviewModal"
+                                th:attr="data-star=${reviewsByRentalId[r.carRentID].reviewStar},
+                                         data-comment=${reviewsByRentalId[r.carRentID].comment},
+                                         data-car=${r.car != null ? r.car.carName : '—'},
+                                         onclick=|showMyReview(this)|">
+                            Xem đánh giá
+                        </button>
                     </td>
                 </tr>
                 </tbody>
@@ -104,21 +115,23 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content p-4">
                 <h5 class="fw-light mb-4 text-white">Đánh giá dịch vụ</h5>
-                <form th:action="@{/customer/review}" th:object="${reviewDTO}" method="post">
-                    <input type="hidden" name="carRentalId" id="modalRentalId">
+                <form th:action="@{/customer/review}" method="post" id="reviewForm">
+                    <input type="hidden" name="carRentalId" id="modalRentalId" value="">
                     <div class="mb-3">
                         <label class="form-label text-muted small mb-1">Số sao</label>
-                        <select name="reviewStar" class="form-select input-minimal py-2">
-                            <option value="5" selected>⭐⭐⭐⭐⭐ (5 Sao)</option>
-                            <option value="4">⭐⭐⭐⭐ (4 Sao)</option>
-                            <option value="3">⭐⭐⭐ (3 Sao)</option>
-                            <option value="2">⭐⭐ (2 Sao)</option>
-                            <option value="1">⭐ (1 Sao)</option>
+                        <select name="reviewStar" id="reviewStar" class="form-select input-minimal py-2" required>
+                            <option value="5" selected>5 sao</option>
+                            <option value="4">4 sao</option>
+                            <option value="3">3 sao</option>
+                            <option value="2">2 sao</option>
+                            <option value="1">1 sao</option>
                         </select>
                     </div>
                     <div class="mb-4">
                         <label class="form-label text-muted small mb-1">Nhận xét của bạn</label>
-                        <textarea name="comment" class="form-control input-minimal py-2" rows="3" placeholder="Nhập ý kiến đánh giá về chiếc xe và dịch vụ..."></textarea>
+                        <textarea name="comment" id="reviewComment" class="form-control input-minimal py-2" rows="3"
+                                  maxlength="500" required
+                                  placeholder="Nhập ý kiến đánh giá về chiếc xe và dịch vụ..."></textarea>
                     </div>
                     <div class="d-flex justify-content-end gap-2">
                         <button type="button" class="btn btn-ghost px-4" data-bs-dismiss="modal">Hủy</button>
@@ -128,20 +141,91 @@
             </div>
         </div>
     </div>
-</div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var reviewModal = document.getElementById('reviewModal');
-        if(reviewModal) {
-            reviewModal.addEventListener('show.bs.modal', function (event) {
-                var button = event.relatedTarget;
-                var rentalId = button.getAttribute('data-rental-id');
-                var modalInput = reviewModal.querySelector('#modalRentalId');
-                modalInput.value = rentalId;
-            });
+    <div class="modal fade modal-glass" id="viewReviewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content p-4">
+                <h5 class="fw-light mb-3 text-white">Đánh giá của bạn</h5>
+                <div class="mb-2">
+                    <span class="text-muted small">Xe</span>
+                    <div class="text-white" id="viewReviewCar">—</div>
+                </div>
+                <div class="mb-2">
+                    <span class="text-muted small">Số sao</span>
+                    <div class="text-gold fw-medium" id="viewReviewStar">—</div>
+                </div>
+                <div class="mb-4">
+                    <span class="text-muted small">Nhận xét</span>
+                    <p class="text-light mb-0 mt-1" id="viewReviewComment">—</p>
+                </div>
+                <div class="text-end">
+                    <button type="button" class="btn btn-minimal px-4 py-2" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function setReviewRentalId(rentalId) {
+            var input = document.getElementById('modalRentalId');
+            if (input) {
+                input.value = rentalId || '';
+            }
+            var star = document.getElementById('reviewStar');
+            if (star) {
+                star.value = '5';
+            }
+            var comment = document.getElementById('reviewComment');
+            if (comment) {
+                comment.value = '';
+            }
         }
-    });
-</script>
+
+        function showMyReview(btn) {
+            if (!btn) return;
+            var star = btn.getAttribute('data-star') || '';
+            var comment = btn.getAttribute('data-comment') || '';
+            var car = btn.getAttribute('data-car') || '—';
+            var starEl = document.getElementById('viewReviewStar');
+            var commentEl = document.getElementById('viewReviewComment');
+            var carEl = document.getElementById('viewReviewCar');
+            if (starEl) starEl.textContent = star ? (star + ' sao') : '—';
+            if (commentEl) commentEl.textContent = comment || '—';
+            if (carEl) carEl.textContent = car;
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var reviewModal = document.getElementById('reviewModal');
+            if (reviewModal) {
+                reviewModal.addEventListener('show.bs.modal', function (event) {
+                    var button = event.relatedTarget;
+                    if (!button) return;
+                    var rentalId = button.getAttribute('data-rental-id');
+                    if (rentalId) {
+                        setReviewRentalId(rentalId);
+                    }
+                });
+            }
+
+            var viewModal = document.getElementById('viewReviewModal');
+            if (viewModal) {
+                viewModal.addEventListener('show.bs.modal', function (event) {
+                    showMyReview(event.relatedTarget);
+                });
+            }
+
+            var reviewForm = document.getElementById('reviewForm');
+            if (reviewForm) {
+                reviewForm.addEventListener('submit', function (e) {
+                    var idInput = document.getElementById('modalRentalId');
+                    if (!idInput || !String(idInput.value).trim()) {
+                        e.preventDefault();
+                        alert('Không xác định được mã thuê xe. Hãy đóng modal và bấm lại Viết đánh giá.');
+                    }
+                });
+            }
+        });
+    </script>
+</div>
 </body>
 </html>

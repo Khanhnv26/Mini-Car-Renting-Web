@@ -3,7 +3,7 @@
 <head th:replace="~{fragments/head :: head(title=${title})}"></head>
 <body class="bg-cinematic-blur">
     <div th:replace="~{fragments/customer-nav :: topbar}"></div>
-    <div class="container mt-4">
+    <div class="container app-shell app-shell-customer mt-4 pb-4">
         <div th:replace="${content}"></div>
     </div>
     <div th:replace="~{fragments/toast :: toast}"></div>

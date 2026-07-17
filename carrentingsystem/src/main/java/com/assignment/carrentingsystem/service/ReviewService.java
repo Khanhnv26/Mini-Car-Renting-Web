@@ -4,7 +4,9 @@ import com.assignment.carrentingsystem.dto.ReviewDTO;
 import com.assignment.carrentingsystem.entity.Review;
 import org.springframework.data.domain.Page;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface ReviewService {
@@ -19,4 +21,8 @@ public interface ReviewService {
     List<Review> findAll();
 
     Page<Review> findAllPaginated(int page, int size);
+
+    Page<Review> findByCustomerIdPaginated(Long customerId, int page, int size);
+
+    Map<Long, Review> findByCarRentalIds(Collection<Long> carRentalIds);
 }

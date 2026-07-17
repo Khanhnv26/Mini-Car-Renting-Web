@@ -9,11 +9,17 @@ import com.assignment.carrentingsystem.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -71,6 +77,25 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public Page<Review> findAllPaginated(int page, int size) {
-        return reviewRepository.findAllBy(PageRequest.of(page, size, org.springframework.data.domain.Sort.by("id").descending()));
+        return reviewRepository.findAllBy(PageRequest.of(page, size, Sort.by("id").descending()));
+    }
+
+    @Override
+    public Page<Review> findByCustomerIdPaginated(Long customerId, int page, int size) {
+        return reviewRepository.findByCarRental_Customer_CustomerId(
+                customerId, PageRequest.of(page, size, Sort.by("id").descending()));
+    }
+
+    @Override
+    public Map<Long, Review> findByCarRentalIds(Collection<Long> carRentalIds) {
+        if (carRentalIds == null || carRentalIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return reviewRepository.findByCarRental_CarRentIDIn(carRentalIds).stream()
+                .filter(r -> r.getCarRental() != null && r.getCarRental().getCarRentID() != null)
+                .collect(Collectors.toMap(
+                        r -> r.getCarRental().getCarRentID(),
+                        Function.identity(),
+                        (a, b) -> a));
     }
 }

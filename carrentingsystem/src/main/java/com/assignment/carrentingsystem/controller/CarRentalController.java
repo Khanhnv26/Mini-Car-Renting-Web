@@ -1,14 +1,18 @@
 package com.assignment.carrentingsystem.controller;
 
+import com.assignment.carrentingsystem.dto.RentalReportDTO;
 import com.assignment.carrentingsystem.service.CarRentalService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDate;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Controller
 @RequiredArgsConstructor
@@ -20,16 +24,32 @@ public class CarRentalController {
     @GetMapping
     public String listAll(
             @RequestParam(name = "status", required = false) String status,
-            @RequestParam(name = "startDate", required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate startDate,
-            @RequestParam(name = "endDate", required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate endDate,
+            @RequestParam(name = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(name = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "sortBy", defaultValue = "carRentID") String sortBy,
             @RequestParam(name = "sortDir", defaultValue = "asc") String sortDir,
             Model model) {
-        java.time.LocalDateTime start = (startDate != null) ? startDate.atStartOfDay() : null;
-        java.time.LocalDateTime end = (endDate != null) ? endDate.atTime(23, 59, 59) : null;
-        org.springframework.data.domain.Page<com.assignment.carrentingsystem.entity.CarRental> rentalPage = 
-            carRentalService.findRentalsPaginated(null, status, start, end, page, 5, sortBy, sortDir);
+
+        String filterStatus;
+        String selectedStatus;
+        if (status == null) {
+            filterStatus = "Pending";
+            selectedStatus = "Pending";
+        } else if (status.isBlank()) {
+            filterStatus = null;
+            selectedStatus = "";
+        } else {
+            filterStatus = status.trim();
+            selectedStatus = filterStatus;
+        }
+
+        LocalDateTime start = (startDate != null) ? startDate.atStartOfDay() : null;
+        LocalDateTime end = (endDate != null) ? endDate.atTime(23, 59, 59) : null;
+
+        var rentalPage = carRentalService.findRentalsPaginated(
+                null, filterStatus, start, end, page, 5, sortBy, sortDir);
+
         model.addAttribute("carRentals", rentalPage.getContent());
         model.addAttribute("rentals", rentalPage.getContent());
         model.addAttribute("currentPage", page);
@@ -37,8 +57,8 @@ public class CarRentalController {
         model.addAttribute("totalItems", rentalPage.getTotalElements());
         model.addAttribute("sortBy", sortBy);
         model.addAttribute("sortDir", sortDir);
-        model.addAttribute("reverseSortDir", sortDir.equals("asc") ? "desc" : "asc");
-        model.addAttribute("selectedStatus", status);
+        model.addAttribute("reverseSortDir", "asc".equals(sortDir) ? "desc" : "asc");
+        model.addAttribute("selectedStatus", selectedStatus);
         model.addAttribute("startDate", startDate);
         model.addAttribute("endDate", endDate);
         return "rental/rental-list";
@@ -58,17 +78,42 @@ public class CarRentalController {
     }
 
     @GetMapping("/report")
-    public String reportPage() {
-        return "rental/rental-report";
-    }
+    public String report(
+            @RequestParam(name = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(name = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(name = "status", required = false) String status,
+            @RequestParam(name = "keyword", required = false) String keyword,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            Model model) {
 
-    @PostMapping("/report")
-    public String report(@RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-                         @RequestParam("endDate")@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-                         Model model) {
-        model.addAttribute("rentals",carRentalService.findRentalReportByPickUpDateBetween(startDate.atStartOfDay(),endDate.atTime(23,59,59)));
-        model.addAttribute("startDate",startDate);
-        model.addAttribute("endDate",endDate);
+        LocalDateTime start = (startDate != null) ? startDate.atStartOfDay() : null;
+        LocalDateTime end = (endDate != null) ? endDate.atTime(23, 59, 59) : null;
+        String cleanStatus = (status != null && !status.isBlank()) ? status.trim() : null;
+        String cleanKeyword = (keyword != null && !keyword.isBlank()) ? keyword.trim() : null;
+
+        Page<RentalReportDTO> reportPage = carRentalService.findRentalReportPaginated(
+                start, end, cleanStatus, cleanKeyword, page, 10);
+        BigDecimal totalRevenue = carRentalService.sumRentPriceFiltered(start, end, cleanStatus, cleanKeyword);
+        long totalItems = reportPage.getTotalElements();
+        BigDecimal averageRevenue = totalItems > 0
+                ? totalRevenue.divide(BigDecimal.valueOf(totalItems), 2, java.math.RoundingMode.HALF_UP)
+                : BigDecimal.ZERO;
+        var statusCounts = carRentalService.countByStatusFiltered(start, end, cleanStatus, cleanKeyword);
+
+        model.addAttribute("rentals", reportPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", reportPage.getTotalPages());
+        model.addAttribute("totalItems", totalItems);
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
+        model.addAttribute("selectedStatus", cleanStatus != null ? cleanStatus : "");
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("totalRevenue", totalRevenue);
+        model.addAttribute("averageRevenue", averageRevenue);
+        model.addAttribute("pendingCount", statusCounts.getOrDefault("Pending", 0L));
+        model.addAttribute("rentingCount", statusCounts.getOrDefault("Renting", 0L));
+        model.addAttribute("completedCount", statusCounts.getOrDefault("Completed", 0L));
+        model.addAttribute("cancelledCount", statusCounts.getOrDefault("Cancelled", 0L));
         return "rental/rental-report";
     }
 }

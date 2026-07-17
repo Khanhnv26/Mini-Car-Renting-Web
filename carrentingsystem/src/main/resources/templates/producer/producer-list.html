@@ -3,25 +3,73 @@
 <body>
 <div th:fragment="content" class="px-2">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="fw-light mb-0">Hãng sản xuất</h4>
+        <h1 class="app-page-title mb-0">Hãng sản xuất</h1>
         <a th:href="@{/admin/producers/new}" class="btn btn-minimal py-2 px-4">+ Thêm mới</a>
     </div>
     <div th:if="${error}" class="alert alert-danger border-0 rounded-1 small mb-4" th:text="${error}"></div>
-    
+
+    <div class="card card-flat p-4 mb-4">
+        <form th:action="@{/admin/producers}" method="get" class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <label class="form-label mb-1">Tìm kiếm</label>
+                <input type="text" name="keyword" class="form-control input-minimal"
+                       placeholder="Tên hãng, địa chỉ hoặc quốc gia..." th:value="${keyword}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label mb-1">Quốc gia</label>
+                <select name="country" class="form-select">
+                    <option value="">Tất cả quốc gia</option>
+                    <option th:each="c : ${countries}"
+                            th:value="${c}"
+                            th:text="${c}"
+                            th:selected="${selectedCountry != null and selectedCountry == c}"></option>
+                </select>
+            </div>
+            <div class="col-md-2 d-grid">
+                <input type="hidden" name="sortBy" th:value="${sortBy}">
+                <input type="hidden" name="sortDir" th:value="${sortDir}">
+                <button type="submit" class="btn btn-minimal py-2">Lọc</button>
+            </div>
+            <div class="col-md-2 d-grid">
+                <a th:href="@{/admin/producers}" class="btn btn-outline-minimal py-2 text-center">Xóa lọc</a>
+            </div>
+        </form>
+    </div>
+
     <div class="card card-flat p-0 overflow-hidden">
         <div th:if="${#lists.isEmpty(producers)}" class="empty-state">
-            <h5 class="fw-light">Chưa có hãng sản xuất nào</h5>
-            <p class="text-muted small mb-0">Hãy bấm "Thêm mới" để tạo hãng xe đầu tiên.</p>
+            <h5>Không tìm thấy hãng sản xuất</h5>
+            <p class="app-page-sub mb-0">Thử đổi từ khóa tìm kiếm hoặc xóa bộ lọc.</p>
         </div>
-        
+
         <div th:unless="${#lists.isEmpty(producers)}" class="table-responsive">
             <table class="table table-minimal mb-0">
                 <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Tên hãng</th>
-                    <th>Địa chỉ</th>
-                    <th>Quốc gia</th>
+                    <th>
+                        <a class="text-decoration-none"
+                           th:href="@{/admin/producers(page=${currentPage}, keyword=${keyword}, country=${selectedCountry}, sortBy='producerId', sortDir=${reverseSortDir})}">
+                            ID <span th:if="${sortBy == 'producerId'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span>
+                        </a>
+                    </th>
+                    <th>
+                        <a class="text-decoration-none"
+                           th:href="@{/admin/producers(page=${currentPage}, keyword=${keyword}, country=${selectedCountry}, sortBy='producerName', sortDir=${reverseSortDir})}">
+                            Tên hãng <span th:if="${sortBy == 'producerName'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span>
+                        </a>
+                    </th>
+                    <th>
+                        <a class="text-decoration-none"
+                           th:href="@{/admin/producers(page=${currentPage}, keyword=${keyword}, country=${selectedCountry}, sortBy='address', sortDir=${reverseSortDir})}">
+                            Địa chỉ <span th:if="${sortBy == 'address'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span>
+                        </a>
+                    </th>
+                    <th>
+                        <a class="text-decoration-none"
+                           th:href="@{/admin/producers(page=${currentPage}, keyword=${keyword}, country=${selectedCountry}, sortBy='country', sortDir=${reverseSortDir})}">
+                            Quốc gia <span th:if="${sortBy == 'country'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span>
+                        </a>
+                    </th>
                     <th class="text-end">Hành động</th>
                 </tr>
                 </thead>
@@ -33,8 +81,8 @@
                     <td th:text="${p.country}"></td>
                     <td class="text-end">
                         <a th:href="@{/admin/producers/edit/{id}(id=${p.producerId})}" class="btn btn-ghost px-2 text-muted">Sửa</a>
-                        <button type="button" class="btn btn-ghost px-2 text-danger" 
-                                data-bs-toggle="modal" data-bs-target="#deleteModal" 
+                        <button type="button" class="btn btn-ghost px-2 text-danger"
+                                data-bs-toggle="modal" data-bs-target="#deleteModal"
                                 th:attr="data-delete-url=@{/admin/producers/delete/{id}(id=${p.producerId})}">
                             Xóa
                         </button>
@@ -43,14 +91,56 @@
                 </tbody>
             </table>
         </div>
+
+        <div th:if="${totalPages > 1}" class="card-footer d-flex justify-content-between align-items-center py-3">
+            <div class="text-muted">
+                Đang hiển thị dòng
+                <span th:text="${currentPage * 5 + 1}"></span>
+                -
+                <span th:text="${T(java.lang.Math).min((currentPage + 1) * 5L, totalItems)}"></span>
+                của tổng số
+                <span th:text="${totalItems}"></span> dòng
+            </div>
+            <nav aria-label="Page navigation">
+                <ul class="pagination pagination-sm pagination-minimal mb-0 gap-1">
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link"
+                           th:href="@{/admin/producers(page=0, keyword=${keyword}, country=${selectedCountry}, sortBy=${sortBy}, sortDir=${sortDir})}"
+                           aria-label="First">&laquo;</a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link"
+                           th:href="@{/admin/producers(page=${currentPage - 1}, keyword=${keyword}, country=${selectedCountry}, sortBy=${sortBy}, sortDir=${sortDir})}"
+                           aria-label="Previous">&lsaquo;</a>
+                    </li>
+                    <li class="page-item"
+                        th:each="i : ${#numbers.sequence(T(java.lang.Math).max(0, currentPage - 2), T(java.lang.Math).min(totalPages - 1, currentPage + 2))}"
+                        th:classappend="${currentPage == i} ? 'active'">
+                        <a class="page-link"
+                           th:href="@{/admin/producers(page=${i}, keyword=${keyword}, country=${selectedCountry}, sortBy=${sortBy}, sortDir=${sortDir})}"
+                           th:text="${i + 1}"></a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage >= totalPages - 1} ? 'disabled'">
+                        <a class="page-link"
+                           th:href="@{/admin/producers(page=${currentPage + 1}, keyword=${keyword}, country=${selectedCountry}, sortBy=${sortBy}, sortDir=${sortDir})}"
+                           aria-label="Next">&rsaquo;</a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage >= totalPages - 1} ? 'disabled'">
+                        <a class="page-link"
+                           th:href="@{/admin/producers(page=${totalPages - 1}, keyword=${keyword}, country=${selectedCountry}, sortBy=${sortBy}, sortDir=${sortDir})}"
+                           aria-label="Last">&raquo;</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
     </div>
 
     <div class="modal fade modal-glass" id="deleteModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-sm">
             <div class="modal-content p-3 text-center">
                 <div class="modal-body">
-                    <h5 class="fw-light mb-3">Xóa hãng xe?</h5>
-                    <p class="text-muted small">Hành động này không thể hoàn tác. Bạn có chắc chắn muốn xóa?</p>
+                    <h5 class="mb-3">Xóa hãng xe?</h5>
+                    <p class="text-muted">Hành động này không thể hoàn tác. Bạn có chắc chắn muốn xóa?</p>
                 </div>
                 <div class="d-flex justify-content-center gap-2 pb-2">
                     <button type="button" class="btn btn-ghost px-4" data-bs-dismiss="modal">Hủy</button>
@@ -59,11 +149,11 @@
             </div>
         </div>
     </div>
-    
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             var deleteModal = document.getElementById('deleteModal');
-            if(deleteModal) {
+            if (deleteModal) {
                 deleteModal.addEventListener('show.bs.modal', function (event) {
                     var button = event.relatedTarget;
                     var url = button.getAttribute('data-delete-url');

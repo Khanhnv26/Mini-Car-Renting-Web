@@ -47,7 +47,7 @@ public class CustomerCarController {
             @org.springframework.web.bind.annotation.RequestParam(name = "sortDir", defaultValue = "asc") String sortDir,
             Model model) {
         org.springframework.data.domain.Page<com.assignment.carrentingsystem.entity.Car> carPage = 
-            carService.findPaginated(name, producerId, "Available", minPrice, maxPrice, page, 5, sortBy, sortDir);
+            carService.findPaginated(name, producerId, "Available", minPrice, maxPrice, page, 6, sortBy, sortDir);
         model.addAttribute("cars", carPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", carPage.getTotalPages());
@@ -109,23 +109,42 @@ public class CustomerCarController {
         java.time.LocalDateTime end = (endDate != null) ? endDate.atTime(23, 59, 59) : null;
         org.springframework.data.domain.Page<com.assignment.carrentingsystem.entity.CarRental> rentalPage =
             carRentalService.findRentalsPaginated(customer.getCustomerId(), status, start, end, page, 5, sortBy, sortDir);
-        java.util.Set<Long> reviewedRentalIds = rentalPage.getContent().stream()
+        java.util.List<Long> rentalIds = rentalPage.getContent().stream()
                 .map(com.assignment.carrentingsystem.entity.CarRental::getCarRentID)
-                .filter(reviewService::existsByCarRentalId)
-                .collect(java.util.stream.Collectors.toSet());
+                .toList();
+        java.util.Map<Long, com.assignment.carrentingsystem.entity.Review> reviewsByRentalId =
+                reviewService.findByCarRentalIds(rentalIds);
         model.addAttribute("rentals", rentalPage.getContent());
-        model.addAttribute("reviewedRentalIds", reviewedRentalIds);
+        model.addAttribute("reviewedRentalIds", reviewsByRentalId.keySet());
+        model.addAttribute("reviewsByRentalId", reviewsByRentalId);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", rentalPage.getTotalPages());
         model.addAttribute("totalItems", rentalPage.getTotalElements());
         model.addAttribute("sortBy", sortBy);
         model.addAttribute("sortDir", sortDir);
         model.addAttribute("reverseSortDir", sortDir.equals("asc") ? "desc" : "asc");
-        model.addAttribute("reviewDTO", new ReviewDTO());
+        ReviewDTO reviewDTO = new ReviewDTO();
+        reviewDTO.setReviewStar(5);
+        model.addAttribute("reviewDTO", reviewDTO);
         model.addAttribute("selectedStatus", status);
         model.addAttribute("startDate", startDate);
         model.addAttribute("endDate", endDate);
         return "customer/history";
+    }
+
+    @GetMapping("/reviews")
+    public String myReviews(
+            @org.springframework.web.bind.annotation.RequestParam(name = "page", defaultValue = "0") int page,
+            Model model,
+            Authentication authentication) {
+        Customer customer = getCurrentCustomer(authentication);
+        org.springframework.data.domain.Page<com.assignment.carrentingsystem.entity.Review> reviewPage =
+                reviewService.findByCustomerIdPaginated(customer.getCustomerId(), page, 6);
+        model.addAttribute("reviews", reviewPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", reviewPage.getTotalPages());
+        model.addAttribute("totalItems", reviewPage.getTotalElements());
+        return "customer/my-reviews";
     }
 
     @GetMapping("/profile")
@@ -157,10 +176,15 @@ public class CustomerCarController {
     }
 
     @PostMapping("/review")
-    public String review(@Valid @ModelAttribute("reviewDTO") ReviewDTO reviewDTO, BindingResult bindingResult, Model model, Authentication authentication, RedirectAttributes redirectAttributes) {
+    public String review(@Valid @ModelAttribute("reviewDTO") ReviewDTO reviewDTO, BindingResult bindingResult, Authentication authentication, RedirectAttributes redirectAttributes) {
         Customer customer = getCurrentCustomer(authentication);
         if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("toastMessage", "Dữ liệu đánh giá không hợp lệ");
+            String msg = bindingResult.getFieldErrors().stream()
+                    .map(org.springframework.validation.FieldError::getDefaultMessage)
+                    .filter(m -> m != null && !m.isBlank())
+                    .findFirst()
+                    .orElse("Dữ liệu đánh giá không hợp lệ");
+            redirectAttributes.addFlashAttribute("toastMessage", msg);
             redirectAttributes.addFlashAttribute("toastType", "error");
             return "redirect:/customer/history";
         }

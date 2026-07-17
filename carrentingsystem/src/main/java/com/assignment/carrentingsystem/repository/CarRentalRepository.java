@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -32,6 +33,42 @@ public interface CarRentalRepository extends JpaRepository<CarRental, Long> {
                                           @Param("start") LocalDateTime start,
                                           @Param("end") LocalDateTime end,
                                           Pageable pageable);
+
+    @EntityGraph(attributePaths = {"customer", "car"})
+    @Query("SELECT cr FROM CarRental cr WHERE " +
+           "(:start IS NULL OR cr.pickUpDate >= :start) AND " +
+           "(:end IS NULL OR cr.pickUpDate <= :end) AND " +
+           "(:status IS NULL OR cr.status = :status) AND " +
+           "(:keyword IS NULL OR LOWER(cr.customer.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+           "OR LOWER(cr.car.carName) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+    Page<CarRental> findReportFiltered(@Param("start") LocalDateTime start,
+                                       @Param("end") LocalDateTime end,
+                                       @Param("status") String status,
+                                       @Param("keyword") String keyword,
+                                       Pageable pageable);
+
+    @Query("SELECT COALESCE(SUM(cr.rentPrice), 0) FROM CarRental cr WHERE " +
+           "(:start IS NULL OR cr.pickUpDate >= :start) AND " +
+           "(:end IS NULL OR cr.pickUpDate <= :end) AND " +
+           "(:status IS NULL OR cr.status = :status) AND " +
+           "(:keyword IS NULL OR LOWER(cr.customer.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+           "OR LOWER(cr.car.carName) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+    BigDecimal sumRentPriceFiltered(@Param("start") LocalDateTime start,
+                                    @Param("end") LocalDateTime end,
+                                    @Param("status") String status,
+                                    @Param("keyword") String keyword);
+
+    @Query("SELECT cr.status, COUNT(cr) FROM CarRental cr WHERE " +
+           "(:start IS NULL OR cr.pickUpDate >= :start) AND " +
+           "(:end IS NULL OR cr.pickUpDate <= :end) AND " +
+           "(:status IS NULL OR cr.status = :status) AND " +
+           "(:keyword IS NULL OR LOWER(cr.customer.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+           "OR LOWER(cr.car.carName) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+           "GROUP BY cr.status")
+    List<Object[]> countGroupByStatusFiltered(@Param("start") LocalDateTime start,
+                                              @Param("end") LocalDateTime end,
+                                              @Param("status") String status,
+                                              @Param("keyword") String keyword);
 
     @Query("SELECT CASE WHEN COUNT(cr) > 0 THEN true ELSE false END FROM CarRental cr " +
            "WHERE cr.car.carId = :carId " +

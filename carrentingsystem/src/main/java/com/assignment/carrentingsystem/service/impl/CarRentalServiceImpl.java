@@ -136,15 +136,55 @@ public class CarRentalServiceImpl implements CarRentalService {
     public List<RentalReportDTO> findRentalReportByPickUpDateBetween(LocalDateTime start, LocalDateTime end) {
         return carRentalRepository.findCarRentalByPickUpDate(start, end)
                 .stream()
-                .map(r -> new RentalReportDTO(
-                        r.getCarRentID(),
-                        r.getCustomer().getFullName(),
-                        r.getCar().getCarName(),
-                        r.getPickUpDate(),
-                        r.getReturnDate(),
-                        r.getRentPrice(),
-                        r.getStatus()))
+                .map(this::toReportDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<RentalReportDTO> findRentalReportPaginated(LocalDateTime start, LocalDateTime end, String status, String keyword, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("rentPrice").descending());
+        String cleanStatus = cleanText(status);
+        String cleanKeyword = cleanText(keyword);
+        return carRentalRepository.findReportFiltered(start, end, cleanStatus, cleanKeyword, pageable).map(this::toReportDTO);
+    }
+
+    @Override
+    public BigDecimal sumRentPriceFiltered(LocalDateTime start, LocalDateTime end, String status, String keyword) {
+        BigDecimal total = carRentalRepository.sumRentPriceFiltered(start, end, cleanText(status), cleanText(keyword));
+        return total != null ? total : BigDecimal.ZERO;
+    }
+
+    @Override
+    public java.util.Map<String, Long> countByStatusFiltered(LocalDateTime start, LocalDateTime end, String status, String keyword) {
+        java.util.Map<String, Long> result = new java.util.HashMap<>();
+        result.put("Pending", 0L);
+        result.put("Renting", 0L);
+        result.put("Completed", 0L);
+        result.put("Cancelled", 0L);
+        for (Object[] row : carRentalRepository.countGroupByStatusFiltered(start, end, cleanText(status), cleanText(keyword))) {
+            if (row[0] != null && row[1] != null) {
+                result.put(String.valueOf(row[0]), ((Number) row[1]).longValue());
+            }
+        }
+        return result;
+    }
+
+    private String cleanText(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        return value.trim();
+    }
+
+    private RentalReportDTO toReportDTO(CarRental r) {
+        return new RentalReportDTO(
+                r.getCarRentID(),
+                r.getCustomer() != null ? r.getCustomer().getFullName() : "—",
+                r.getCar() != null ? r.getCar().getCarName() : "—",
+                r.getPickUpDate(),
+                r.getReturnDate(),
+                r.getRentPrice(),
+                r.getStatus());
     }
 
     @Override

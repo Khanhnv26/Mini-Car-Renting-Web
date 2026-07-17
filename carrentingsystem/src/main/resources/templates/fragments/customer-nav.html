@@ -1,10 +1,11 @@
 <nav th:fragment="topbar" class="navbar navbar-expand-lg glass-nav sticky-top">
     <div class="container">
         <a class="navbar-brand sidebar-brand" th:href="@{/customer/cars}">CarRenting</a>
-        <div class="d-flex gap-3">
+        <div class="d-flex gap-3 flex-wrap align-items-center">
             <a th:href="@{/customer/cars}" class="sidebar-link py-1">Xe</a>
             <a th:href="@{/customer/rent}" class="sidebar-link py-1">Thuê</a>
             <a th:href="@{/customer/history}" class="sidebar-link py-1">Lịch sử</a>
+            <a th:href="@{/customer/reviews}" class="sidebar-link py-1">Đánh giá</a>
             <a th:href="@{/customer/profile}" class="sidebar-link py-1">Hồ sơ</a>
             <form th:action="@{/logout}" method="post" class="d-inline">
                 <button type="submit" class="sidebar-link py-1 text-danger border-0 bg-transparent">Đăng xuất</button>
