@@ -14,19 +14,22 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final AuthService authService;
+    private final LoginSuccessHandler loginSuccessHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(a -> a
-                .requestMatchers("/", "/register", "/login", "/css/**","/js/**","/images/**").permitAll()
+                .requestMatchers("/", "/cars", "/reviews", "/register", "/login", "/css/**", "/js/**", "/images/**").permitAll()
                 .requestMatchers("/admin/**").hasRole("Admin")
                 .requestMatchers("/customer/**").hasRole("Customer")
                 .anyRequest().authenticated())
-                .formLogin(f -> f.loginPage("/login").defaultSuccessUrl("/", true).permitAll())
+                .formLogin(f -> f
+                        .loginPage("/login")
+                        .successHandler(loginSuccessHandler)
+                        .permitAll())
                 .logout(l -> l.logoutSuccessUrl("/").permitAll())
                 .csrf(c -> c.disable())
                 .userDetailsService(authService);
         return http.build();
     }
-
 }

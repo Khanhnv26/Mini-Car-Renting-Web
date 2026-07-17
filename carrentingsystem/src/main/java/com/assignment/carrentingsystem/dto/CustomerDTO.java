@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
@@ -26,6 +27,7 @@ public class CustomerDTO {
     private String mobile;
 
     @NotNull(message = "Ngày sinh không được để trống")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate birthDate;
 
     @NotBlank(message = "Số CCCD không được để trống")
@@ -37,6 +39,7 @@ public class CustomerDTO {
     private String licenceNumber;
 
     @NotNull(message = "Ngày cấp bằng không được để trống")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate licenceDate;
 
     @NotNull(message = "Tài khoản không được trống")

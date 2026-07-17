@@ -6,18 +6,22 @@
         <h1 class="hero-slogan text-white mb-3" style="text-shadow: 0 2px 10px rgba(0,0,0,0.3);">Hành trình thanh lịch bắt đầu từ đây</h1>
         <p class="text-light opacity-75 fs-5" style="text-shadow: 0 1px 5px rgba(0,0,0,0.3);">Trải nghiệm dịch vụ thuê xe cao cấp, tối giản và tinh tế.</p>
     </div>
-    
-    <div class="card card-glass p-4" style="width: 100%; max-width: 800px;">
-        <form th:action="@{/login}" method="get" class="row g-3 align-items-end">
-            <div class="col-md-4 text-start">
+
+    <div class="card card-glass p-4" style="width: 100%; max-width: 900px;">
+        <form th:action="@{/cars}" method="get" class="row g-3 align-items-end">
+            <div class="col-md-3 text-start">
+                <label class="form-label text-muted small">Tên xe</label>
+                <input type="text" name="name" class="form-control input-minimal py-2" placeholder="Tìm theo tên...">
+            </div>
+            <div class="col-md-3 text-start">
                 <label class="form-label text-muted small">Ngày nhận</label>
-                <input type="date" class="form-control input-minimal py-2" required>
+                <input type="date" name="pickupDate" class="form-control input-minimal py-2">
             </div>
-            <div class="col-md-4 text-start">
+            <div class="col-md-3 text-start">
                 <label class="form-label text-muted small">Ngày trả</label>
-                <input type="date" class="form-control input-minimal py-2" required>
+                <input type="date" name="returnDate" class="form-control input-minimal py-2">
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <button type="submit" class="btn btn-minimal w-100 py-2">Tìm kiếm xe</button>
             </div>
         </form>

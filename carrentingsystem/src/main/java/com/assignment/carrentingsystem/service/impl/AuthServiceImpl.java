@@ -22,9 +22,8 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void register(RegisterForm user) {
-        if(accountRepository.existsByEmail(user.getEmail())) {
-            throw new UsernameNotFoundException("Email đã tồn tại");
-
+        if (accountRepository.existsByEmail(user.getEmail())) {
+            throw new RuntimeException("Email đã tồn tại");
         }
 
         Account account = new Account();

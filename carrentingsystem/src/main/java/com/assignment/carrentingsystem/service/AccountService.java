@@ -10,4 +10,6 @@ public interface AccountService {
     Account save(Account account);
     boolean existsByEmail(String email);
     List<Account> findAllCustomers();
+
+    List<Account> findAvailableCustomerAccounts(Long keepAccountId);
 }

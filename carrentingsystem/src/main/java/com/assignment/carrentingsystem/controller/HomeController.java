@@ -1,10 +1,10 @@
 package com.assignment.carrentingsystem.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
@@ -13,13 +13,20 @@ public class HomeController {
 
     @GetMapping("/")
     public String home(Authentication authentication) {
-        if (authentication == null) {
-            return "home";
+        if (isLoggedIn(authentication)) {
+            if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_Admin"))) {
+                return "redirect:/admin/cars";
+            }
+            if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_Customer"))) {
+                return "redirect:/customer/cars";
+            }
         }
+        return "home";
+    }
 
-        if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_Admin"))) {
-            return "redirect:/admin/cars";
-        }
-        return "redirect:/customer/cars";
+    private boolean isLoggedIn(Authentication authentication) {
+        return authentication != null
+                && authentication.isAuthenticated()
+                && !(authentication instanceof AnonymousAuthenticationToken);
     }
 }

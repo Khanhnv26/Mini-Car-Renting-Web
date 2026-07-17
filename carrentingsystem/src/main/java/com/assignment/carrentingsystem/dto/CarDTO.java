@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -39,6 +40,7 @@ public class CarDTO {
     private String description;
 
     @NotNull(message = "Ngày nhập không được để trống")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate importDate;
 
     @NotNull(message = "Hãng xe không được để trống")

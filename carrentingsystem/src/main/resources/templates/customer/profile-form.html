@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/customer-layout :: layout(title='Sửa hồ sơ', content=~{::content})}">
 <body>
-<div th:fragment="content" class="max-w-4xl mx-auto">
+<div th:fragment="content" class="mx-auto" style="max-width: 600px; padding: 1rem 0;">
     <div class="mb-4">
-        <a th:href="@{/customer/profile}" class="btn btn-ghost px-0">&larr; Quay lại hồ sơ</a>
+        <a th:href="@{/customer/profile}" class="btn btn-ghost px-0 text-muted">&larr; Quay lại hồ sơ</a>
     </div>
-    <div class="card card-flat p-4">
-        <h4 class="fw-light mb-4">Sửa thông tin cá nhân</h4>
+    <div class="card card-flat p-5">
+        <h4 class="fw-light mb-4 text-white">Sửa thông tin cá nhân</h4>
         <form th:action="@{/customer/profile/edit}" th:object="${customer}" method="post" class="row g-4">
             <div class="col-md-6">
                 <label class="form-label text-muted small mb-1">Họ tên</label>

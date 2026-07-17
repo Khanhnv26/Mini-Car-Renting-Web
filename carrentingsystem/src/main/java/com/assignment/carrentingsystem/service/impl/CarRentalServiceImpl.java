@@ -39,6 +39,11 @@ public class CarRentalServiceImpl implements CarRentalService {
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new RuntimeException("Khách hàng không tồn tại"));
 
+        if (request.getPickupDate() == null || request.getReturnDate() == null
+                || !request.getPickupDate().isBefore(request.getReturnDate())) {
+            throw new RuntimeException("Ngày nhận xe phải trước ngày trả xe");
+        }
+
         long days = Math.max(1, Duration.between(request.getPickupDate(), request.getReturnDate()).toDays());
 
         for (Long carId : request.getCarIds()) {
@@ -47,6 +52,12 @@ public class CarRentalServiceImpl implements CarRentalService {
 
             if (!"Available".equals(car.getStatus())) {
                 throw new RuntimeException("Xe " + car.getCarName() + " hiện không sẵn sàng cho thuê");
+            }
+
+            if (carRentalRepository.existsOverlappingRental(
+                    carId, request.getPickupDate(), request.getReturnDate())) {
+                throw new RuntimeException("Xe " + car.getCarName()
+                        + " đã có lịch thuê trùng khoảng thời gian đã chọn");
             }
 
             CarRental carRental = new CarRental();
@@ -96,15 +107,22 @@ public class CarRentalServiceImpl implements CarRentalService {
             throw new RuntimeException("Giao dịch đang chờ chỉ có thể chuyển sang Renting hoặc Cancelled");
         }
 
+        if ("Renting".equals(currentStatus)
+                && !"Completed".equals(status) && !"Cancelled".equals(status)) {
+            throw new RuntimeException("Giao dịch đang thuê chỉ có thể chuyển sang Completed hoặc Cancelled");
+        }
+
         carRental.setStatus(status);
 
         Car car = carRental.getCar();
-        if("Renting".equals(status)){
+        if ("Renting".equals(status)) {
             car.setStatus("Rented");
             carRepository.save(car);
-        } else if ("Completed".equals(status) || "Cancelled".equals(status)){
-            car.setStatus("Available");
-            carRepository.save(car);
+        } else if ("Completed".equals(status) || "Cancelled".equals(status)) {
+            if (!carRentalRepository.existsOtherActiveRental(car.getCarId(), carRental.getCarRentID())) {
+                car.setStatus("Available");
+                carRepository.save(car);
+            }
         }
         carRentalRepository.save(carRental);
     }
@@ -131,7 +149,13 @@ public class CarRentalServiceImpl implements CarRentalService {
 
     @Override
     public Page<CarRental> findRentalsPaginated(Long customerId, String status, LocalDateTime start, LocalDateTime end, int page, int size, String sortBy, String sortDir) {
-        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        String safeSortBy = switch (sortBy == null ? "" : sortBy) {
+            case "pickUpDate", "returnDate", "rentPrice", "status", "carRentID" -> sortBy;
+            default -> "carRentID";
+        };
+        Sort sort = "desc".equalsIgnoreCase(sortDir)
+                ? Sort.by(safeSortBy).descending()
+                : Sort.by(safeSortBy).ascending();
         Pageable pageable = PageRequest.of(page, size, sort);
         String cleanStatus = (status != null && !status.trim().isEmpty()) ? status.trim() : null;
         return carRentalRepository.findRentalsWithFilters(customerId, cleanStatus, start, end, pageable);

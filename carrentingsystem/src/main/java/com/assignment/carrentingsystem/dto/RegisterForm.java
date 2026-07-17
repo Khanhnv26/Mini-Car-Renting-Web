@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
@@ -38,6 +39,7 @@ public class RegisterForm {
     private String mobile;
 
     @NotNull(message = "Ngày sinh không được trống")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate birthday;
 
     @NotBlank(message = "Số CCCD không để trống")
@@ -49,6 +51,7 @@ public class RegisterForm {
     private String licenceNumber;
 
     @NotNull(message = "Ngày cấp bằng lái không được để trống")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate licenceDate;
 
 }

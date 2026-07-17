@@ -42,10 +42,11 @@
             <div class="col-md-6">
                 <label class="form-label text-muted small mb-1">Tài khoản</label>
                 <select th:field="*{accountId}" class="form-select input-minimal py-2">
-                    <option value="">-- Chọn tài khoản --</option>
+                    <option value="">-- Chọn tài khoản (chưa gán hồ sơ) --</option>
                     <option th:each="a : ${accounts}" th:value="${a.accountId}" th:text="${a.email}"></option>
                 </select>
                 <div th:errors="*{accountId}" class="text-danger small mt-1"></div>
+                <div class="text-muted small mt-1" th:if="${#lists.isEmpty(accounts)}">Không còn tài khoản Customer trống để gán.</div>
             </div>
             <div class="col-12 mt-4">
                 <button type="submit" class="btn btn-minimal py-2 px-5">Lưu</button>

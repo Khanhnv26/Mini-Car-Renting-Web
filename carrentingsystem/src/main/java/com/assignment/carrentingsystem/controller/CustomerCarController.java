@@ -64,8 +64,12 @@ public class CustomerCarController {
     }
 
     @GetMapping("/rent")
-    public String rentForm(Model model) {
-        model.addAttribute("rentalRequest", new RentalRequest());
+    public String rentForm(@org.springframework.web.bind.annotation.RequestParam(name = "carId", required = false) Long carId, Model model) {
+        RentalRequest req = new RentalRequest();
+        if (carId != null) {
+            req.setCarIds(java.util.List.of(carId));
+        }
+        model.addAttribute("rentalRequest", req);
         model.addAttribute("cars", carService.findByStatus("Available"));
         return "customer/rent-form";
     }
@@ -103,9 +107,14 @@ public class CustomerCarController {
         Customer customer = getCurrentCustomer(authentication);
         java.time.LocalDateTime start = (startDate != null) ? startDate.atStartOfDay() : null;
         java.time.LocalDateTime end = (endDate != null) ? endDate.atTime(23, 59, 59) : null;
-        org.springframework.data.domain.Page<com.assignment.carrentingsystem.entity.CarRental> rentalPage = 
+        org.springframework.data.domain.Page<com.assignment.carrentingsystem.entity.CarRental> rentalPage =
             carRentalService.findRentalsPaginated(customer.getCustomerId(), status, start, end, page, 5, sortBy, sortDir);
+        java.util.Set<Long> reviewedRentalIds = rentalPage.getContent().stream()
+                .map(com.assignment.carrentingsystem.entity.CarRental::getCarRentID)
+                .filter(reviewService::existsByCarRentalId)
+                .collect(java.util.stream.Collectors.toSet());
         model.addAttribute("rentals", rentalPage.getContent());
+        model.addAttribute("reviewedRentalIds", reviewedRentalIds);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", rentalPage.getTotalPages());
         model.addAttribute("totalItems", rentalPage.getTotalElements());
@@ -149,23 +158,22 @@ public class CustomerCarController {
 
     @PostMapping("/review")
     public String review(@Valid @ModelAttribute("reviewDTO") ReviewDTO reviewDTO, BindingResult bindingResult, Model model, Authentication authentication, RedirectAttributes redirectAttributes) {
+        Customer customer = getCurrentCustomer(authentication);
         if (bindingResult.hasErrors()) {
-            Customer customer = getCurrentCustomer(authentication);
-            model.addAttribute("rentals", carRentalService.findByCustomerId(customer.getCustomerId()));
-            return "customer/history";
+            redirectAttributes.addFlashAttribute("toastMessage", "Dữ liệu đánh giá không hợp lệ");
+            redirectAttributes.addFlashAttribute("toastType", "error");
+            return "redirect:/customer/history";
         }
 
         try {
-            reviewService.save(reviewDTO);
+            reviewService.save(reviewDTO, customer.getCustomerId());
             redirectAttributes.addFlashAttribute("toastMessage", "Gửi đánh giá thành công!");
             redirectAttributes.addFlashAttribute("toastType", "success");
             return "redirect:/customer/history";
         } catch (Exception e) {
-            Customer customer = getCurrentCustomer(authentication);
-            model.addAttribute("error", e.getMessage());
-            model.addAttribute("rentals", carRentalService.findByCustomerId(customer.getCustomerId()));
-            return "customer/history";
-
+            redirectAttributes.addFlashAttribute("toastMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("toastType", "error");
+            return "redirect:/customer/history";
         }
     }
 

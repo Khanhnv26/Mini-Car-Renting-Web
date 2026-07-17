@@ -13,6 +13,8 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     @Query("from Customer c where c.account.accountId =:accountId")
     Customer findByAccountId(@Param("accountId") Long accountId);
 
+    boolean existsByAccount_AccountId(Long accountId);
+
     @Query("SELECT c FROM Customer c WHERE " +
            "(:keyword IS NULL OR LOWER(c.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
            "LOWER(c.mobile) LIKE LOWER(CONCAT('%', :keyword, '%')))")

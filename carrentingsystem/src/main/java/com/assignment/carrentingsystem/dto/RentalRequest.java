@@ -8,6 +8,8 @@ import lombok.Setter;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -20,9 +22,11 @@ public class RentalRequest {
     private List<Long> carIds;
 
     @NotNull(message = "Ngày nhận xe không được để trống")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime pickupDate;
 
     @NotNull(message = "Ngày trả xe không được để trống")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime returnDate;
 
     @AssertTrue(message = "Ngày nhận xe phải trước ngày trả xe")

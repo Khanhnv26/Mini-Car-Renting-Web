@@ -46,9 +46,14 @@ public class CarRentalController {
 
     @PostMapping("/status/{id}")
     public String updateStatus(@PathVariable("id") Long id, @RequestParam("status") String status, RedirectAttributes redirectAttributes) {
-        carRentalService.updateStatus(id, status);
-        redirectAttributes.addFlashAttribute("toastMessage", "Cập nhật trạng thái thành công!");
-        redirectAttributes.addFlashAttribute("toastType", "success");
+        try {
+            carRentalService.updateStatus(id, status);
+            redirectAttributes.addFlashAttribute("toastMessage", "Cập nhật trạng thái thành công!");
+            redirectAttributes.addFlashAttribute("toastType", "success");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("toastMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("toastType", "error");
+        }
         return "redirect:/admin/rentals";
     }
 

@@ -44,14 +44,15 @@ public class CustomerController {
     @GetMapping("/new")
     public String createForm(Model model) {
         model.addAttribute("customerDTO", new CustomerDTO());
-        model.addAttribute("accounts", accountService.findAllCustomers());
+        model.addAttribute("accounts", accountService.findAvailableCustomerAccounts(null));
         return "customer/customer-form";
     }
 
     @PostMapping("/save")
     public String save(@Valid @ModelAttribute("customerDTO") CustomerDTO customerDTO, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+        Long keepAccountId = customerDTO.getAccountId();
         if (bindingResult.hasErrors()) {
-            model.addAttribute("accounts", accountService.findAllCustomers());
+            model.addAttribute("accounts", accountService.findAvailableCustomerAccounts(keepAccountId));
             return "customer/customer-form";
         }
 
@@ -61,7 +62,7 @@ public class CustomerController {
             redirectAttributes.addFlashAttribute("toastType", "success");
             return "redirect:/admin/customers";
         } catch (Exception e) {
-            model.addAttribute("accounts", accountService.findAllCustomers());
+            model.addAttribute("accounts", accountService.findAvailableCustomerAccounts(keepAccountId));
             model.addAttribute("error", e.getMessage());
             return "customer/customer-form";
         }
@@ -69,8 +70,9 @@ public class CustomerController {
 
     @GetMapping("/edit/{id}")
     public String editForm(@PathVariable("id") Long id, Model model) {
-        model.addAttribute("customerDTO", customerService.findDTOById(id));
-        model.addAttribute("accounts", accountService.findAllCustomers());
+        CustomerDTO dto = customerService.findDTOById(id);
+        model.addAttribute("customerDTO", dto);
+        model.addAttribute("accounts", accountService.findAvailableCustomerAccounts(dto.getAccountId()));
         return "customer/customer-form";
     }
 

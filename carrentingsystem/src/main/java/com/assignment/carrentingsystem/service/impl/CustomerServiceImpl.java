@@ -72,7 +72,16 @@ public class CustomerServiceImpl implements CustomerService {
         if (customerDTO.getCustomerId() != null) {
             customer = customerRepository.findById(customerDTO.getCustomerId())
                     .orElseThrow(() -> new RuntimeException("Khách hàng không tồn tại"));
+            Long currentAccountId = customer.getAccount() != null ? customer.getAccount().getAccountId() : null;
+            if (customerDTO.getAccountId() != null
+                    && !customerDTO.getAccountId().equals(currentAccountId)
+                    && customerRepository.existsByAccount_AccountId(customerDTO.getAccountId())) {
+                throw new RuntimeException("Tài khoản này đã được gán cho khách hàng khác");
+            }
         } else {
+            if (customerRepository.existsByAccount_AccountId(customerDTO.getAccountId())) {
+                throw new RuntimeException("Tài khoản này đã có hồ sơ khách hàng");
+            }
             customer = new Customer();
         }
         return customerRepository.save(toEntity(customerDTO, customer));

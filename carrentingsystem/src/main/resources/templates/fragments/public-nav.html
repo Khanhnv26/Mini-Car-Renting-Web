@@ -5,20 +5,21 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse justify-content-center" id="navbarPublic">
-            <ul class="navbar-nav mb-2 mb-lg-0 gap-4">
+            <ul class="navbar-nav mb-2 mb-lg-0 gap-lg-4">
                 <li class="nav-item">
-                    <a class="nav-link nav-link-minimal active" aria-current="page" th:href="@{/}">Trang chủ</a>
+                    <a class="nav-link nav-link-minimal" th:href="@{/}">Trang chủ</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link nav-link-minimal" th:href="@{/customer/cars}">Dịch vụ xe</a>
+                    <a class="nav-link nav-link-minimal" th:href="@{/cars}">Dịch vụ thuê</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link nav-link-minimal" th:href="@{/#}">Về chúng tôi</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link nav-link-minimal" th:href="@{/#}">Liên hệ</a>
+                    <a class="nav-link nav-link-minimal" th:href="@{/reviews}">Đánh giá</a>
                 </li>
             </ul>
+            <div class="d-flex d-lg-none flex-column gap-2 mt-3 pb-2">
+                <a th:href="@{/login}" class="btn btn-ghost text-start">Đăng nhập</a>
+                <a th:href="@{/register}" class="btn btn-outline-minimal">Đăng ký</a>
+            </div>
         </div>
         <div class="d-none d-lg-flex gap-3 align-items-center">
             <a th:href="@{/login}" class="btn btn-ghost">Đăng nhập</a>
@@ -29,7 +30,7 @@
 <script th:fragment="navscript">
     document.addEventListener("DOMContentLoaded", function() {
         const navbar = document.getElementById('publicNavbar');
-        if(navbar) {
+        if (navbar) {
             window.addEventListener('scroll', function() {
                 if (window.scrollY > 50) {
                     navbar.classList.add('scrolled');

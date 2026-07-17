@@ -63,10 +63,16 @@ public class CarController {
             model.addAttribute("producers", producerService.findAll());
             return "car/car-form";
         }
-        carService.save(car);
-        redirectAttributes.addFlashAttribute("toastMessage", "Lưu xe thành công!");
-        redirectAttributes.addFlashAttribute("toastType", "success");
-        return "redirect:/admin/cars";
+        try {
+            carService.save(car);
+            redirectAttributes.addFlashAttribute("toastMessage", "Lưu xe thành công!");
+            redirectAttributes.addFlashAttribute("toastType", "success");
+            return "redirect:/admin/cars";
+        } catch (Exception e) {
+            model.addAttribute("producers", producerService.findAll());
+            model.addAttribute("error", e.getMessage());
+            return "car/car-form";
+        }
     }
 
     @GetMapping("/edit/{id}")
@@ -78,9 +84,19 @@ public class CarController {
 
     @GetMapping("/delete/{id}")
     public String deleteForm(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
-        carService.deleteById(id);
-        redirectAttributes.addFlashAttribute("toastMessage", "Xóa xe thành công!");
-        redirectAttributes.addFlashAttribute("toastType", "success");
+        try {
+            carService.deleteById(id);
+            Car after = carService.findById(id);
+            if (after != null && "Inactive".equals(after.getStatus())) {
+                redirectAttributes.addFlashAttribute("toastMessage", "Xe đã có lịch sử thuê — chuyển trạng thái Inactive (không xóa cứng).");
+            } else {
+                redirectAttributes.addFlashAttribute("toastMessage", "Xóa xe thành công!");
+            }
+            redirectAttributes.addFlashAttribute("toastType", "success");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("toastMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("toastType", "error");
+        }
         return "redirect:/admin/cars";
     }
 

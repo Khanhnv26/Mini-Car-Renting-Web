@@ -1,16 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/customer-layout :: layout(title='Lịch sử thuê xe', content=~{::content})}">
 <body>
-<div th:fragment="content" class="max-w-4xl mx-auto">
-    <div class="mb-4">
-        <ul class="nav nav-tabs border-0">
-            <li class="nav-item">
-                <a class="nav-link tab-minimal" th:href="@{/customer/profile}">Hồ sơ</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link tab-minimal active" th:href="@{/customer/history}">Lịch sử thuê xe</a>
-            </li>
-        </ul>
+<div th:fragment="content" class="max-w-5xl mx-auto py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-light mb-0 text-white">Lịch sử thuê xe</h4>
+        <span class="text-muted small">Xem và đánh giá các giao dịch thuê xe của bạn</span>
     </div>
     
     <div class="card card-flat p-4 mb-4">
@@ -43,12 +37,12 @@
             <table class="table table-minimal">
                 <thead>
                 <tr>
-                    <th><a class="text-decoration-none text-dark" th:href="@{/customer/history(page=${currentPage}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy='carRentID', sortDir=${reverseSortDir})}">Mã số <span th:if="${sortBy == 'carRentID'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
+                    <th><a class="text-decoration-none" th:href="@{/customer/history(page=${currentPage}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy='carRentID', sortDir=${reverseSortDir})}">Mã số <span th:if="${sortBy == 'carRentID'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
                     <th>Xe</th>
-                    <th><a class="text-decoration-none text-dark" th:href="@{/customer/history(page=${currentPage}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy='pickUpDate', sortDir=${reverseSortDir})}">Ngày nhận <span th:if="${sortBy == 'pickUpDate'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
-                    <th><a class="text-decoration-none text-dark" th:href="@{/customer/history(page=${currentPage}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy='returnDate', sortDir=${reverseSortDir})}">Ngày trả <span th:if="${sortBy == 'returnDate'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
-                    <th><a class="text-decoration-none text-dark" th:href="@{/customer/history(page=${currentPage}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy='rentPrice', sortDir=${reverseSortDir})}">Giá ($) <span th:if="${sortBy == 'rentPrice'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
-                    <th><a class="text-decoration-none text-dark" th:href="@{/customer/history(page=${currentPage}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy='status', sortDir=${reverseSortDir})}">Trạng thái <span th:if="${sortBy == 'status'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
+                    <th><a class="text-decoration-none" th:href="@{/customer/history(page=${currentPage}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy='pickUpDate', sortDir=${reverseSortDir})}">Ngày nhận <span th:if="${sortBy == 'pickUpDate'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
+                    <th><a class="text-decoration-none" th:href="@{/customer/history(page=${currentPage}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy='returnDate', sortDir=${reverseSortDir})}">Ngày trả <span th:if="${sortBy == 'returnDate'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
+                    <th><a class="text-decoration-none" th:href="@{/customer/history(page=${currentPage}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy='rentPrice', sortDir=${reverseSortDir})}">Giá ($) <span th:if="${sortBy == 'rentPrice'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
+                    <th><a class="text-decoration-none" th:href="@{/customer/history(page=${currentPage}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy='status', sortDir=${reverseSortDir})}">Trạng thái <span th:if="${sortBy == 'status'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
                     <th>Đánh giá</th>
                 </tr>
                 </thead>
@@ -66,51 +60,88 @@
                         <span th:if="${r.status == 'Cancelled'}" class="badge badge-soft-gray py-2 px-3 rounded-pill">Đã hủy</span>
                     </td>
                     <td>
-                        <div th:if="${r.status == 'Completed'}">
-                            <form th:action="@{/customer/review}" th:object="${reviewDTO}" method="post" class="d-flex gap-2">
-                                <input type="hidden" name="carRentalId" th:value="${r.carRentID}">
-                                <select name="reviewStar" class="form-select input-minimal py-1 px-2" style="width: auto;">
-                                    <option value="1">1 Sao</option>
-                                    <option value="2">2 Sao</option>
-                                    <option value="3">3 Sao</option>
-                                    <option value="4">4 Sao</option>
-                                    <option value="5" selected>5 Sao</option>
-                                </select>
-                                <input type="text" name="comment" class="form-control input-minimal py-1 px-2" placeholder="Nhận xét..." style="width: auto;">
-                                <div th:errors="*{comment}" class="text-danger small"></div>
-                                <button type="submit" class="btn btn-minimal py-1 px-3">Gửi</button>
-                            </form>
-                        </div>
+                        <button type="button" class="btn btn-minimal btn-sm py-1 px-3"
+                                th:if="${r.status == 'Completed' and !#sets.contains(reviewedRentalIds, r.carRentID)}"
+                                data-bs-toggle="modal" data-bs-target="#reviewModal"
+                                th:attr="data-rental-id=${r.carRentID}">
+                            Viết đánh giá
+                        </button>
+                        <span th:if="${r.status == 'Completed' and #sets.contains(reviewedRentalIds, r.carRentID)}"
+                              class="text-muted small">Đã đánh giá</span>
                     </td>
                 </tr>
                 </tbody>
             </table>
         </div>
         
-        <div th:if="${totalPages > 1}" class="card-footer bg-white d-flex justify-content-between align-items-center py-3 px-0 border-top mt-3">
+        <div th:if="${totalPages > 1}" class="card-footer d-flex justify-content-between align-items-center py-3 px-0 border-top mt-3">
             <div class="text-muted small">
-                Đang hiển thị dòng <span th:text="${currentPage * 5 + 1}"></span> - <span th:text="${T(java.lang.Math).min((currentPage + 1) * 5, totalItems)}"></span> của tổng số <span th:text="${totalItems}"></span> dòng
+                Đang hiển thị dòng <span th:text="${currentPage * 5 + 1}"></span> - <span th:text="${T(java.lang.Math).min((currentPage + 1) * 5L, totalItems)}"></span> của tổng số <span th:text="${totalItems}"></span> dòng
             </div>
             <nav aria-label="Page navigation">
-                <ul class="pagination pagination-sm pagination-minimal mb-0">
+                <ul class="pagination pagination-sm pagination-minimal mb-0 gap-1">
                     <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                        <a class="page-link" th:href="@{/customer/history(page=0, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy=${sortBy}, sortDir=${sortDir})}">Đầu</a>
+                        <a class="page-link" th:href="@{/customer/history(page=0, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy=${sortBy}, sortDir=${sortDir})}" aria-label="First">&laquo;</a>
                     </li>
                     <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                        <a class="page-link" th:href="@{/customer/history(page=${currentPage - 1}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy=${sortBy}, sortDir=${sortDir})}">Trước</a>
+                        <a class="page-link" th:href="@{/customer/history(page=${currentPage - 1}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy=${sortBy}, sortDir=${sortDir})}" aria-label="Previous">&lsaquo;</a>
                     </li>
-                    <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" th:classappend="${currentPage == i} ? 'active'">
+                    <li class="page-item" th:each="i : ${#numbers.sequence(T(java.lang.Math).max(0, currentPage - 2), T(java.lang.Math).min(totalPages - 1, currentPage + 2))}" th:classappend="${currentPage == i} ? 'active'">
                         <a class="page-link" th:href="@{/customer/history(page=${i}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy=${sortBy}, sortDir=${sortDir})}" th:text="${i + 1}"></a>
                     </li>
                     <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
-                        <a class="page-link" th:href="@{/customer/history(page=${currentPage + 1}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy=${sortBy}, sortDir=${sortDir})}">Sau</a>
+                        <a class="page-link" th:href="@{/customer/history(page=${currentPage + 1}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy=${sortBy}, sortDir=${sortDir})}" aria-label="Next">&rsaquo;</a>
                     </li>
                     <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
-                        <a class="page-link" th:href="@{/customer/history(page=${totalPages - 1}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy=${sortBy}, sortDir=${sortDir})}">Cuối</a>
+                        <a class="page-link" th:href="@{/customer/history(page=${totalPages - 1}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy=${sortBy}, sortDir=${sortDir})}" aria-label="Last">&raquo;</a>
                     </li>
                 </ul>
             </nav>
         </div>
+    </div>
+
+    <div class="modal fade modal-glass" id="reviewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content p-4">
+                <h5 class="fw-light mb-4 text-white">Đánh giá dịch vụ</h5>
+                <form th:action="@{/customer/review}" th:object="${reviewDTO}" method="post">
+                    <input type="hidden" name="carRentalId" id="modalRentalId">
+                    <div class="mb-3">
+                        <label class="form-label text-muted small mb-1">Số sao</label>
+                        <select name="reviewStar" class="form-select input-minimal py-2">
+                            <option value="5" selected>⭐⭐⭐⭐⭐ (5 Sao)</option>
+                            <option value="4">⭐⭐⭐⭐ (4 Sao)</option>
+                            <option value="3">⭐⭐⭐ (3 Sao)</option>
+                            <option value="2">⭐⭐ (2 Sao)</option>
+                            <option value="1">⭐ (1 Sao)</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label text-muted small mb-1">Nhận xét của bạn</label>
+                        <textarea name="comment" class="form-control input-minimal py-2" rows="3" placeholder="Nhập ý kiến đánh giá về chiếc xe và dịch vụ..."></textarea>
+                    </div>
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-ghost px-4" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-minimal px-4 py-2">Gửi đánh giá</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var reviewModal = document.getElementById('reviewModal');
+        if(reviewModal) {
+            reviewModal.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget;
+                var rentalId = button.getAttribute('data-rental-id');
+                var modalInput = reviewModal.querySelector('#modalRentalId');
+                modalInput.value = rentalId;
+            });
+        }
+    });
+</script>
 </body>
 </html>
