@@ -32,6 +32,13 @@
 .border-top-gold { border-top: 3px solid var(--gold) !important; }
 .badge-soft-gold { background: var(--gold-light); color: #8a6d2b; font-weight: 400; }
 .badge-soft-gray { background: #f0f0f0; color: #666; font-weight: 400; }
+.badge-soft-blue { background: #dbeafe; color: #1e40af; font-weight: 400; }
+.badge-soft-green { background: #d1fae5; color: #065f46; font-weight: 400; }
+
+.action-cell {
+    min-height: 2.5rem;
+    vertical-align: middle;
+}
 .table-minimal { border-collapse: collapse; }
 .table-minimal thead th {
     border-bottom: 1px solid #e5e5e5;
@@ -132,6 +139,35 @@ a { color: var(--gold); text-decoration: none; }
 .navbar-transparent.scrolled .btn-outline-minimal:hover {
     background: var(--gold);
     color: #fff !important;
+}
+
+.pagination-minimal .page-link {
+    color: #555;
+    border: 1px solid #e5e5e5;
+    border-radius: 0;
+    background: #fff;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+.pagination-minimal .page-link:hover {
+    background: var(--gold-bg);
+    border-color: var(--gold-light);
+    color: var(--gold);
+}
+.pagination-minimal .page-item.active .page-link {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: #fff;
+}
+.pagination-minimal .page-item.disabled .page-link {
+    color: #ccc;
+    background: #fafafa;
+    border-color: #eee;
+    pointer-events: none;
+}
+.pagination-minimal .page-link:focus {
+    box-shadow: none;
 }
 
 .bg-cinematic {

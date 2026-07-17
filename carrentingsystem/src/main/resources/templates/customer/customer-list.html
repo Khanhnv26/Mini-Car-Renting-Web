@@ -7,6 +7,17 @@
         <a th:href="@{/admin/customers/new}" class="btn btn-minimal py-2 px-4">+ Thêm mới</a>
     </div>
     <div th:if="${error}" class="alert alert-danger border-0 rounded-1 small mb-4" th:text="${error}"></div>
+
+    <div class="card card-flat p-4 mb-4">
+        <form th:action="@{/admin/customers}" method="get" class="row g-3">
+            <div class="col-md-6">
+                <input type="text" name="keyword" class="form-control form-control-sm" placeholder="Tìm theo tên hoặc số điện thoại..." th:value="${keyword}" />
+            </div>
+            <div class="col-md-2 d-grid">
+                <button type="submit" class="btn btn-minimal py-1">Tìm kiếm</button>
+            </div>
+        </form>
+    </div>
     
     <div class="card card-flat p-0 overflow-hidden">
         <div th:if="${#lists.isEmpty(customers)}" class="empty-state">
@@ -18,10 +29,10 @@
             <table class="table table-minimal mb-0">
                 <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Họ tên</th>
-                    <th>SĐT</th>
-                    <th>Ngày sinh</th>
+                    <th><a class="text-decoration-none text-dark" th:href="@{/admin/customers(page=${currentPage}, keyword=${keyword}, sortBy='customerId', sortDir=${reverseSortDir})}">ID <span th:if="${sortBy == 'customerId'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
+                    <th><a class="text-decoration-none text-dark" th:href="@{/admin/customers(page=${currentPage}, keyword=${keyword}, sortBy='fullName', sortDir=${reverseSortDir})}">Họ tên <span th:if="${sortBy == 'fullName'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
+                    <th><a class="text-decoration-none text-dark" th:href="@{/admin/customers(page=${currentPage}, keyword=${keyword}, sortBy='mobile', sortDir=${reverseSortDir})}">SĐT <span th:if="${sortBy == 'mobile'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
+                    <th><a class="text-decoration-none text-dark" th:href="@{/admin/customers(page=${currentPage}, keyword=${keyword}, sortBy='birthday', sortDir=${reverseSortDir})}">Ngày sinh <span th:if="${sortBy == 'birthday'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
                     <th>Email</th>
                     <th class="text-end">Hành động</th>
                 </tr>
@@ -44,6 +55,31 @@
                 </tr>
                 </tbody>
             </table>
+        </div>
+        
+        <div th:if="${totalPages > 1}" class="card-footer bg-white d-flex justify-content-between align-items-center py-3">
+            <div class="text-muted small">
+                Đang hiển thị dòng <span th:text="${currentPage * 5 + 1}"></span> - <span th:text="${T(java.lang.Math).min((currentPage + 1) * 5, totalItems)}"></span> của tổng số <span th:text="${totalItems}"></span> dòng
+            </div>
+            <nav aria-label="Page navigation">
+                <ul class="pagination pagination-sm pagination-minimal mb-0">
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{/admin/customers(page=0, keyword=${keyword}, sortBy=${sortBy}, sortDir=${sortDir})}">Đầu</a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{/admin/customers(page=${currentPage - 1}, keyword=${keyword}, sortBy=${sortBy}, sortDir=${sortDir})}">Trước</a>
+                    </li>
+                    <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" th:classappend="${currentPage == i} ? 'active'">
+                        <a class="page-link" th:href="@{/admin/customers(page=${i}, keyword=${keyword}, sortBy=${sortBy}, sortDir=${sortDir})}" th:text="${i + 1}"></a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/admin/customers(page=${currentPage + 1}, keyword=${keyword}, sortBy=${sortBy}, sortDir=${sortDir})}">Sau</a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/admin/customers(page=${totalPages - 1}, keyword=${keyword}, sortBy=${sortBy}, sortDir=${sortDir})}">Cuối</a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
 

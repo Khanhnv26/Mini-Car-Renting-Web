@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +35,7 @@ public class ReviewServiceImpl implements ReviewService {
         if (!"Completed".equals(carRental.getStatus())) {
             throw new RuntimeException("Chỉ đánh giá được giao dịch đã hoàn thành");
         }
-        Review existing = reviewRepository.findByCarRental_CarRentID(reviewDTO.getCarRentalId());
+        Review existing = reviewRepository.findByCarRental_CarRentID(reviewDTO.getCarRentalId()).orElse(null);
         if (existing != null) {
             throw new RuntimeException("Giao dịch này đã được đánh giá");
         }
@@ -42,7 +43,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public Review findByCarRentalId(Long carRentalId) {
+    public Optional<Review> findByCarRentalId(Long carRentalId) {
         return reviewRepository.findByCarRental_CarRentID(carRentalId);
     }
 

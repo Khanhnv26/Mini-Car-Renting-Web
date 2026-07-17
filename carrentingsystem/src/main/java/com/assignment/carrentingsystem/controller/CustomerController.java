@@ -21,8 +21,22 @@ public class CustomerController {
     private final AccountService accountService;
 
     @GetMapping
-    public String getAllCustomers(Model model) {
-        model.addAttribute("customers", customerService.findAll());
+    public String getAllCustomers(
+            @RequestParam(name = "keyword", required = false) String keyword,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "sortBy", defaultValue = "customerId") String sortBy,
+            @RequestParam(name = "sortDir", defaultValue = "asc") String sortDir,
+            Model model) {
+        org.springframework.data.domain.Page<com.assignment.carrentingsystem.entity.Customer> customerPage = 
+            customerService.findPaginated(keyword, page, 5, sortBy, sortDir);
+        model.addAttribute("customers", customerPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", customerPage.getTotalPages());
+        model.addAttribute("totalItems", customerPage.getTotalElements());
+        model.addAttribute("sortBy", sortBy);
+        model.addAttribute("sortDir", sortDir);
+        model.addAttribute("reverseSortDir", sortDir.equals("asc") ? "desc" : "asc");
+        model.addAttribute("keyword", keyword);
         return "customer/customer-list";
     }
 

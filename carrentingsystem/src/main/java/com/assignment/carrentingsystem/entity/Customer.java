@@ -40,8 +40,8 @@ public class Customer {
     @Column(name = "LicenceDate", nullable = false)
     private LocalDate licenceDate;
 
-    @OneToOne
-    @JoinColumn(name = "AccountID", unique = true)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "AccountID", nullable = false, unique = true)
     private Account account;
 
 }

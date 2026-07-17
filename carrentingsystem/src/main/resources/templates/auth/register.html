@@ -4,7 +4,7 @@
 <div th:fragment="content">
     <div th:if="${error}" class="alert alert-danger border-0 rounded-1 text-center small" th:text="${error}"></div>
     
-    <form th:action="@{/register}" method="post" th:object="${registerDTO}">
+    <form th:action="@{/register}" method="post" th:object="${registerForm}">
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label class="form-label text-muted small mb-1">Tên tài khoản</label>
@@ -37,8 +37,8 @@
             </div>
             <div class="col-md-6 mb-3">
                 <label class="form-label text-muted small mb-1">Ngày sinh</label>
-                <input type="date" th:field="*{birthDate}" class="form-control input-minimal py-2" required>
-                <div th:if="${#fields.hasErrors('birthDate')}" th:errors="*{birthDate}" class="text-danger small mt-1"></div>
+                <input type="date" th:field="*{birthday}" class="form-control input-minimal py-2" required>
+                <div th:if="${#fields.hasErrors('birthday')}" th:errors="*{birthday}" class="text-danger small mt-1"></div>
             </div>
         </div>
         <div class="row mb-4">

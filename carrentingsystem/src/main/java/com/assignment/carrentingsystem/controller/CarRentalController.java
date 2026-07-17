@@ -18,8 +18,29 @@ public class CarRentalController {
     private final CarRentalService carRentalService;
 
     @GetMapping
-    public String listAll(Model model) {
-        model.addAttribute("carRentals", carRentalService.findAll());
+    public String listAll(
+            @RequestParam(name = "status", required = false) String status,
+            @RequestParam(name = "startDate", required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate startDate,
+            @RequestParam(name = "endDate", required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate endDate,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "sortBy", defaultValue = "carRentID") String sortBy,
+            @RequestParam(name = "sortDir", defaultValue = "asc") String sortDir,
+            Model model) {
+        java.time.LocalDateTime start = (startDate != null) ? startDate.atStartOfDay() : null;
+        java.time.LocalDateTime end = (endDate != null) ? endDate.atTime(23, 59, 59) : null;
+        org.springframework.data.domain.Page<com.assignment.carrentingsystem.entity.CarRental> rentalPage = 
+            carRentalService.findRentalsPaginated(null, status, start, end, page, 5, sortBy, sortDir);
+        model.addAttribute("carRentals", rentalPage.getContent());
+        model.addAttribute("rentals", rentalPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", rentalPage.getTotalPages());
+        model.addAttribute("totalItems", rentalPage.getTotalElements());
+        model.addAttribute("sortBy", sortBy);
+        model.addAttribute("sortDir", sortDir);
+        model.addAttribute("reverseSortDir", sortDir.equals("asc") ? "desc" : "asc");
+        model.addAttribute("selectedStatus", status);
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
         return "rental/rental-list";
     }
 
@@ -40,7 +61,7 @@ public class CarRentalController {
     public String report(@RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
                          @RequestParam("endDate")@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
                          Model model) {
-        model.addAttribute("rentals",carRentalService.findByPickUpDateBetween(startDate.atStartOfDay(),endDate.atTime(23,59,59)));
+        model.addAttribute("rentals",carRentalService.findRentalReportByPickUpDateBetween(startDate.atStartOfDay(),endDate.atTime(23,59,59)));
         model.addAttribute("startDate",startDate);
         model.addAttribute("endDate",endDate);
         return "rental/rental-report";

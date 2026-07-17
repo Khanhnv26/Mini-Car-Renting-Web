@@ -20,7 +20,7 @@ public class Review {
     @Column(name = "ID")
     private Long id;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "CarRentID", nullable = false, unique = true)
     private CarRental carRental;
 

@@ -1,7 +1,7 @@
 /* ============================================================================
    FU Car Renting Management System  -  Database creation + seed script (v2.0)
    Target  : Microsoft SQL Server
-   Database: CarRentingSystem_DB
+    Database: FUFUCarRentingSystem_DB
    Login   : test / test   (see section 0)
 
    Schema follows Assignment 01 v2.0 - section "2. Database Design":
@@ -27,9 +27,9 @@
 ----------------------------------------------------------------------------
 -- 0. Create database + login/user  (run once, in the master context)
 ----------------------------------------------------------------------------
-IF DB_ID(N'CarRentingSystem_DB') IS NULL
+IF DB_ID(N'FUCarRentingSystem_DB') IS NULL
 BEGIN
-    CREATE DATABASE [CarRentingSystem_DB];
+    CREATE DATABASE [FUCarRentingSystem_DB];
 END
 GO
 
@@ -39,11 +39,11 @@ IF SUSER_ID(N'test') IS NULL
 BEGIN
     CREATE LOGIN [test] WITH PASSWORD = N'test',
         CHECK_POLICY = OFF, CHECK_EXPIRATION = OFF,
-        DEFAULT_DATABASE = [CarRentingSystem_DB];
+        DEFAULT_DATABASE = [FUCarRentingSystem_DB];
 END
 GO
 
-USE [CarRentingSystem_DB];
+USE [FUCarRentingSystem_DB];
 GO
 
 -- Map the login to a db user and give it full rights on this database.
@@ -229,5 +229,5 @@ INSERT INTO dbo.Review (CarRentID, ReviewStar, Comment) VALUES
     (3, 5, N'Smooth ride and easy to drive in the city.');
 GO
 
-PRINT N'CarRentingSystem_DB created and seeded successfully.';
+PRINT N'FUCarRentingSystem_DB created and seeded successfully.';
 GO

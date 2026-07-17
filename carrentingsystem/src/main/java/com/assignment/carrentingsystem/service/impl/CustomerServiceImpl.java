@@ -8,6 +8,10 @@ import com.assignment.carrentingsystem.repository.CarRentalRepository;
 import com.assignment.carrentingsystem.repository.CustomerRepository;
 import com.assignment.carrentingsystem.service.CustomerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -106,5 +110,13 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public Customer findByAccountId(Long accountId) {
         return customerRepository.findByAccountId(accountId);
+    }
+
+    @Override
+    public Page<Customer> findPaginated(String keyword, int page, int size, String sortBy, String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        String cleanKeyword = (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : null;
+        return customerRepository.findCustomersWithFilters(cleanKeyword, pageable);
     }
 }

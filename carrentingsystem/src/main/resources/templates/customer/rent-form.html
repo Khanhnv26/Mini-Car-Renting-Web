@@ -8,14 +8,16 @@
     <div class="card card-flat p-4">
         <h4 class="fw-light mb-4">Đăng ký thuê xe</h4>
         <div th:if="${error}" class="alert alert-danger border-0 rounded-1 text-center small" th:text="${error}"></div>
-        <form th:action="@{/customer/rent}" th:object="${carRentalDTO}" method="post" class="row g-4">
+        <form th:action="@{/customer/rent}" th:object="${rentalRequest}" method="post" class="row g-4">
             <div class="col-12">
-                <label class="form-label text-muted small mb-1">Chọn xe</label>
-                <select th:field="*{carId}" class="form-select input-minimal py-2">
-                    <option value="">-- Chọn xe --</option>
-                    <option th:each="car : ${cars}" th:value="${car.carId}" th:text="${car.carName + ' - ' + car.rentPrice + '$/ngày'}"></option>
-                </select>
-                <div th:errors="*{carId}" class="text-danger small mt-1"></div>
+                <label class="form-label text-muted small mb-1">Chọn xe (có thể chọn nhiều)</label>
+                <div th:errors="*{carIds}" class="text-danger small mb-2"></div>
+                <div class="list-group" style="max-height: 300px; overflow-y: auto;">
+                    <label th:each="car : ${cars}" class="list-group-item d-flex align-items-center gap-3 py-2 px-3 border-0">
+                        <input type="checkbox" th:field="*{carIds}" th:value="${car.carId}" class="form-check-input">
+                        <span th:text="${car.carName + ' - ' + car.rentPrice + '$/ngày - ' + car.carProducer.producerName}"></span>
+                    </label>
+                </div>
             </div>
             <div class="col-md-6">
                 <label class="form-label text-muted small mb-1">Ngày nhận xe</label>

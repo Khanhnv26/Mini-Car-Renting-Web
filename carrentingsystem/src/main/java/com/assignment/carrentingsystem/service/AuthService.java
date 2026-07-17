@@ -1,11 +1,11 @@
 package com.assignment.carrentingsystem.service;
 
-import com.assignment.carrentingsystem.dto.RegisterDTO;
+import com.assignment.carrentingsystem.dto.RegisterForm;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 public interface AuthService extends UserDetailsService {
-    void register(RegisterDTO user);
+    void register(RegisterForm user);
     UserDetails loadUserByUsername(String email) throws UsernameNotFoundException;
 }

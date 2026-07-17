@@ -22,7 +22,7 @@ public class Account {
     @Column(name = "AccountName", nullable = false, length = 255)
     private String accountName;
 
-    @Column(name = "Email", nullable = false, length = 255)
+    @Column(name = "Email", nullable = false, length = 255, unique = true)
     private String email;
 
     @Column(name = "Password",nullable = false, length = 255)
@@ -31,7 +31,7 @@ public class Account {
     @Column(name = "Role", nullable = false, length = 20)
     private String role;
 
-    @OneToOne(mappedBy = "account")
+    @OneToOne(mappedBy = "account", fetch = FetchType.LAZY)
     private Customer customer;
 
 }

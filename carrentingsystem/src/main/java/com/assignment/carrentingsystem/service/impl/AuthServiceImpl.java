@@ -1,6 +1,6 @@
 package com.assignment.carrentingsystem.service.impl;
 
-import com.assignment.carrentingsystem.dto.RegisterDTO;
+import com.assignment.carrentingsystem.dto.RegisterForm;
 import com.assignment.carrentingsystem.entity.Account;
 import com.assignment.carrentingsystem.entity.Customer;
 import com.assignment.carrentingsystem.repository.AccountRepository;
@@ -21,7 +21,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public void register(RegisterDTO user) {
+    public void register(RegisterForm user) {
         if(accountRepository.existsByEmail(user.getEmail())) {
             throw new UsernameNotFoundException("Email đã tồn tại");
 
@@ -38,7 +38,7 @@ public class AuthServiceImpl implements AuthService {
         Customer customer = new Customer();
         customer.setFullName(user.getFullName());
         customer.setMobile(user.getMobile());
-        customer.setBirthday(user.getBirthDate());
+        customer.setBirthday(user.getBirthday());
         customer.setIdentityCard(user.getIdentityCard());
         customer.setLicenceNumber(user.getLicenceNumber());
         customer.setLicenceDate(user.getLicenceDate());

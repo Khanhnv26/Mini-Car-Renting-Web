@@ -1,8 +1,4 @@
-Các bạn được yêu cầu hoàn thành assignment 1 trước 19/Jul:
-Project Name: SE2035-JV_StudentId_CarRentingSystem. Ex: SE2035-JV_DieuNTHE123456_CarRentingSystem
-Database name: CarRentingSystem_DB, UserName/Pass: test
-Database design:
-Hibernate properties: ddl-auto: none
-ID (Identity): Long
-Các trường name: NVARCHAR(255), AccountName: VARCHAR(255)
-Các trường ngày tháng: LocalDate. Với PickupDate, ReturnDate: LocalDateTime
+Project Name: SE2030-JV_StudentID_CarRentingSystem. Ex: SE2030-JV_DieuNTHE123456_CarRentingSystem
+Database name: FUCarRentingSystem_DB
+Tạo sẵn tài khoản admin/admin
+Update ddl-auto: none

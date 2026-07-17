@@ -1,6 +1,7 @@
 package com.assignment.carrentingsystem.service.impl;
 
-import com.assignment.carrentingsystem.dto.CarRentalDTO;
+import com.assignment.carrentingsystem.dto.RentalReportDTO;
+import com.assignment.carrentingsystem.dto.RentalRequest;
 import com.assignment.carrentingsystem.entity.Car;
 import com.assignment.carrentingsystem.entity.CarRental;
 import com.assignment.carrentingsystem.entity.Customer;
@@ -9,6 +10,10 @@ import com.assignment.carrentingsystem.repository.CarRepository;
 import com.assignment.carrentingsystem.repository.CustomerRepository;
 import com.assignment.carrentingsystem.service.CarRentalService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +22,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,27 +35,29 @@ public class CarRentalServiceImpl implements CarRentalService {
 
     @Override
     @Transactional
-    public void createCarRental(Long customerId, CarRentalDTO carRentalDTO) {
+    public void createCarRental(Long customerId, RentalRequest request) {
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new RuntimeException("Khách hàng không tồn tại"));
 
-        Car car = carRepository.findById(carRentalDTO.getCarId())
-                .orElseThrow(() -> new RuntimeException("Xe không tồn tại"));
+        long days = Math.max(1, Duration.between(request.getPickupDate(), request.getReturnDate()).toDays());
 
-        if (!"Available".equals(car.getStatus())){
-            throw new RuntimeException("Xe hiện không sẵn sàng cho thuê");
+        for (Long carId : request.getCarIds()) {
+            Car car = carRepository.findById(carId)
+                    .orElseThrow(() -> new RuntimeException("Xe không tồn tại: " + carId));
+
+            if (!"Available".equals(car.getStatus())) {
+                throw new RuntimeException("Xe " + car.getCarName() + " hiện không sẵn sàng cho thuê");
+            }
+
+            CarRental carRental = new CarRental();
+            carRental.setCustomer(customer);
+            carRental.setCar(car);
+            carRental.setPickUpDate(request.getPickupDate());
+            carRental.setReturnDate(request.getReturnDate());
+            carRental.setRentPrice(car.getRentPrice().multiply(BigDecimal.valueOf(days)));
+            carRental.setStatus("Pending");
+            carRentalRepository.save(carRental);
         }
-
-        long days = Math.max(1, Duration.between(carRentalDTO.getPickupDate(), carRentalDTO.getReturnDate()).toDays());
-
-        CarRental carRental = new CarRental();
-        carRental.setCustomer(customer);
-        carRental.setCar(car);
-        carRental.setPickUpDate(carRentalDTO.getPickupDate());
-        carRental.setReturnDate(carRentalDTO.getReturnDate());
-        carRental.setRentPrice(car.getRentPrice().multiply(BigDecimal.valueOf(days)));
-        carRental.setStatus("Pending");
-        carRentalRepository.save(carRental);
     }
 
     @Override
@@ -104,5 +112,28 @@ public class CarRentalServiceImpl implements CarRentalService {
     @Override
     public List<CarRental> findByPickUpDateBetween(LocalDateTime start, LocalDateTime end) {
         return carRentalRepository.findCarRentalByPickUpDate(start, end);
+    }
+
+    @Override
+    public List<RentalReportDTO> findRentalReportByPickUpDateBetween(LocalDateTime start, LocalDateTime end) {
+        return carRentalRepository.findCarRentalByPickUpDate(start, end)
+                .stream()
+                .map(r -> new RentalReportDTO(
+                        r.getCarRentID(),
+                        r.getCustomer().getFullName(),
+                        r.getCar().getCarName(),
+                        r.getPickUpDate(),
+                        r.getReturnDate(),
+                        r.getRentPrice(),
+                        r.getStatus()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<CarRental> findRentalsPaginated(Long customerId, String status, LocalDateTime start, LocalDateTime end, int page, int size, String sortBy, String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        String cleanStatus = (status != null && !status.trim().isEmpty()) ? status.trim() : null;
+        return carRentalRepository.findRentalsWithFilters(customerId, cleanStatus, start, end, pageable);
     }
 }

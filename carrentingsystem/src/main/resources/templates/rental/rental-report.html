@@ -36,10 +36,10 @@
             </thead>
             <tbody>
             <tr th:each="r : ${rentals}">
-                <td th:text="${r.carRentID}"></td>
-                <td th:text="${r.customer.fullName}"></td>
-                <td th:text="${r.car.carName}"></td>
-                <td th:text="${r.pickUpDate}"></td>
+                <td th:text="${r.carRentId}"></td>
+                <td th:text="${r.customerName}"></td>
+                <td th:text="${r.carName}"></td>
+                <td th:text="${r.pickupDate}"></td>
                 <td th:text="${r.returnDate}"></td>
                 <td class="text-gold" th:text="${r.rentPrice}"></td>
                 <td th:text="${r.status}"></td>

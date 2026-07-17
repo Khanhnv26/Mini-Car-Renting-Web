@@ -1,6 +1,6 @@
 package com.assignment.carrentingsystem.controller;
 
-import com.assignment.carrentingsystem.dto.RegisterDTO;
+import com.assignment.carrentingsystem.dto.RegisterForm;
 import com.assignment.carrentingsystem.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -25,18 +25,18 @@ public class AuthController {
 
     @GetMapping("/register")
     public String registerPage(Model model) {
-        model.addAttribute("registerDTO", new RegisterDTO());
+        model.addAttribute("registerForm", new RegisterForm());
         return "auth/register";
     }
 
     @PostMapping("/register")
-    public String register(@Valid @ModelAttribute("registerDTO") RegisterDTO registerDTO, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+    public String register(@Valid @ModelAttribute("registerForm") RegisterForm registerForm, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             return "auth/register";
         }
 
         try {
-            authService.register(registerDTO);
+            authService.register(registerForm);
             redirectAttributes.addFlashAttribute("toastMessage", "Đăng ký tài khoản thành công!");
             redirectAttributes.addFlashAttribute("toastType", "success");
             return "redirect:/login?registered";

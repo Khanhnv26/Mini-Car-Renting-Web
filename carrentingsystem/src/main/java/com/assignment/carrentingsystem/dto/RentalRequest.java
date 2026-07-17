@@ -6,16 +6,18 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class CarRentalDTO {
-    @NotNull(message = "Xe không được để trống")
-    private Long carId;
+public class RentalRequest {
+    @NotEmpty(message = "Phải chọn ít nhất 1 xe")
+    private List<Long> carIds;
 
     @NotNull(message = "Ngày nhận xe không được để trống")
     private LocalDateTime pickupDate;

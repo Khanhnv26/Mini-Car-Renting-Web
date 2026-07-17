@@ -1,10 +1,12 @@
 package com.assignment.carrentingsystem.controller;
 
 import com.assignment.carrentingsystem.dto.CarDTO;
+import com.assignment.carrentingsystem.entity.Car;
 import com.assignment.carrentingsystem.service.CarService;
 import com.assignment.carrentingsystem.service.ProducerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -20,8 +22,31 @@ public class CarController {
     private final ProducerService producerService;
 
     @GetMapping
-    public String listAll(Model model) {
-        model.addAttribute("cars", carService.findAll());
+    public String listAll(
+            @RequestParam(name = "name", required = false) String name,
+            @RequestParam(name = "producerId", required = false) Long producerId,
+            @RequestParam(name = "status", required = false) String status,
+            @RequestParam(name = "minPrice", required = false) java.math.BigDecimal minPrice,
+            @RequestParam(name = "maxPrice", required = false) java.math.BigDecimal maxPrice,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "sortBy", defaultValue = "carId") String sortBy,
+            @RequestParam(name = "sortDir", defaultValue = "asc") String sortDir,
+            Model model) {
+       Page<Car> carPage =
+            carService.findPaginated(name, producerId, status, minPrice, maxPrice, page, 5, sortBy, sortDir);
+        model.addAttribute("cars", carPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", carPage.getTotalPages());
+        model.addAttribute("totalItems", carPage.getTotalElements());
+        model.addAttribute("sortBy", sortBy);
+        model.addAttribute("sortDir", sortDir);
+        model.addAttribute("reverseSortDir", sortDir.equals("asc") ? "desc" : "asc");
+        model.addAttribute("producers", producerService.findAll());
+        model.addAttribute("name", name);
+        model.addAttribute("selectedProducerId", producerId);
+        model.addAttribute("selectedStatus", status);
+        model.addAttribute("minPrice", minPrice);
+        model.addAttribute("maxPrice", maxPrice);
         return "car/car-list";
     }
 

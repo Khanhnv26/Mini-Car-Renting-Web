@@ -8,9 +8,14 @@ import com.assignment.carrentingsystem.repository.CarRentalRepository;
 import com.assignment.carrentingsystem.repository.CarRepository;
 import com.assignment.carrentingsystem.service.CarService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -99,5 +104,14 @@ public class CarServiceImpl implements CarService {
         Car car = carRepository.findById(id).
                 orElseThrow(() -> new RuntimeException("Xe không tồn tại"));
         return toDTO(car);
+    }
+
+    @Override
+    public Page<Car> findPaginated(String name, Long producerId, String status, BigDecimal minPrice, BigDecimal maxPrice, int page, int size, String sortBy, String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        String cleanName = (name != null && !name.trim().isEmpty()) ? name.trim() : null;
+        String cleanStatus = (status != null && !status.trim().isEmpty()) ? status.trim() : null;
+        return carRepository.findCarsWithFilters(cleanName, producerId, cleanStatus, minPrice, maxPrice, pageable);
     }
 }

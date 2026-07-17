@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Setter
 @Getter
-public class RegisterDTO {
+public class RegisterForm {
 
     @NotBlank(message = "Email không được để trống")
     @Email(message = "Email không hợp lệ")
@@ -38,7 +38,7 @@ public class RegisterDTO {
     private String mobile;
 
     @NotNull(message = "Ngày sinh không được trống")
-    private LocalDate birthDate;
+    private LocalDate birthday;
 
     @NotBlank(message = "Số CCCD không để trống")
     @Size(max = 20)
@@ -50,6 +50,5 @@ public class RegisterDTO {
 
     @NotNull(message = "Ngày cấp bằng lái không được để trống")
     private LocalDate licenceDate;
-
 
 }
