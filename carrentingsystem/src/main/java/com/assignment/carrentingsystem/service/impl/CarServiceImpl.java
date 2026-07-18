@@ -69,7 +69,7 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    public Car findById(Long id) {
+    public Car findById(Integer id) {
         return carRepository.findById(id).orElse(null);
     }
 
@@ -88,7 +88,7 @@ public class CarServiceImpl implements CarService {
 
     @Override
     @Transactional
-    public void deleteById(Long id) {
+    public void deleteById(Integer id) {
         if (carRentalRepository.existsByCar_CarId(id)) {
             Car car = carRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Xe không tồn tại"));
@@ -100,14 +100,14 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    public CarDTO findDTOById(Long id) {
+    public CarDTO findDTOById(Integer id) {
         Car car = carRepository.findById(id).
                 orElseThrow(() -> new RuntimeException("Xe không tồn tại"));
         return toDTO(car);
     }
 
     @Override
-    public Page<Car> findPaginated(String name, Long producerId, String status, BigDecimal minPrice, BigDecimal maxPrice, int page, int size, String sortBy, String sortDir) {
+    public Page<Car> findPaginated(String name, Integer producerId, String status, BigDecimal minPrice, BigDecimal maxPrice, int page, int size, String sortBy, String sortDir) {
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
         String cleanName = (name != null && !name.trim().isEmpty()) ? name.trim() : null;

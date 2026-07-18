@@ -43,7 +43,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
-    public Review save(ReviewDTO reviewDTO, Long customerId) {
+    public Review save(ReviewDTO reviewDTO, Integer customerId) {
         CarRental carRental = carRentalRepository.findById(reviewDTO.getCarRentalId())
                 .orElseThrow(() -> new RuntimeException("Giao dịch thuê không tồn tại"));
         if (customerId != null
@@ -54,20 +54,20 @@ public class ReviewServiceImpl implements ReviewService {
         if (!"Completed".equals(carRental.getStatus())) {
             throw new RuntimeException("Chỉ đánh giá được giao dịch đã hoàn thành");
         }
-        if (reviewRepository.existsByCarRental_CarRentID(reviewDTO.getCarRentalId())) {
+        if (reviewRepository.existsByCarRental_CarRenId(reviewDTO.getCarRentalId())) {
             throw new RuntimeException("Giao dịch này đã được đánh giá");
         }
         return reviewRepository.save(toEntity(reviewDTO, carRental));
     }
 
     @Override
-    public Optional<Review> findByCarRentalId(Long carRentalId) {
-        return reviewRepository.findByCarRental_CarRentID(carRentalId);
+    public Optional<Review> findByCarRentalId(Integer carRentalId) {
+        return reviewRepository.findByCarRental_CarRenId(carRentalId);
     }
 
     @Override
-    public boolean existsByCarRentalId(Long carRentalId) {
-        return reviewRepository.existsByCarRental_CarRentID(carRentalId);
+    public boolean existsByCarRentalId(Integer carRentalId) {
+        return reviewRepository.existsByCarRental_CarRenId(carRentalId);
     }
 
     @Override
@@ -81,21 +81,57 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public Page<Review> findByCustomerIdPaginated(Long customerId, int page, int size) {
+    public Page<Review> findByCustomerIdPaginated(Integer customerId, int page, int size) {
         return reviewRepository.findByCarRental_Customer_CustomerId(
                 customerId, PageRequest.of(page, size, Sort.by("id").descending()));
     }
 
     @Override
-    public Map<Long, Review> findByCarRentalIds(Collection<Long> carRentalIds) {
+    public Page<Review> findAllFiltered(Integer star, String keyword, int page, int size) {
+        return reviewRepository.findFiltered(
+                cleanStar(star), cleanKeyword(keyword),
+                PageRequest.of(page, size, Sort.by("id").descending()));
+    }
+
+    @Override
+    public Page<Review> findByCustomerFiltered(Integer customerId, Integer star, String keyword, int page, int size) {
+        return reviewRepository.findFilteredByCustomer(
+                customerId, cleanStar(star), cleanKeyword(keyword),
+                PageRequest.of(page, size, Sort.by("id").descending()));
+    }
+
+    private Integer cleanStar(Integer star) {
+        if (star == null || star < 1 || star > 5) {
+            return null;
+        }
+        return star;
+    }
+
+    private String cleanKeyword(String keyword) {
+        if (keyword == null || keyword.isBlank()) {
+            return null;
+        }
+        return keyword.trim();
+    }
+
+    @Override
+    public Map<Integer, Review> findByCarRentalIds(Collection<Integer> carRentalIds) {
         if (carRentalIds == null || carRentalIds.isEmpty()) {
             return Collections.emptyMap();
         }
-        return reviewRepository.findByCarRental_CarRentIDIn(carRentalIds).stream()
-                .filter(r -> r.getCarRental() != null && r.getCarRental().getCarRentID() != null)
+        return reviewRepository.findByCarRental_CarRenIdIn(carRentalIds).stream()
+                .filter(r -> r.getCarRental() != null && r.getCarRental().getCarRenId() != null)
                 .collect(Collectors.toMap(
-                        r -> r.getCarRental().getCarRentID(),
+                        r -> r.getCarRental().getCarRenId(),
                         Function.identity(),
                         (a, b) -> a));
+    }
+
+    @Override
+    public List<Review> findByCarId(Integer carId) {
+        if (carId == null) {
+            return Collections.emptyList();
+        }
+        return reviewRepository.findByCarRental_Car_CarIdOrderByIdDesc(carId);
     }
 }

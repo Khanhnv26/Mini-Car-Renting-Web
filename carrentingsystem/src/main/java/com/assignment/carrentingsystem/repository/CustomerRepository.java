@@ -9,11 +9,11 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CustomerRepository extends JpaRepository<Customer, Long> {
+public interface CustomerRepository extends JpaRepository<Customer, Integer> {
     @Query("from Customer c where c.account.accountId =:accountId")
-    Customer findByAccountId(@Param("accountId") Long accountId);
+    Customer findByAccountId(@Param("accountId") Integer accountId);
 
-    boolean existsByAccount_AccountId(Long accountId);
+    boolean existsByAccount_AccountId(Integer accountId);
 
     @Query("SELECT c FROM Customer c WHERE " +
            "(:keyword IS NULL OR LOWER(c.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +

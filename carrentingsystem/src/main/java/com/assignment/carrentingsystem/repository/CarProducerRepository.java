@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface CarProducerRepository extends JpaRepository<CarProducer, Long> {
+public interface CarProducerRepository extends JpaRepository<CarProducer, Integer> {
 
     @Query("SELECT p FROM CarProducer p WHERE " +
            "(:keyword IS NULL OR LOWER(p.producerName) LIKE LOWER(CONCAT('%', :keyword, '%')) " +

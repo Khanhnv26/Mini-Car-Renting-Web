@@ -8,10 +8,10 @@ import java.util.List;
 
 public interface ProducerService {
     List<CarProducer> findAll();
-    CarProducer findById(Long id);
-    CarProducerDTO findDTOById(Long id);
+    CarProducer findById(Integer id);
+    CarProducerDTO findDTOById(Integer id);
     CarProducer save(CarProducerDTO carProducerDTO);
-    void deleteById(Long id);
+    void deleteById(Integer id);
     Page<CarProducer> findPaginated(String keyword, String country, int page, int size, String sortBy, String sortDir);
     List<String> findCountries();
 }

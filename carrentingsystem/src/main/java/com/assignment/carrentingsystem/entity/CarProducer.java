@@ -1,7 +1,10 @@
 package com.assignment.carrentingsystem.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -15,15 +18,15 @@ public class CarProducer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ProducerID")
-    private Long producerId;
+    private Integer producerId;
 
-    @Column(name = "ProducerName", length = 255, nullable = false)
+    @Column(name = "ProducerName", length = 100, nullable = false)
     private String producerName;
 
-    @Column(name = "Address", length = 255, nullable = false)
+    @Column(name = "Address", length = 200, nullable = false)
     private String address;
 
-    @Column(name = "Country", length = 255, nullable = false)
+    @Column(name = "Country", length = 100, nullable = false)
     private String country;
 
     @OneToMany(mappedBy = "carProducer")

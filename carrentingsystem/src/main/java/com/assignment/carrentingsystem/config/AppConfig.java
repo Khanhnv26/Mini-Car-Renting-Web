@@ -1,13 +1,19 @@
 package com.assignment.carrentingsystem.config;
 
-import org.springframework.context.annotation.Bean;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Configuration
 public class AppConfig {
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+
+    public static String hashPassword(String rawPassword) {
+        return BCrypt.hashpw(rawPassword, BCrypt.gensalt(10));
+    }
+
+    public static boolean matches(String rawPassword, String hashedPassword) {
+        if (rawPassword == null || hashedPassword == null || hashedPassword.isBlank()) {
+            return false;
+        }
+        return BCrypt.checkpw(rawPassword, hashedPassword);
     }
 }

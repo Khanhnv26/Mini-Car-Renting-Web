@@ -13,10 +13,41 @@
             </span>
         </div>
 
+        <div class="card card-flat p-4 mb-4">
+            <form th:action="@{/reviews}" method="get" class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label public-filter-label mb-1">Số sao</label>
+                    <select name="star" class="form-select">
+                        <option value="" th:selected="${selectedStar == null}">Tất cả</option>
+                        <option value="5" th:selected="${selectedStar == 5}">5 sao</option>
+                        <option value="4" th:selected="${selectedStar == 4}">4 sao</option>
+                        <option value="3" th:selected="${selectedStar == 3}">3 sao</option>
+                        <option value="2" th:selected="${selectedStar == 2}">2 sao</option>
+                        <option value="1" th:selected="${selectedStar == 1}">1 sao</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label public-filter-label mb-1">Tìm kiếm</label>
+                    <input type="text" name="keyword" class="form-control"
+                           placeholder="Nội dung hoặc tên xe..." th:value="${keyword}">
+                </div>
+                <div class="col-md-3 d-grid">
+                    <button type="submit" class="btn btn-minimal">Lọc</button>
+                </div>
+            </form>
+        </div>
+
         <div th:if="${reviews == null or #lists.isEmpty(reviews)}" class="empty-state py-5 text-center card card-flat">
-            <h5 class="public-page-title" style="font-size: 1.25rem;">Chưa có đánh giá</h5>
-            <p class="public-page-sub mb-3">Hãy thuê xe và chia sẻ trải nghiệm của bạn.</p>
-            <a th:href="@{/cars}" class="btn btn-minimal px-4">Xem danh sách xe</a>
+            <h5 class="public-page-title" style="font-size: 1.25rem;"
+                th:text="${selectedStar != null or (keyword != null and !#strings.isEmpty(keyword))}
+                    ? 'Không tìm thấy đánh giá phù hợp' : 'Chưa có đánh giá nào'">Chưa có đánh giá nào</h5>
+            <p class="public-page-sub mb-3"
+               th:text="${selectedStar != null or (keyword != null and !#strings.isEmpty(keyword))}
+                    ? 'Thử đổi bộ lọc hoặc xóa điều kiện tìm kiếm.' : 'Hãy thuê xe và chia sẻ trải nghiệm của bạn.'">…</p>
+            <a th:if="${selectedStar != null or (keyword != null and !#strings.isEmpty(keyword))}"
+               th:href="@{/reviews}" class="btn btn-minimal px-4">Xóa lọc</a>
+            <a th:unless="${selectedStar != null or (keyword != null and !#strings.isEmpty(keyword))}"
+               th:href="@{/cars}" class="btn btn-minimal px-4">Xem danh sách xe</a>
         </div>
 
         <div th:unless="${reviews == null or #lists.isEmpty(reviews)}" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
@@ -50,21 +81,21 @@
             <nav aria-label="Page navigation">
                 <ul class="pagination pagination-sm pagination-minimal fleet-page-nav mb-0 gap-1">
                     <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                        <a class="page-link" th:href="@{/reviews(page=0)}" aria-label="First">&laquo;</a>
+                        <a class="page-link" th:href="@{/reviews(page=0, star=${selectedStar}, keyword=${keyword})}" aria-label="First">&laquo;</a>
                     </li>
                     <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                        <a class="page-link" th:href="@{/reviews(page=${currentPage - 1})}" aria-label="Previous">&lsaquo;</a>
+                        <a class="page-link" th:href="@{/reviews(page=${currentPage - 1}, star=${selectedStar}, keyword=${keyword})}" aria-label="Previous">&lsaquo;</a>
                     </li>
                     <li class="page-item"
                         th:each="i : ${#numbers.sequence(T(java.lang.Math).max(0, currentPage - 2), T(java.lang.Math).min(totalPages - 1, currentPage + 2))}"
                         th:classappend="${currentPage == i} ? 'active'">
-                        <a class="page-link" th:href="@{/reviews(page=${i})}" th:text="${i + 1}"></a>
+                        <a class="page-link" th:href="@{/reviews(page=${i}, star=${selectedStar}, keyword=${keyword})}" th:text="${i + 1}"></a>
                     </li>
                     <li class="page-item" th:classappend="${currentPage >= totalPages - 1} ? 'disabled'">
-                        <a class="page-link" th:href="@{/reviews(page=${currentPage + 1})}" aria-label="Next">&rsaquo;</a>
+                        <a class="page-link" th:href="@{/reviews(page=${currentPage + 1}, star=${selectedStar}, keyword=${keyword})}" aria-label="Next">&rsaquo;</a>
                     </li>
                     <li class="page-item" th:classappend="${currentPage >= totalPages - 1} ? 'disabled'">
-                        <a class="page-link" th:href="@{/reviews(page=${totalPages - 1})}" aria-label="Last">&raquo;</a>
+                        <a class="page-link" th:href="@{/reviews(page=${totalPages - 1}, star=${selectedStar}, keyword=${keyword})}" aria-label="Last">&raquo;</a>
                     </li>
                 </ul>
             </nav>

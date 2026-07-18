@@ -8,7 +8,6 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
-
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,12 +19,12 @@ public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "CustomerID")
-    private Long customerId;
+    private Integer customerId;
 
-    @Column(name = "FullName", nullable = false, length = 255)
+    @Column(name = "FullName", nullable = false, length = 200)
     private String fullName;
 
-    @Column(name = "Mobile", nullable = false, length = 20)
+    @Column(name = "Mobile", nullable = false, length = 15)
     private String mobile;
 
     @Column(name = "Birthday", nullable = false)
@@ -43,5 +42,4 @@ public class Customer {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "AccountID", nullable = false, unique = true)
     private Account account;
-
 }

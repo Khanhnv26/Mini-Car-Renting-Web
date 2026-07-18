@@ -24,12 +24,14 @@ public class ProducerController {
             @RequestParam(name = "keyword", required = false) String keyword,
             @RequestParam(name = "country", required = false) String country,
             @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "sortBy", defaultValue = "producerId") String sortBy,
+            @RequestParam(name = "sortBy", defaultValue = "producerName") String sortBy,
             @RequestParam(name = "sortDir", defaultValue = "asc") String sortDir,
             Model model) {
-        Page<CarProducer> producerPage = producerService.findPaginated(keyword, country, page, 5, sortBy, sortDir);
+        int pageSize = 5;
+        Page<CarProducer> producerPage = producerService.findPaginated(keyword, country, page, pageSize, sortBy, sortDir);
         model.addAttribute("producers", producerPage.getContent());
         model.addAttribute("currentPage", page);
+        model.addAttribute("pageSize", pageSize);
         model.addAttribute("totalPages", producerPage.getTotalPages());
         model.addAttribute("totalItems", producerPage.getTotalElements());
         model.addAttribute("sortBy", sortBy);
@@ -65,13 +67,13 @@ public class ProducerController {
     }
 
     @GetMapping("/edit/{id}")
-    public String editForm(@PathVariable("id") Long id, Model model) {
+    public String editForm(@PathVariable("id") Integer id, Model model) {
         model.addAttribute("producerDTO", producerService.findDTOById(id));
         return "producer/producer-form";
     }
 
     @GetMapping("/delete/{id}")
-    public String delete(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
+    public String delete(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
         try {
             producerService.deleteById(id);
             redirectAttributes.addFlashAttribute("toastMessage", "Xóa hãng xe thành công!");

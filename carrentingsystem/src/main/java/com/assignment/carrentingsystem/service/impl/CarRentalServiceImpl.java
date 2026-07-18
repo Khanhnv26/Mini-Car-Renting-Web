@@ -18,8 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,10 +34,9 @@ public class CarRentalServiceImpl implements CarRentalService {
     private final CarRepository carRepository;
     private final CarRentalRepository carRentalRepository;
 
-
     @Override
     @Transactional
-    public void createCarRental(Long customerId, RentalRequest request) {
+    public void createCarRental(Integer customerId, RentalRequest request) {
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new RuntimeException("Khách hàng không tồn tại"));
 
@@ -46,9 +45,14 @@ public class CarRentalServiceImpl implements CarRentalService {
             throw new RuntimeException("Ngày nhận xe phải trước ngày trả xe");
         }
 
-        long days = Math.max(1, Duration.between(request.getPickupDate(), request.getReturnDate()).toDays());
+        LocalDate today = LocalDate.now();
+        if (request.getPickupDate().isBefore(today) || request.getReturnDate().isBefore(today)) {
+            throw new RuntimeException("Không được chọn ngày nhận/trả trong quá khứ");
+        }
 
-        for (Long carId : request.getCarIds()) {
+        long days = Math.max(1, ChronoUnit.DAYS.between(request.getPickupDate(), request.getReturnDate()));
+
+        for (Integer carId : request.getCarIds()) {
             Car car = carRepository.findById(carId)
                     .orElseThrow(() -> new RuntimeException("Xe không tồn tại: " + carId));
 
@@ -65,7 +69,7 @@ public class CarRentalServiceImpl implements CarRentalService {
             CarRental carRental = new CarRental();
             carRental.setCustomer(customer);
             carRental.setCar(car);
-            carRental.setPickUpDate(request.getPickupDate());
+            carRental.setPickupDate(request.getPickupDate());
             carRental.setReturnDate(request.getReturnDate());
             carRental.setRentPrice(car.getRentPrice().multiply(BigDecimal.valueOf(days)));
             carRental.setStatus("Pending");
@@ -79,12 +83,12 @@ public class CarRentalServiceImpl implements CarRentalService {
     }
 
     @Override
-    public List<CarRental> findByCustomerId(Long customerId) {
+    public List<CarRental> findByCustomerId(Integer customerId) {
         return carRentalRepository.findByCustomerId(customerId);
     }
 
     @Override
-    public CarRental findById(Long id) {
+    public CarRental findById(Integer id) {
         return carRentalRepository.findById(id).orElse(null);
     }
 
@@ -92,7 +96,7 @@ public class CarRentalServiceImpl implements CarRentalService {
 
     @Override
     @Transactional
-    public void updateStatus(Long rentalId, String status) {
+    public void updateStatus(Integer rentalId, String status) {
         if (status == null || !VALID_STATUSES.contains(status)) {
             throw new RuntimeException("Trạng thái không hợp lệ");
         }
@@ -101,7 +105,7 @@ public class CarRentalServiceImpl implements CarRentalService {
                 .orElseThrow(() -> new RuntimeException("Giao dịch thuê không tồn tại"));
         String currentStatus = carRental.getStatus();
 
-        if("Cancelled".equals(currentStatus) || "Completed".equals(currentStatus)){
+        if ("Cancelled".equals(currentStatus) || "Completed".equals(currentStatus)) {
             throw new RuntimeException("Không thể đổi trạng thái giao dịch đã kết thúc");
         }
 
@@ -121,7 +125,7 @@ public class CarRentalServiceImpl implements CarRentalService {
             car.setStatus("Rented");
             carRepository.save(car);
         } else if ("Completed".equals(status) || "Cancelled".equals(status)) {
-            if (!carRentalRepository.existsOtherActiveRental(car.getCarId(), carRental.getCarRentID())) {
+            if (!carRentalRepository.existsOtherActiveRental(car.getCarId(), carRental.getCarRenId())) {
                 car.setStatus("Available");
                 carRepository.save(car);
             }
@@ -130,34 +134,33 @@ public class CarRentalServiceImpl implements CarRentalService {
     }
 
     @Override
-    public List<CarRental> findByPickUpDateBetween(LocalDateTime start, LocalDateTime end) {
-        return carRentalRepository.findCarRentalByPickUpDate(start, end);
+    public List<CarRental> findByPickupDateBetween(LocalDate start, LocalDate end) {
+        return carRentalRepository.findCarRentalByPickupDate(start, end);
     }
 
     @Override
-    public List<RentalReportDTO> findRentalReportByPickUpDateBetween(LocalDateTime start, LocalDateTime end) {
-        return carRentalRepository.findCarRentalByPickUpDate(start, end)
+    public List<RentalReportDTO> findRentalReportByPickupDateBetween(LocalDate start, LocalDate end) {
+        return carRentalRepository.findCarRentalByPickupDate(start, end)
                 .stream()
                 .map(this::toReportDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public Page<RentalReportDTO> findRentalReportPaginated(LocalDateTime start, LocalDateTime end, String status, String keyword, int page, int size) {
+    public Page<RentalReportDTO> findRentalReportPaginated(LocalDate start, LocalDate end, String status, String keyword, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("rentPrice").descending());
-        String cleanStatus = cleanText(status);
-        String cleanKeyword = cleanText(keyword);
-        return carRentalRepository.findReportFiltered(start, end, cleanStatus, cleanKeyword, pageable).map(this::toReportDTO);
+        return carRentalRepository.findReportFiltered(start, end, cleanText(status), cleanText(keyword), pageable)
+                .map(this::toReportDTO);
     }
 
     @Override
-    public BigDecimal sumRentPriceFiltered(LocalDateTime start, LocalDateTime end, String status, String keyword) {
+    public BigDecimal sumRentPriceFiltered(LocalDate start, LocalDate end, String status, String keyword) {
         BigDecimal total = carRentalRepository.sumRentPriceFiltered(start, end, cleanText(status), cleanText(keyword));
         return total != null ? total : BigDecimal.ZERO;
     }
 
     @Override
-    public Map<String, Long> countByStatusFiltered(LocalDateTime start, LocalDateTime end, String status, String keyword) {
+    public Map<String, Long> countByStatusFiltered(LocalDate start, LocalDate end, String status, String keyword) {
         Map<String, Long> result = new HashMap<>();
         result.put("Pending", 0L);
         result.put("Renting", 0L);
@@ -180,26 +183,27 @@ public class CarRentalServiceImpl implements CarRentalService {
 
     private RentalReportDTO toReportDTO(CarRental r) {
         return new RentalReportDTO(
-                r.getCarRentID(),
-                r.getCustomer() != null ? r.getCustomer().getFullName() : "—",
-                r.getCar() != null ? r.getCar().getCarName() : "—",
-                r.getPickUpDate(),
+                r.getCarRenId(),
+                r.getCustomer() != null ? r.getCustomer().getFullName() : "-",
+                r.getCar() != null ? r.getCar().getCarName() : "-",
+                r.getPickupDate(),
                 r.getReturnDate(),
                 r.getRentPrice(),
                 r.getStatus());
     }
 
     @Override
-    public Page<CarRental> findRentalsPaginated(Long customerId, String status, LocalDateTime start, LocalDateTime end, int page, int size, String sortBy, String sortDir) {
+    public Page<CarRental> findRentalsPaginated(Integer customerId, String status, LocalDate start, LocalDate end, String keyword, int page, int size, String sortBy, String sortDir) {
         String safeSortBy = switch (sortBy == null ? "" : sortBy) {
-            case "pickUpDate", "returnDate", "rentPrice", "status", "carRentID" -> sortBy;
-            default -> "carRentID";
+            case "pickupDate", "returnDate", "rentPrice", "status", "carRenId" -> sortBy;
+            default -> "carRenId";
         };
         Sort sort = "desc".equalsIgnoreCase(sortDir)
                 ? Sort.by(safeSortBy).descending()
                 : Sort.by(safeSortBy).ascending();
         Pageable pageable = PageRequest.of(page, size, sort);
         String cleanStatus = (status != null && !status.trim().isEmpty()) ? status.trim() : null;
-        return carRentalRepository.findRentalsWithFilters(customerId, cleanStatus, start, end, pageable);
+        String cleanKeyword = cleanText(keyword);
+        return carRentalRepository.findRentalsWithFilters(customerId, cleanStatus, start, end, cleanKeyword, pageable);
     }
 }

@@ -7,8 +7,14 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface AccountRepository extends JpaRepository<Account, Long> {
+public interface AccountRepository extends JpaRepository<Account, Integer> {
     boolean existsByEmail(String email);
+
+    boolean existsByAccountName(String accountName);
+
     Account findByEmail(String email);
+
+    Account findByAccountName(String accountName);
+
     List<Account> findByRole(String role);
 }

@@ -39,7 +39,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public List<Account> findAvailableCustomerAccounts(Long keepAccountId) {
+    public List<Account> findAvailableCustomerAccounts(Integer keepAccountId) {
         return accountRepository.findByRole("Customer").stream()
                 .filter(a -> a.getAccountId().equals(keepAccountId)
                         || !customerRepository.existsByAccount_AccountId(a.getAccountId()))

@@ -8,11 +8,11 @@ import java.util.List;
 
 public interface CustomerService {
     List<Customer> findAll();
-    Customer findById(Long id);
-    CustomerDTO findDTOById(Long id);
+    Customer findById(Integer id);
+    CustomerDTO findDTOById(Integer id);
     Customer save(CustomerDTO customer);
-    void deleteById(Long id);
-    Customer findByAccountId(Long accountId);
+    void deleteById(Integer id);
+    Customer findByAccountId(Integer accountId);
     Customer findByEmail(String email);
     void updateProfile(String email, Customer data);
     Page<Customer> findPaginated(String keyword, int page, int size, String sortBy, String sortDir);

@@ -9,6 +9,10 @@
     <div class="card card-flat p-4 mb-4">
         <form th:action="@{/admin/rentals}" method="get" class="row g-3">
             <div class="col-md-3">
+                <input type="text" name="keyword" class="form-control form-control-sm"
+                       placeholder="Tên khách hàng hoặc tên xe..." th:value="${keyword}" />
+            </div>
+            <div class="col-md-2">
                 <select name="status" class="form-select form-select-sm">
                     <option value="" th:selected="${selectedStatus == null or selectedStatus == ''}">-- Tất cả --</option>
                     <option value="Pending" th:selected="${selectedStatus == 'Pending'}">Chờ xử lý</option>
@@ -17,10 +21,10 @@
                     <option value="Cancelled" th:selected="${selectedStatus == 'Cancelled'}">Đã hủy</option>
                 </select>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <input type="date" name="startDate" class="form-control form-control-sm" placeholder="Từ ngày..." th:value="${startDate}" />
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <input type="date" name="endDate" class="form-control form-control-sm" placeholder="Đến ngày..." th:value="${endDate}" />
             </div>
             <div class="col-md-2 d-grid">
@@ -30,31 +34,35 @@
     </div>
     
     <div class="card card-flat p-0 overflow-hidden">
-        <div th:if="${#lists.isEmpty(rentals)}" class="empty-state">
-            <h5 class="fw-light">Chưa có giao dịch nào</h5>
-            <p class="text-muted small mb-0">Khi khách hàng đặt thuê xe, danh sách sẽ xuất hiện tại đây.</p>
+        <div th:if="${rentals == null or #lists.isEmpty(rentals)}" class="empty-state">
+            <h5 class="fw-light"
+                th:text="${(selectedStatus != null and selectedStatus != '') or startDate != null or endDate != null or (keyword != null and !#strings.isEmpty(keyword))}
+                    ? 'Không tìm thấy giao dịch phù hợp' : 'Chưa có giao dịch nào'">Chưa có giao dịch nào</h5>
+            <p class="text-muted small mb-0"
+               th:text="${(selectedStatus != null and selectedStatus != '') or startDate != null or endDate != null or (keyword != null and !#strings.isEmpty(keyword))}
+                    ? 'Thử đổi bộ lọc hoặc xóa điều kiện tìm kiếm.' : 'Khi khách hàng đặt thuê xe, danh sách sẽ xuất hiện tại đây.'">…</p>
         </div>
         
-        <div th:unless="${#lists.isEmpty(rentals)}" class="table-responsive">
+        <div th:unless="${rentals == null or #lists.isEmpty(rentals)}" class="table-responsive">
             <table class="table table-minimal mb-0">
                 <thead>
                 <tr>
-                    <th><a class="text-decoration-none text-dark" th:href="@{/admin/rentals(page=${currentPage}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy='carRentID', sortDir=${reverseSortDir})}">ID <span th:if="${sortBy == 'carRentID'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
-                    <th>Khách hàng</th>
+                     <th class="text-muted" style="width: 4rem;">STT</th>
+                     <th>Khách hàng</th>
                     <th>Xe</th>
-                    <th><a class="text-decoration-none text-dark" th:href="@{/admin/rentals(page=${currentPage}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy='pickUpDate', sortDir=${reverseSortDir})}">Ngày nhận <span th:if="${sortBy == 'pickUpDate'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
-                    <th><a class="text-decoration-none text-dark" th:href="@{/admin/rentals(page=${currentPage}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy='returnDate', sortDir=${reverseSortDir})}">Ngày trả <span th:if="${sortBy == 'returnDate'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
-                    <th><a class="text-decoration-none text-dark" th:href="@{/admin/rentals(page=${currentPage}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy='rentPrice', sortDir=${reverseSortDir})}">Giá <span th:if="${sortBy == 'rentPrice'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
-                    <th><a class="text-decoration-none text-dark" th:href="@{/admin/rentals(page=${currentPage}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy='status', sortDir=${reverseSortDir})}">Trạng thái <span th:if="${sortBy == 'status'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
+                    <th><a class="text-decoration-none text-dark" th:href="@{/admin/rentals(page=${currentPage}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, keyword=${keyword}, sortBy='pickupDate', sortDir=${reverseSortDir})}">Ngày nhận <span th:if="${sortBy == 'pickupDate'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
+                    <th><a class="text-decoration-none text-dark" th:href="@{/admin/rentals(page=${currentPage}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, keyword=${keyword}, sortBy='returnDate', sortDir=${reverseSortDir})}">Ngày trả <span th:if="${sortBy == 'returnDate'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
+                    <th><a class="text-decoration-none text-dark" th:href="@{/admin/rentals(page=${currentPage}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, keyword=${keyword}, sortBy='rentPrice', sortDir=${reverseSortDir})}">Giá <span th:if="${sortBy == 'rentPrice'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
+                    <th><a class="text-decoration-none text-dark" th:href="@{/admin/rentals(page=${currentPage}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, keyword=${keyword}, sortBy='status', sortDir=${reverseSortDir})}">Trạng thái <span th:if="${sortBy == 'status'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
                     <th class="text-end">Cập nhật</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="r : ${rentals}">
-                    <td class="text-muted" th:text="${r.carRentID}"></td>
-                    <td class="fw-medium" th:text="${r.customer != null ? r.customer.fullName : '—'}"></td>
+                 <tr th:each="r, iterStat : ${rentals}">
+                     <td class="text-muted" th:text="${currentPage * pageSize + iterStat.count}"></td>
+                     <td class="fw-medium" th:text="${r.customer != null ? r.customer.fullName : '—'}"></td>
                     <td th:text="${r.car != null ? r.car.carName : '—'}"></td>
-                    <td th:text="${r.pickUpDate}"></td>
+                    <td th:text="${r.pickupDate}"></td>
                     <td th:text="${r.returnDate}"></td>
                     <td class="text-gold fw-medium" th:text="${r.rentPrice} + '$'"></td>
                     <td>
@@ -65,21 +73,21 @@
                     </td>
                     <td class="text-end action-cell">
                         <div th:if="${r.status == 'Pending'}" class="rental-actions">
-                            <form th:action="@{/admin/rentals/status/{id}(id=${r.carRentID})}" method="post">
+                            <form th:action="@{/admin/rentals/status/{id}(id=${r.carRenId})}" method="post">
                                 <input type="hidden" name="status" value="Renting"/>
                                 <button type="submit" class="btn btn-action-confirm">Xác nhận</button>
                             </form>
-                            <form th:action="@{/admin/rentals/status/{id}(id=${r.carRentID})}" method="post">
+                            <form th:action="@{/admin/rentals/status/{id}(id=${r.carRenId})}" method="post">
                                 <input type="hidden" name="status" value="Cancelled"/>
                                 <button type="submit" class="btn btn-action-cancel">Hủy</button>
                             </form>
                         </div>
                         <div th:if="${r.status == 'Renting'}" class="rental-actions">
-                            <form th:action="@{/admin/rentals/status/{id}(id=${r.carRentID})}" method="post">
+                            <form th:action="@{/admin/rentals/status/{id}(id=${r.carRenId})}" method="post">
                                 <input type="hidden" name="status" value="Completed"/>
                                 <button type="submit" class="btn btn-action-done">Hoàn thành</button>
                             </form>
-                            <form th:action="@{/admin/rentals/status/{id}(id=${r.carRentID})}" method="post">
+                            <form th:action="@{/admin/rentals/status/{id}(id=${r.carRenId})}" method="post">
                                 <input type="hidden" name="status" value="Cancelled"/>
                                 <button type="submit" class="btn btn-action-cancel">Hủy</button>
                             </form>
@@ -93,24 +101,24 @@
         
         <div th:if="${totalPages > 1}" class="card-footer d-flex justify-content-between align-items-center py-3">
             <div class="text-muted small">
-                Đang hiển thị dòng <span th:text="${currentPage * 5 + 1}"></span> - <span th:text="${T(java.lang.Math).min((currentPage + 1) * 5L, totalItems)}"></span> của tổng số <span th:text="${totalItems}"></span> dòng
+                Đang hiển thị dòng <span th:text="${currentPage * pageSize + 1}"></span> - <span th:text="${T(java.lang.Math).min((currentPage + 1L) * pageSize, totalItems)}"></span> của tổng số <span th:text="${totalItems}"></span> dòng
             </div>
             <nav aria-label="Page navigation">
                 <ul class="pagination pagination-sm pagination-minimal mb-0 gap-1">
                     <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                        <a class="page-link" th:href="@{/admin/rentals(page=0, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy=${sortBy}, sortDir=${sortDir})}" aria-label="First">&laquo;</a>
+                        <a class="page-link" th:href="@{/admin/rentals(page=0, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, keyword=${keyword}, sortBy=${sortBy}, sortDir=${sortDir})}" aria-label="First">&laquo;</a>
                     </li>
                     <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                        <a class="page-link" th:href="@{/admin/rentals(page=${currentPage - 1}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy=${sortBy}, sortDir=${sortDir})}" aria-label="Previous">&lsaquo;</a>
+                        <a class="page-link" th:href="@{/admin/rentals(page=${currentPage - 1}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, keyword=${keyword}, sortBy=${sortBy}, sortDir=${sortDir})}" aria-label="Previous">&lsaquo;</a>
                     </li>
                     <li class="page-item" th:each="i : ${#numbers.sequence(T(java.lang.Math).max(0, currentPage - 2), T(java.lang.Math).min(totalPages - 1, currentPage + 2))}" th:classappend="${currentPage == i} ? 'active'">
-                        <a class="page-link" th:href="@{/admin/rentals(page=${i}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy=${sortBy}, sortDir=${sortDir})}" th:text="${i + 1}"></a>
+                        <a class="page-link" th:href="@{/admin/rentals(page=${i}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, keyword=${keyword}, sortBy=${sortBy}, sortDir=${sortDir})}" th:text="${i + 1}"></a>
                     </li>
                     <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
-                        <a class="page-link" th:href="@{/admin/rentals(page=${currentPage + 1}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy=${sortBy}, sortDir=${sortDir})}" aria-label="Next">&rsaquo;</a>
+                        <a class="page-link" th:href="@{/admin/rentals(page=${currentPage + 1}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, keyword=${keyword}, sortBy=${sortBy}, sortDir=${sortDir})}" aria-label="Next">&rsaquo;</a>
                     </li>
                     <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
-                        <a class="page-link" th:href="@{/admin/rentals(page=${totalPages - 1}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy=${sortBy}, sortDir=${sortDir})}" aria-label="Last">&raquo;</a>
+                        <a class="page-link" th:href="@{/admin/rentals(page=${totalPages - 1}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, keyword=${keyword}, sortBy=${sortBy}, sortDir=${sortDir})}" aria-label="Last">&raquo;</a>
                     </li>
                 </ul>
             </nav>

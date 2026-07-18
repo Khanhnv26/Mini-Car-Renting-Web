@@ -4,16 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Getter
 @AllArgsConstructor
 public class RentalReportDTO {
-    private Long carRentId;
+    private Integer carRenId;
     private String customerName;
     private String carName;
-    private LocalDateTime pickupDate;
-    private LocalDateTime returnDate;
+    private LocalDate pickupDate;
+    private LocalDate returnDate;
     private BigDecimal rentPrice;
     private String status;
 }

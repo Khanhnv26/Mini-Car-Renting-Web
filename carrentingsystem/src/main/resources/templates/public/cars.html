@@ -89,9 +89,14 @@
         </div>
 
         <div th:if="${cars == null or #lists.isEmpty(cars)}" class="empty-state py-5 text-center card card-flat">
-            <h5 class="fw-normal public-page-title" style="font-size: 1.25rem;">Không tìm thấy xe phù hợp</h5>
-            <p class="public-page-sub mb-3">Thử đổi bộ lọc hoặc xóa điều kiện tìm kiếm.</p>
-            <a th:href="@{/cars}" class="btn btn-minimal px-4">Xem tất cả</a>
+            <h5 class="fw-normal public-page-title" style="font-size: 1.25rem;"
+                th:text="${(name != null and !#strings.isEmpty(name)) or selectedProducerId != null or minPrice != null or maxPrice != null or pickupDate != null or returnDate != null}
+                    ? 'Không tìm thấy xe phù hợp' : 'Chưa có xe nào'">Chưa có xe nào</h5>
+            <p class="public-page-sub mb-3"
+               th:text="${(name != null and !#strings.isEmpty(name)) or selectedProducerId != null or minPrice != null or maxPrice != null or pickupDate != null or returnDate != null}
+                    ? 'Thử đổi bộ lọc hoặc xóa điều kiện tìm kiếm.' : 'Hiện chưa có xe để hiển thị.'">…</p>
+            <a th:if="${(name != null and !#strings.isEmpty(name)) or selectedProducerId != null or minPrice != null or maxPrice != null or pickupDate != null or returnDate != null}"
+               th:href="@{/cars}" class="btn btn-minimal px-4">Xem tất cả</a>
         </div>
 
         <div th:unless="${cars == null or #lists.isEmpty(cars)}" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">

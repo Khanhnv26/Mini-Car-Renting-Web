@@ -47,12 +47,16 @@
         </div>
     </div>
 
-    <div th:if="${#lists.isEmpty(cars)}" class="empty-state py-5 text-center card card-flat mb-4">
-        <h5 class="fw-light">Không tìm thấy xe nào phù hợp</h5>
-        <p class="text-muted small mb-0">Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm.</p>
+    <div th:if="${cars == null or #lists.isEmpty(cars)}" class="empty-state py-5 text-center card card-flat mb-4">
+        <h5 class="fw-light"
+            th:text="${(name != null and !#strings.isEmpty(name)) or selectedProducerId != null or minPrice != null or maxPrice != null}
+                ? 'Không tìm thấy xe phù hợp' : 'Chưa có xe sẵn sàng'">Chưa có xe sẵn sàng</h5>
+        <p class="text-muted small mb-0"
+           th:text="${(name != null and !#strings.isEmpty(name)) or selectedProducerId != null or minPrice != null or maxPrice != null}
+                ? 'Thử đổi bộ lọc hoặc xóa điều kiện tìm kiếm.' : 'Hiện chưa có xe Available để thuê.'">…</p>
     </div>
 
-    <div th:unless="${#lists.isEmpty(cars)}" class="row row-cols-1 row-cols-md-3 g-4">
+    <div th:unless="${cars == null or #lists.isEmpty(cars)}" class="row row-cols-1 row-cols-md-3 g-4">
         <div th:each="car : ${cars}" class="col">
             <div class="card card-flat h-100">
                 <div class="card-body">
@@ -67,7 +71,10 @@
                         <span class="text-gold" th:text="${car.rentPrice + ' $/ngày'}"></span>
                         <span class="badge badge-soft-gold rounded-0" th:text="${car.status}"></span>
                     </div>
-                    <a th:href="@{/customer/rent(carId=${car.carId})}" class="btn btn-minimal w-100 mt-3 py-2">Thuê ngay</a>
+                    <div class="d-grid gap-2 mt-3">
+                        <a th:href="@{/customer/rent(carId=${car.carId})}" class="btn btn-minimal py-2">Thuê ngay</a>
+                        <a th:href="@{/customer/cars/{id}/reviews(id=${car.carId})}" class="btn btn-ghost btn-sm py-1">Xem đánh giá</a>
+                    </div>
                 </div>
             </div>
         </div>

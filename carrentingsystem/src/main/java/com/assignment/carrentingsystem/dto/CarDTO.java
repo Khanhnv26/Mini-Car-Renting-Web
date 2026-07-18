@@ -10,17 +10,16 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 public class CarDTO {
 
-    private Long carId;
+    private Integer carId;
 
     @NotBlank(message = "Tên xe không được để trống")
-    @Size(max = 255, message = "Tên xe tối đa 255 ký tự")
+    @Size(max = 200, message = "Tên xe tối đa 200 ký tự")
     private String carName;
 
     @NotNull(message = "Năm sản xuất không được để trống")
@@ -39,17 +38,27 @@ public class CarDTO {
     @Size(max = 1000, message = "Mô tả tối đa 1000 ký tự")
     private String description;
 
-    @NotNull(message = "Ngày nhập không được để trống")
+    @NotNull(message = "Ngày nhập kho không được để trống")
+    @PastOrPresent(message = "Ngày nhập kho không được ở tương lai")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate importDate;
 
     @NotNull(message = "Hãng xe không được để trống")
-    private Long producerId;
+    private Integer producerId;
 
     @NotNull(message = "Giá thuê không được để trống")
-    @DecimalMin(value = "0.0", inclusive = true, message = "Giá thuê không âm")
+    @DecimalMin(value = "0", inclusive = false, message = "Giá thuê phải lớn hơn 0")
     private BigDecimal rentPrice;
 
     @NotBlank(message = "Trạng thái không được trống")
+    @Size(max = 10, message = "Trạng thái tối đa 10 ký tự")
     private String status;
+
+    @AssertTrue(message = "Ngày nhập kho không được trước năm sản xuất")
+    public boolean isImportOnOrAfterModelYear() {
+        if (importDate == null || carModelYear == null) {
+            return true;
+        }
+        return importDate.getYear() >= carModelYear;
+    }
 }

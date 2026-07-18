@@ -37,27 +37,26 @@
     </div>
 
     <div class="card card-flat p-0 overflow-hidden">
-        <div th:if="${#lists.isEmpty(producers)}" class="empty-state">
-            <h5>Không tìm thấy hãng sản xuất</h5>
-            <p class="app-page-sub mb-0">Thử đổi từ khóa tìm kiếm hoặc xóa bộ lọc.</p>
+        <div th:if="${producers == null or #lists.isEmpty(producers)}" class="empty-state">
+            <h5 class="fw-light"
+                th:text="${(keyword != null and !#strings.isEmpty(keyword)) or (selectedCountry != null and !#strings.isEmpty(selectedCountry))}
+                    ? 'Không tìm thấy hãng sản xuất phù hợp' : 'Chưa có hãng sản xuất nào'">Chưa có hãng sản xuất nào</h5>
+            <p class="text-muted small mb-0"
+               th:text="${(keyword != null and !#strings.isEmpty(keyword)) or (selectedCountry != null and !#strings.isEmpty(selectedCountry))}
+                    ? 'Thử đổi bộ lọc hoặc xóa điều kiện tìm kiếm.' : 'Hãy bấm nút Thêm mới để tạo hãng đầu tiên.'">…</p>
         </div>
 
-        <div th:unless="${#lists.isEmpty(producers)}" class="table-responsive">
+        <div th:unless="${producers == null or #lists.isEmpty(producers)}" class="table-responsive">
             <table class="table table-minimal mb-0">
                 <thead>
                 <tr>
-                    <th>
-                        <a class="text-decoration-none"
-                           th:href="@{/admin/producers(page=${currentPage}, keyword=${keyword}, country=${selectedCountry}, sortBy='producerId', sortDir=${reverseSortDir})}">
-                            ID <span th:if="${sortBy == 'producerId'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span>
-                        </a>
-                    </th>
-                    <th>
-                        <a class="text-decoration-none"
-                           th:href="@{/admin/producers(page=${currentPage}, keyword=${keyword}, country=${selectedCountry}, sortBy='producerName', sortDir=${reverseSortDir})}">
-                            Tên hãng <span th:if="${sortBy == 'producerName'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span>
-                        </a>
-                    </th>
+                     <th class="text-muted" style="width: 4rem;">STT</th>
+                     <th>
+                         <a class="text-decoration-none"
+                            th:href="@{/admin/producers(page=${currentPage}, keyword=${keyword}, country=${selectedCountry}, sortBy='producerName', sortDir=${reverseSortDir})}">
+                             Tên hãng <span th:if="${sortBy == 'producerName'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span>
+                         </a>
+                     </th>
                     <th>
                         <a class="text-decoration-none"
                            th:href="@{/admin/producers(page=${currentPage}, keyword=${keyword}, country=${selectedCountry}, sortBy='address', sortDir=${reverseSortDir})}">
@@ -74,8 +73,8 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="p : ${producers}">
-                    <td class="text-muted" th:text="${p.producerId}"></td>
+                 <tr th:each="p, iterStat : ${producers}">
+                     <td class="text-muted" th:text="${currentPage * pageSize + iterStat.count}"></td>
                     <td class="fw-medium" th:text="${p.producerName}"></td>
                     <td th:text="${p.address}"></td>
                     <td th:text="${p.country}"></td>

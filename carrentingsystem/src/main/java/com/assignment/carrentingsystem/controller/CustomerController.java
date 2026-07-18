@@ -13,6 +13,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
+
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/admin/customers")
@@ -21,16 +23,24 @@ public class CustomerController {
     private final CustomerService customerService;
     private final AccountService accountService;
 
+    private void addDateBounds(Model model) {
+        LocalDate today = LocalDate.now();
+        model.addAttribute("today", today);
+        model.addAttribute("maxBirthday", today.minusYears(18));
+    }
+
     @GetMapping
     public String getAllCustomers(
             @RequestParam(name = "keyword", required = false) String keyword,
             @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "sortBy", defaultValue = "customerId") String sortBy,
+            @RequestParam(name = "sortBy", defaultValue = "fullName") String sortBy,
             @RequestParam(name = "sortDir", defaultValue = "asc") String sortDir,
             Model model) {
-        Page<Customer> customerPage = customerService.findPaginated(keyword, page, 5, sortBy, sortDir);
+        int pageSize = 5;
+        Page<Customer> customerPage = customerService.findPaginated(keyword, page, pageSize, sortBy, sortDir);
         model.addAttribute("customers", customerPage.getContent());
         model.addAttribute("currentPage", page);
+        model.addAttribute("pageSize", pageSize);
         model.addAttribute("totalPages", customerPage.getTotalPages());
         model.addAttribute("totalItems", customerPage.getTotalElements());
         model.addAttribute("sortBy", sortBy);
@@ -40,19 +50,25 @@ public class CustomerController {
         return "customer/customer-list";
     }
 
-
     @GetMapping("/new")
     public String createForm(Model model) {
         model.addAttribute("customerDTO", new CustomerDTO());
         model.addAttribute("accounts", accountService.findAvailableCustomerAccounts(null));
+        addDateBounds(model);
         return "customer/customer-form";
     }
 
     @PostMapping("/save")
-    public String save(@Valid @ModelAttribute("customerDTO") CustomerDTO customerDTO, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
-        Long keepAccountId = customerDTO.getAccountId();
+    public String save(@Valid @ModelAttribute("customerDTO") CustomerDTO customerDTO,
+                       BindingResult bindingResult,
+                       Model model,
+                       RedirectAttributes redirectAttributes) {
+        boolean isEdit = customerDTO.getCustomerId() != null;
         if (bindingResult.hasErrors()) {
-            model.addAttribute("accounts", accountService.findAvailableCustomerAccounts(keepAccountId));
+            if (!isEdit) {
+                model.addAttribute("accounts", accountService.findAvailableCustomerAccounts(null));
+            }
+            addDateBounds(model);
             return "customer/customer-form";
         }
 
@@ -62,22 +78,25 @@ public class CustomerController {
             redirectAttributes.addFlashAttribute("toastType", "success");
             return "redirect:/admin/customers";
         } catch (Exception e) {
-            model.addAttribute("accounts", accountService.findAvailableCustomerAccounts(keepAccountId));
+            if (!isEdit) {
+                model.addAttribute("accounts", accountService.findAvailableCustomerAccounts(null));
+            }
             model.addAttribute("error", e.getMessage());
+            addDateBounds(model);
             return "customer/customer-form";
         }
     }
 
     @GetMapping("/edit/{id}")
-    public String editForm(@PathVariable("id") Long id, Model model) {
+    public String editForm(@PathVariable("id") Integer id, Model model) {
         CustomerDTO dto = customerService.findDTOById(id);
         model.addAttribute("customerDTO", dto);
-        model.addAttribute("accounts", accountService.findAvailableCustomerAccounts(dto.getAccountId()));
+        addDateBounds(model);
         return "customer/customer-form";
     }
 
     @GetMapping("/delete/{id}")
-    public String delete(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
+    public String delete(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
         try {
             customerService.deleteById(id);
             redirectAttributes.addFlashAttribute("toastMessage", "Xóa khách hàng thành công!");

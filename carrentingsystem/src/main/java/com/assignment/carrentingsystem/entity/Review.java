@@ -1,12 +1,10 @@
 package com.assignment.carrentingsystem.entity;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 
 @Entity
 @Setter
@@ -18,10 +16,10 @@ public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
-    private Long id;
+    private Integer id;
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "CarRentID", nullable = false, unique = true)
+    @JoinColumn(name = "CarRenID", nullable = false, unique = true)
     private CarRental carRental;
 
     @Column(name = "ReviewStar", nullable = false)
@@ -29,7 +27,4 @@ public class Review {
 
     @Column(name = "Comment", nullable = false, length = 500)
     private String comment;
-
-
-
 }

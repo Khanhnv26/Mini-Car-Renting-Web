@@ -1,16 +1,15 @@
 package com.assignment.carrentingsystem.dto;
 
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import jakarta.validation.constraints.AssertTrue;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @NoArgsConstructor
@@ -19,18 +18,28 @@ import java.util.List;
 @Setter
 public class RentalRequest {
     @NotEmpty(message = "Phải chọn ít nhất 1 xe")
-    private List<Long> carIds;
+    private List<Integer> carIds;
 
     @NotNull(message = "Ngày nhận xe không được để trống")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private LocalDateTime pickupDate;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate pickupDate;
 
     @NotNull(message = "Ngày trả xe không được để trống")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private LocalDateTime returnDate;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate returnDate;
 
     @AssertTrue(message = "Ngày nhận xe phải trước ngày trả xe")
     public boolean isValidDateRange() {
-        return pickupDate != null && returnDate != null && pickupDate.isBefore(returnDate);
+        return pickupDate == null || returnDate == null || pickupDate.isBefore(returnDate);
+    }
+
+    @AssertTrue(message = "Ngày nhận xe không được ở quá khứ")
+    public boolean isPickupNotInPast() {
+        return pickupDate == null || !pickupDate.isBefore(LocalDate.now());
+    }
+
+    @AssertTrue(message = "Ngày trả xe không được ở quá khứ")
+    public boolean isReturnNotInPast() {
+        return returnDate == null || !returnDate.isBefore(LocalDate.now());
     }
 }

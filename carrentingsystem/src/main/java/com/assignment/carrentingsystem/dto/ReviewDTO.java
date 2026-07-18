@@ -11,8 +11,8 @@ import lombok.Setter;
 @Setter
 @Getter
 public class ReviewDTO {
-    @NotNull(message =  "Mã thuê xe không được trống")
-    private Long carRentalId;
+    @NotNull(message = "Mã thuê xe không được trống")
+    private Integer carRentalId;
 
     @NotNull(message = "Đánh giá không được trống")
     @Min(value = 1, message = "Tối thiểu 1 sao")
@@ -22,5 +22,4 @@ public class ReviewDTO {
     @NotBlank(message = "Nhận xét không được trống")
     @Size(max = 500, message = "Nhận xét tối đa 500 ký tự")
     private String comment;
-
 }

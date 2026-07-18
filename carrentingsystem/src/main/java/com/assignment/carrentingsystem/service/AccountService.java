@@ -11,5 +11,5 @@ public interface AccountService {
     boolean existsByEmail(String email);
     List<Account> findAllCustomers();
 
-    List<Account> findAvailableCustomerAccounts(Long keepAccountId);
+    List<Account> findAvailableCustomerAccounts(Integer keepAccountId);
 }

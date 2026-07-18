@@ -43,14 +43,16 @@
 
             <div class="col-md-4">
                 <label class="form-label text-muted small mb-1">Giá thuê ($/ngày)</label>
-                <input type="number" step="0.01" th:field="*{rentPrice}" class="form-control input-minimal py-2">
+                <input type="number" step="1" min="1" th:field="*{rentPrice}" class="form-control input-minimal py-2">
                 <div th:errors="*{rentPrice}" class="text-danger small mt-1"></div>
             </div>
             <div class="col-md-4">
                 <label class="form-label text-muted small mb-1">Ngày nhập kho</label>
                 <input type="date" th:field="*{importDate}" class="form-control input-minimal py-2"
-                       th:classappend="${#fields.hasErrors('importDate')} ? ' is-invalid' : ''">
+                       th:max="${today}"
+                       th:classappend="${#fields.hasErrors('importDate') or #fields.hasErrors('importOnOrAfterModelYear')} ? ' is-invalid' : ''">
                 <div th:errors="*{importDate}" class="text-danger small mt-1"></div>
+                <div th:errors="*{importOnOrAfterModelYear}" class="text-danger small mt-1"></div>
             </div>
             <div class="col-md-4">
                 <label class="form-label text-muted small mb-1">Trạng thái hoạt động</label>

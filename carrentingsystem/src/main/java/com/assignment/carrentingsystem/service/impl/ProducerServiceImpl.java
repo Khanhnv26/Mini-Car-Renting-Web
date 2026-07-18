@@ -44,12 +44,12 @@ public class ProducerServiceImpl implements ProducerService {
     }
 
     @Override
-    public CarProducer findById(Long id) {
+    public CarProducer findById(Integer id) {
         return carProducerRepository.findById(id).orElse(null);
     }
 
     @Override
-    public CarProducerDTO findDTOById(Long id) {
+    public CarProducerDTO findDTOById(Integer id) {
         CarProducer p = carProducerRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Hãng xe không tồn tại"));
         return toDTO(p);
@@ -70,7 +70,7 @@ public class ProducerServiceImpl implements ProducerService {
 
     @Override
     @Transactional
-    public void deleteById(Long id) {
+    public void deleteById(Integer id) {
         if (carRepository.existsByCarProducer_ProducerId(id)) {
             throw new RuntimeException("Không thể xoá hãng xe đang có xe");
         }

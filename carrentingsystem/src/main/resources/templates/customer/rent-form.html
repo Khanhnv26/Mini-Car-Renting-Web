@@ -9,34 +9,47 @@
         <h1 class="app-page-title mb-1">Đăng ký thuê xe</h1>
         <p class="app-page-sub mb-4">Chọn xe, ngày nhận và ngày trả. Giao dịch sẽ ở trạng thái <span class="text-gold">Pending</span> chờ Admin xác nhận.</p>
         <div th:if="${error}" class="alert alert-danger border-0 rounded-1 text-center small" th:text="${error}"></div>
-        <form th:action="@{/customer/rent}" th:object="${rentalRequest}" method="post" class="row g-4">
+        <form th:action="@{/customer/rent}" th:object="${rentalRequest}" method="post" class="row g-4" id="rentForm">
             <div class="col-12">
                 <label class="form-label text-muted small mb-1">Chọn xe (có thể chọn nhiều)</label>
                 <div th:errors="*{carIds}" class="text-danger small mb-2"></div>
-                <div class="list-group rent-car-list" style="max-height: 320px; overflow-y: auto;">
-                    <label th:each="car : ${cars}"
-                           th:classappend="${rentalRequest.carIds != null and rentalRequest.carIds.contains(car.carId)} ? ' rent-car-selected' : ''"
-                           class="list-group-item d-flex align-items-center gap-3 py-2 px-3 border-0 rent-car-item">
-                        <input type="checkbox" th:field="*{carIds}" th:value="${car.carId}" class="form-check-input">
+                <div th:if="${cars == null or #lists.isEmpty(cars)}" class="empty-state text-center py-4">
+                    <h5 class="fw-light">Không có xe sẵn sàng để thuê</h5>
+                    <p class="text-muted small mb-0">Hiện chưa có xe Available. Vui lòng quay lại sau.</p>
+                </div>
+                <div th:unless="${cars == null or #lists.isEmpty(cars)}"
+                     class="list-group rent-car-list" style="max-height: 320px; overflow-y: auto;">
+                    <div th:each="car : ${cars}"
+                         th:classappend="${rentalRequest.carIds != null and rentalRequest.carIds.contains(car.carId)} ? ' rent-car-selected' : ''"
+                         class="list-group-item d-flex align-items-center gap-3 py-2 px-3 border-0 rent-car-item">
+                        <input type="checkbox" th:field="*{carIds}" th:value="${car.carId}"
+                               class="form-check-input rent-car-check" th:attr="data-car-id=${car.carId}">
                         <span class="flex-grow-1">
                             <span class="d-block text-white" th:text="${car.carName}"></span>
                             <span class="small text-muted"
                                   th:text="${car.rentPrice + '$/ngày · ' + (car.carProducer != null ? car.carProducer.producerName : '—')}"></span>
                         </span>
+                        <a th:href="@{/customer/cars/{id}/reviews(id=${car.carId})}"
+                           class="btn btn-ghost btn-sm py-1 px-2 js-view-reviews"
+                           th:attr="data-car-id=${car.carId}">Xem đánh giá</a>
                         <span th:if="${rentalRequest.carIds != null and rentalRequest.carIds.contains(car.carId)}"
                               class="badge badge-soft-gold rounded-pill small">Đã chọn</span>
-                    </label>
+                    </div>
                 </div>
             </div>
             <div class="col-md-6">
                 <label class="form-label text-muted small mb-1">Ngày nhận xe</label>
-                <input type="datetime-local" th:field="*{pickupDate}" class="form-control input-minimal py-2">
+                <input type="date" th:field="*{pickupDate}" class="form-control input-minimal py-2"
+                       th:min="${today}">
                 <div th:errors="*{pickupDate}" class="text-danger small mt-1"></div>
+                <div th:errors="*{pickupNotInPast}" class="text-danger small mt-1"></div>
             </div>
             <div class="col-md-6">
                 <label class="form-label text-muted small mb-1">Ngày trả xe</label>
-                <input type="datetime-local" th:field="*{returnDate}" class="form-control input-minimal py-2">
+                <input type="date" th:field="*{returnDate}" class="form-control input-minimal py-2"
+                       th:min="${today}">
                 <div th:errors="*{returnDate}" class="text-danger small mt-1"></div>
+                <div th:errors="*{returnNotInPast}" class="text-danger small mt-1"></div>
             </div>
             <div th:errors="*{validDateRange}" class="col-12 text-danger small"></div>
             <div class="col-12 mt-2">
@@ -44,6 +57,29 @@
             </div>
         </form>
     </div>
+    <script th:inline="javascript">
+        (function () {
+            var base = /*[[@{/customer/cars/}]]*/ '/customer/cars/';
+            document.querySelectorAll('.js-view-reviews').forEach(function (link) {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    var carId = link.getAttribute('data-car-id');
+                    var ids = Array.from(document.querySelectorAll('.rent-car-check:checked'))
+                        .map(function (el) { return el.getAttribute('data-car-id') || el.value; });
+                    if (ids.indexOf(String(carId)) === -1) {
+                        ids.push(String(carId));
+                    }
+                    var url = base + encodeURIComponent(carId) + '/reviews';
+                    if (ids.length) {
+                        url += '?' + ids.map(function (id) {
+                            return 'returnCarIds=' + encodeURIComponent(id);
+                        }).join('&');
+                    }
+                    window.location.href = url;
+                });
+            });
+        })();
+    </script>
 </div>
 </body>
 </html>

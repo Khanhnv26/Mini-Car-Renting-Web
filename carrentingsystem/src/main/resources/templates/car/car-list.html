@@ -23,15 +23,14 @@
                     <option value="">-- Trạng thái --</option>
                     <option value="Available" th:selected="${selectedStatus == 'Available'}">Sẵn sàng</option>
                     <option value="Rented" th:selected="${selectedStatus == 'Rented'}">Đang thuê</option>
-                    <option value="Maintenance" th:selected="${selectedStatus == 'Maintenance'}">Bảo trì</option>
                     <option value="Inactive" th:selected="${selectedStatus == 'Inactive'}">Ngừng hoạt động</option>
                 </select>
             </div>
             <div class="col-md-2">
-                <input type="number" name="minPrice" step="0.01" class="form-control form-control-sm" placeholder="Giá từ..." th:value="${minPrice}" />
+                <input type="number" name="minPrice" step="1" min="0" class="form-control form-control-sm" placeholder="Giá từ..." th:value="${minPrice}" />
             </div>
             <div class="col-md-2">
-                <input type="number" name="maxPrice" step="0.01" class="form-control form-control-sm" placeholder="Giá đến..." th:value="${maxPrice}" />
+                <input type="number" name="maxPrice" step="1" min="0" class="form-control form-control-sm" placeholder="Giá đến..." th:value="${maxPrice}" />
             </div>
             <div class="col-md-1 d-grid">
                 <button type="submit" class="btn btn-minimal py-1">Lọc</button>
@@ -40,17 +39,21 @@
     </div>
     
     <div class="card card-flat p-0 overflow-hidden">
-        <div th:if="${#lists.isEmpty(cars)}" class="empty-state">
-            <h5 class="fw-light">Chưa có xe nào</h5>
-            <p class="text-muted small mb-0">Hãy bấm "Thêm xe mới" để tạo dữ liệu đầu tiên.</p>
+        <div th:if="${cars == null or #lists.isEmpty(cars)}" class="empty-state">
+            <h5 class="fw-light"
+                th:text="${(name != null and !#strings.isEmpty(name)) or selectedProducerId != null or (selectedStatus != null and !#strings.isEmpty(selectedStatus)) or minPrice != null or maxPrice != null}
+                    ? 'Không tìm thấy xe phù hợp' : 'Chưa có xe nào'">Chưa có xe nào</h5>
+            <p class="text-muted small mb-0"
+               th:text="${(name != null and !#strings.isEmpty(name)) or selectedProducerId != null or (selectedStatus != null and !#strings.isEmpty(selectedStatus)) or minPrice != null or maxPrice != null}
+                    ? 'Thử đổi bộ lọc hoặc xóa điều kiện tìm kiếm.' : 'Hãy bấm nút Thêm xe mới để tạo dữ liệu đầu tiên.'">…</p>
         </div>
         
-        <div th:unless="${#lists.isEmpty(cars)}" class="table-responsive">
+        <div th:unless="${cars == null or #lists.isEmpty(cars)}" class="table-responsive">
             <table class="table table-minimal mb-0">
                 <thead>
                 <tr>
-                    <th><a class="text-decoration-none text-dark" th:href="@{/admin/cars(page=${currentPage}, name=${name}, producerId=${selectedProducerId}, status=${selectedStatus}, minPrice=${minPrice}, maxPrice=${maxPrice}, sortBy='carId', sortDir=${reverseSortDir})}">ID <span th:if="${sortBy == 'carId'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
-                    <th><a class="text-decoration-none text-dark" th:href="@{/admin/cars(page=${currentPage}, name=${name}, producerId=${selectedProducerId}, status=${selectedStatus}, minPrice=${minPrice}, maxPrice=${maxPrice}, sortBy='carName', sortDir=${reverseSortDir})}">Tên xe <span th:if="${sortBy == 'carName'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
+                     <th class="text-muted" style="width: 4rem;">STT</th>
+                     <th><a class="text-decoration-none text-dark" th:href="@{/admin/cars(page=${currentPage}, name=${name}, producerId=${selectedProducerId}, status=${selectedStatus}, minPrice=${minPrice}, maxPrice=${maxPrice}, sortBy='carName', sortDir=${reverseSortDir})}">Tên xe <span th:if="${sortBy == 'carName'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
                     <th><a class="text-decoration-none text-dark" th:href="@{/admin/cars(page=${currentPage}, name=${name}, producerId=${selectedProducerId}, status=${selectedStatus}, minPrice=${minPrice}, maxPrice=${maxPrice}, sortBy='carModelYear', sortDir=${reverseSortDir})}">Năm <span th:if="${sortBy == 'carModelYear'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
                     <th><a class="text-decoration-none text-dark" th:href="@{/admin/cars(page=${currentPage}, name=${name}, producerId=${selectedProducerId}, status=${selectedStatus}, minPrice=${minPrice}, maxPrice=${maxPrice}, sortBy='capacity', sortDir=${reverseSortDir})}">Sức chứa <span th:if="${sortBy == 'capacity'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
                     <th><a class="text-decoration-none text-dark" th:href="@{/admin/cars(page=${currentPage}, name=${name}, producerId=${selectedProducerId}, status=${selectedStatus}, minPrice=${minPrice}, maxPrice=${maxPrice}, sortBy='rentPrice', sortDir=${reverseSortDir})}">Giá thuê <span th:if="${sortBy == 'rentPrice'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
@@ -60,8 +63,8 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="car : ${cars}">
-                    <td class="text-muted" th:text="${car.carId}"></td>
+                 <tr th:each="car, iterStat : ${cars}">
+                     <td class="text-muted" th:text="${currentPage * pageSize + iterStat.count}"></td>
                     <td th:text="${car.carName}"></td>
                     <td th:text="${car.carModelYear}"></td>
                     <td th:text="${car.capacity} + ' chỗ'"></td>
@@ -69,7 +72,6 @@
                     <td>
                         <span th:if="${car.status == 'Available'}" class="badge badge-soft-gold py-2 px-3 rounded-pill">Sẵn sàng</span>
                         <span th:if="${car.status == 'Rented'}" class="badge badge-soft-gray py-2 px-3 rounded-pill">Đang thuê</span>
-                        <span th:if="${car.status == 'Maintenance'}" class="badge badge-soft-gray py-2 px-3 rounded-pill">Bảo trì</span>
                         <span th:if="${car.status == 'Inactive'}" class="badge badge-soft-gray py-2 px-3 rounded-pill">Ngừng hoạt động</span>
                     </td>
                     <td th:text="${car.carProducer.producerName}"></td>

@@ -1,16 +1,14 @@
 package com.assignment.carrentingsystem.service.impl;
 
+import com.assignment.carrentingsystem.config.AppConfig;
 import com.assignment.carrentingsystem.dto.RegisterForm;
 import com.assignment.carrentingsystem.entity.Account;
 import com.assignment.carrentingsystem.entity.Customer;
 import com.assignment.carrentingsystem.repository.AccountRepository;
 import com.assignment.carrentingsystem.repository.CustomerRepository;
 import com.assignment.carrentingsystem.service.AuthService;
+import com.assignment.carrentingsystem.util.CustomerDateRules;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,17 +16,20 @@ import org.springframework.stereotype.Service;
 public class AuthServiceImpl implements AuthService {
     private final AccountRepository accountRepository;
     private final CustomerRepository customerRepository;
-    private final PasswordEncoder passwordEncoder;
 
     @Override
     public void register(RegisterForm user) {
+        CustomerDateRules.validate(user.getBirthday(), user.getLicenceDate());
         if (accountRepository.existsByEmail(user.getEmail())) {
             throw new RuntimeException("Email đã tồn tại");
+        }
+        if (accountRepository.existsByAccountName(user.getAccountName())) {
+            throw new RuntimeException("Tên đăng nhập đã tồn tại");
         }
 
         Account account = new Account();
         account.setAccountName(user.getAccountName());
-        account.setPassword(passwordEncoder.encode(user.getPassword()));
+        account.setPassword(AppConfig.hashPassword(user.getPassword()));
         account.setEmail(user.getEmail());
         account.setRole("Customer");
 
@@ -46,14 +47,11 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Account account = accountRepository.findByEmail(email);
-        if(account == null) {
-            throw new UsernameNotFoundException("Email không tồn tại: " + email);
+    public Account login(String accountName, String password) {
+        Account account = accountRepository.findByAccountName(accountName);
+        if (account == null || !AppConfig.matches(password, account.getPassword())) {
+            throw new RuntimeException("Sai tên đăng nhập hoặc mật khẩu");
         }
-        return User.withUsername(account.getEmail())
-                   .password(account.getPassword())
-                   .roles(account.getRole())
-                   .build();
+        return account;
     }
 }

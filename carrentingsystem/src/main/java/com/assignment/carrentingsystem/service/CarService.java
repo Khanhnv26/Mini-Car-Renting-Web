@@ -10,9 +10,9 @@ import java.util.List;
 public interface CarService {
     List<Car> findAll();
     List<Car> findByStatus(String status);
-    Car findById(Long id);
+    Car findById(Integer id);
     Car save(CarDTO carDTO);
-    void deleteById(Long id);
-    CarDTO findDTOById(Long id);
-    Page<Car> findPaginated(String name, Long producerId, String status, BigDecimal minPrice, BigDecimal maxPrice, int page, int size, String sortBy, String sortDir);
+    void deleteById(Integer id);
+    CarDTO findDTOById(Integer id);
+    Page<Car> findPaginated(String name, Integer producerId, String status, BigDecimal minPrice, BigDecimal maxPrice, int page, int size, String sortBy, String sortDir);
 }

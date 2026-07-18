@@ -31,11 +31,11 @@ IF OBJECT_ID(N'dbo.Account',     N'U') IS NOT NULL DROP TABLE dbo.Account;
 GO
 
 CREATE TABLE dbo.Account (
-    AccountID    BIGINT        IDENTITY(1,1) NOT NULL,
-    AccountName  VARCHAR(255)                NOT NULL,
-    Email        VARCHAR(255)                NOT NULL,
-    Password     VARCHAR(255)                NOT NULL,
-    Role         NVARCHAR(20)                NOT NULL,
+    AccountID    INT            IDENTITY(1,1) NOT NULL,
+    AccountName  NVARCHAR(100)                NOT NULL,
+    Email        VARCHAR(200)                 NOT NULL,
+    Password     VARCHAR(200)                 NOT NULL,
+    Role         NVARCHAR(10)                 NOT NULL,
     CONSTRAINT PK_Account PRIMARY KEY (AccountID),
     CONSTRAINT UQ_Account_Email UNIQUE (Email),
     CONSTRAINT CK_Account_Role  CHECK (Role IN (N'Admin', N'Customer'))
@@ -43,25 +43,25 @@ CREATE TABLE dbo.Account (
 GO
 
 CREATE TABLE dbo.CarProducer (
-    ProducerID    BIGINT        IDENTITY(1,1) NOT NULL,
-    ProducerName  NVARCHAR(255)               NOT NULL,
-    Address       NVARCHAR(255)               NOT NULL,
-    Country       NVARCHAR(255)               NOT NULL,
+    ProducerID    INT            IDENTITY(1,1) NOT NULL,
+    ProducerName  NVARCHAR(100)                NOT NULL,
+    Address       NVARCHAR(200)                NOT NULL,
+    Country       NVARCHAR(100)                NOT NULL,
     CONSTRAINT PK_CarProducer PRIMARY KEY (ProducerID)
 );
 GO
 
 CREATE TABLE dbo.Car (
-    CarID         BIGINT         IDENTITY(1,1) NOT NULL,
-    CarName       NVARCHAR(255)                NOT NULL,
-    CarModelYear  INT                          NOT NULL,
-    Color         NVARCHAR(50)                 NOT NULL,
-    Capacity      INT                          NOT NULL,
-    Description   NVARCHAR(1000)               NOT NULL,
-    ImportDate    DATE                         NOT NULL,
-    ProducerID    BIGINT                       NOT NULL,
-    RentPrice     DECIMAL(18,2)                NOT NULL,
-    Status        NVARCHAR(20)                 NOT NULL,
+    CarID         INT             IDENTITY(1,1) NOT NULL,
+    CarName       NVARCHAR(200)                 NOT NULL,
+    CarModelYear  INT                           NOT NULL,
+    Color         NVARCHAR(50)                  NOT NULL,
+    Capacity      INT                           NOT NULL,
+    Description   NVARCHAR(1000)                NOT NULL,
+    ImportDate    DATE                          NOT NULL,
+    ProducerID    INT                           NOT NULL,
+    RentPrice     DECIMAL(10,0)                 NOT NULL,
+    Status        NVARCHAR(10)                  NOT NULL,
     CONSTRAINT PK_Car PRIMARY KEY (CarID),
     CONSTRAINT FK_Car_CarProducer FOREIGN KEY (ProducerID)
         REFERENCES dbo.CarProducer (ProducerID),
@@ -71,14 +71,14 @@ CREATE TABLE dbo.Car (
 GO
 
 CREATE TABLE dbo.Customer (
-    CustomerID     BIGINT        IDENTITY(1,1) NOT NULL,
-    FullName       NVARCHAR(255)               NOT NULL,
-    Mobile         VARCHAR(20)                 NOT NULL,
-    Birthday       DATE                        NOT NULL,
-    IdentityCard   VARCHAR(20)                 NOT NULL,
-    LicenceNumber  VARCHAR(20)                 NOT NULL,
-    LicenceDate    DATE                        NOT NULL,
-    AccountID      BIGINT                      NOT NULL,
+    CustomerID     INT            IDENTITY(1,1) NOT NULL,
+    FullName       NVARCHAR(200)                NOT NULL,
+    Mobile         VARCHAR(15)                  NOT NULL,
+    Birthday       DATE                         NOT NULL,
+    IdentityCard   VARCHAR(20)                  NOT NULL,
+    LicenceNumber  VARCHAR(20)                  NOT NULL,
+    LicenceDate    DATE                         NOT NULL,
+    AccountID      INT                          NOT NULL,
     CONSTRAINT PK_Customer PRIMARY KEY (CustomerID),
     CONSTRAINT FK_Customer_Account FOREIGN KEY (AccountID)
         REFERENCES dbo.Account (AccountID),
@@ -87,14 +87,14 @@ CREATE TABLE dbo.Customer (
 GO
 
 CREATE TABLE dbo.CarRental (
-    CarRentID   BIGINT        IDENTITY(1,1) NOT NULL,
-    CustomerID  BIGINT                      NOT NULL,
-    CarID       BIGINT                      NOT NULL,
-    PickupDate  DATETIME2                   NOT NULL,
-    ReturnDate  DATETIME2                   NOT NULL,
-    RentPrice   DECIMAL(18,2)               NOT NULL,
-    Status      NVARCHAR(20)                NOT NULL,
-    CONSTRAINT PK_CarRental PRIMARY KEY (CarRentID),
+    CarRenID    INT             IDENTITY(1,1) NOT NULL,
+    CustomerID  INT                           NOT NULL,
+    CarID       INT                           NOT NULL,
+    PickupDate  DATE                          NOT NULL,
+    ReturnDate  DATE                          NOT NULL,
+    RentPrice   DECIMAL(10,0)                 NOT NULL,
+    Status      NVARCHAR(10)                  NOT NULL,
+    CONSTRAINT PK_CarRental PRIMARY KEY (CarRenID),
     CONSTRAINT FK_CarRental_Customer FOREIGN KEY (CustomerID)
         REFERENCES dbo.Customer (CustomerID),
     CONSTRAINT FK_CarRental_Car FOREIGN KEY (CarID)
@@ -105,14 +105,14 @@ CREATE TABLE dbo.CarRental (
 GO
 
 CREATE TABLE dbo.Review (
-    ID          BIGINT        IDENTITY(1,1) NOT NULL,
-    CarRentID   BIGINT                      NOT NULL,
-    ReviewStar  INT                         NOT NULL,
-    Comment     NVARCHAR(500)               NOT NULL,
+    ID          INT             IDENTITY(1,1) NOT NULL,
+    CarRenID    INT                           NOT NULL,
+    ReviewStar  INT                           NOT NULL,
+    Comment     NVARCHAR(500)                 NOT NULL,
     CONSTRAINT PK_Review PRIMARY KEY (ID),
-    CONSTRAINT FK_Review_CarRental FOREIGN KEY (CarRentID)
-        REFERENCES dbo.CarRental (CarRentID),
-    CONSTRAINT UQ_Review_CarRental UNIQUE (CarRentID),
+    CONSTRAINT FK_Review_CarRental FOREIGN KEY (CarRenID)
+        REFERENCES dbo.CarRental (CarRenID),
+    CONSTRAINT UQ_Review_CarRental UNIQUE (CarRenID),
     CONSTRAINT CK_Review_Star CHECK (ReviewStar BETWEEN 1 AND 5)
 );
 GO
@@ -134,12 +134,12 @@ GO
 INSERT INTO dbo.Car
     (CarName, CarModelYear, Color, Capacity, Description, ImportDate, ProducerID, RentPrice, Status)
 VALUES
-    (N'Toyota Vios',     2022, N'White', 5, N'Compact sedan, automatic',        '2022-06-15', 1, 50.00,  N'Available'),
-    (N'Toyota Innova',   2021, N'Silver',7, N'7-seat MPV, family friendly',     '2021-09-10', 1, 70.00,  N'Available'),
-    (N'Ford Ranger',     2023, N'Black', 5, N'Pickup truck, 4x4',              '2023-01-20', 2, 90.00,  N'Available'),
-    (N'Hyundai Accent',  2022, N'Red',   5, N'Economy sedan, fuel efficient',   '2022-03-05', 3, 45.00,  N'Available'),
-    (N'Mercedes C200',   2023, N'Black', 5, N'Luxury sedan, leather interior',  '2023-04-18', 4, 150.00, N'Rented'),
-    (N'Ford Everest',    2020, N'Grey',  7, N'7-seat SUV (kept for history)',   '2020-11-30', 2, 110.00, N'Inactive');
+    (N'Toyota Vios',     2022, N'White', 5, N'Compact sedan, automatic',        '2022-06-15', 1, 50,  N'Available'),
+    (N'Toyota Innova',   2021, N'Silver',7, N'7-seat MPV, family friendly',     '2021-09-10', 1, 70,  N'Available'),
+    (N'Ford Ranger',     2023, N'Black', 5, N'Pickup truck, 4x4',              '2023-01-20', 2, 90,  N'Available'),
+    (N'Hyundai Accent',  2022, N'Red',   5, N'Economy sedan, fuel efficient',   '2022-03-05', 3, 45,  N'Available'),
+    (N'Mercedes C200',   2023, N'Black', 5, N'Luxury sedan, leather interior',  '2023-04-18', 4, 150, N'Rented'),
+    (N'Ford Everest',    2020, N'Grey',  7, N'7-seat SUV (kept for history)',   '2020-11-30', 2, 110, N'Inactive');
 GO
 
 INSERT INTO dbo.Customer
@@ -151,14 +151,14 @@ VALUES
 GO
 
 INSERT INTO dbo.CarRental (CustomerID, CarID, PickupDate, ReturnDate, RentPrice, Status) VALUES
-    (1, 1, '2024-07-01 08:00:00', '2024-07-05 08:00:00', 200.00, N'Completed'),
-    (1, 3, '2024-08-10 09:30:00', '2024-08-12 18:00:00', 180.00, N'Completed'),
-    (2, 4, '2024-09-15 07:00:00', '2024-09-18 07:00:00', 135.00, N'Completed'),
-    (3, 5, '2025-06-20 10:00:00', '2025-06-25 10:00:00', 750.00, N'Renting'),
-    (2, 2, '2025-07-01 08:00:00', '2025-07-03 08:00:00', 140.00, N'Pending');
+    (1, 1, '2024-07-01', '2024-07-05', 200, N'Completed'),
+    (1, 3, '2024-08-10', '2024-08-12', 180, N'Completed'),
+    (2, 4, '2024-09-15', '2024-09-18', 135, N'Completed'),
+    (3, 5, '2025-06-20', '2025-06-25', 750, N'Renting'),
+    (2, 2, '2025-07-01', '2025-07-03', 140, N'Pending');
 GO
 
-INSERT INTO dbo.Review (CarRentID, ReviewStar, Comment) VALUES
+INSERT INTO dbo.Review (CarRenID, ReviewStar, Comment) VALUES
     (1, 5, N'Great car, very clean and fuel efficient.'),
     (2, 4, N'Powerful truck, a bit thirsty on fuel.'),
     (3, 5, N'Smooth ride and easy to drive in the city.');

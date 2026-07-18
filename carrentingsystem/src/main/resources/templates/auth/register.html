@@ -3,7 +3,7 @@
 <body>
 <div th:fragment="content">
     <div th:if="${error}" class="alert alert-danger border-0 rounded-1 text-center small" th:text="${error}"></div>
-    
+
     <form th:action="@{/register}" method="post" th:object="${registerForm}">
         <div class="row">
             <div class="col-md-6 mb-3">
@@ -37,8 +37,9 @@
             </div>
             <div class="col-md-6 mb-3">
                 <label class="form-label text-muted small mb-1">Ngày sinh</label>
-                <input type="date" th:field="*{birthday}" class="form-control input-minimal py-2" required>
+                <input type="date" th:field="*{birthday}" class="form-control input-minimal py-2" required th:max="${today}">
                 <div th:if="${#fields.hasErrors('birthday')}" th:errors="*{birthday}" class="text-danger small mt-1"></div>
+                <div th:errors="*{adult}" class="text-danger small mt-1"></div>
             </div>
         </div>
         <div class="row mb-4">
@@ -54,8 +55,9 @@
             </div>
             <div class="col-md-4">
                 <label class="form-label text-muted small mb-1">Ngày cấp bằng</label>
-                <input type="date" th:field="*{licenceDate}" class="form-control input-minimal py-2" required>
+                <input type="date" th:field="*{licenceDate}" class="form-control input-minimal py-2" required th:max="${today}">
                 <div th:if="${#fields.hasErrors('licenceDate')}" th:errors="*{licenceDate}" class="text-danger small mt-1"></div>
+                <div th:errors="*{licenceOnOrAfterAdultAge}" class="text-danger small mt-1"></div>
             </div>
         </div>
         <button type="submit" class="btn btn-minimal w-100 py-2 mt-2">Đăng ký tài khoản</button>

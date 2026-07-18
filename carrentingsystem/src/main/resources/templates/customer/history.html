@@ -34,14 +34,23 @@
 
     <div class="card card-flat p-4">
         <div th:if="${error}" class="alert alert-danger border-0 rounded-1 text-center small" th:text="${error}"></div>
+
+        <div th:if="${rentals == null or #lists.isEmpty(rentals)}" class="empty-state py-5 text-center">
+            <h5 class="fw-light"
+                th:text="${(selectedStatus != null and !#strings.isEmpty(selectedStatus)) or startDate != null or endDate != null}
+                    ? 'Không tìm thấy giao dịch phù hợp' : 'Chưa có giao dịch nào'">Chưa có giao dịch nào</h5>
+            <p class="text-muted small mb-0"
+               th:text="${(selectedStatus != null and !#strings.isEmpty(selectedStatus)) or startDate != null or endDate != null}
+                    ? 'Thử đổi bộ lọc hoặc xóa điều kiện tìm kiếm.' : 'Khi bạn đặt thuê xe, lịch sử sẽ hiển thị tại đây.'">…</p>
+        </div>
         
-        <div class="table-responsive">
+        <div th:unless="${rentals == null or #lists.isEmpty(rentals)}" class="table-responsive">
             <table class="table table-minimal">
                 <thead>
                 <tr>
-                    <th><a class="text-decoration-none" th:href="@{/customer/history(page=${currentPage}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy='carRentID', sortDir=${reverseSortDir})}">Mã số <span th:if="${sortBy == 'carRentID'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
-                    <th>Xe</th>
-                    <th><a class="text-decoration-none" th:href="@{/customer/history(page=${currentPage}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy='pickUpDate', sortDir=${reverseSortDir})}">Ngày nhận <span th:if="${sortBy == 'pickUpDate'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
+                     <th class="text-muted" style="width: 4rem;">STT</th>
+                     <th>Xe</th>
+                    <th><a class="text-decoration-none" th:href="@{/customer/history(page=${currentPage}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy='pickupDate', sortDir=${reverseSortDir})}">Ngày nhận <span th:if="${sortBy == 'pickupDate'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
                     <th><a class="text-decoration-none" th:href="@{/customer/history(page=${currentPage}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy='returnDate', sortDir=${reverseSortDir})}">Ngày trả <span th:if="${sortBy == 'returnDate'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
                     <th><a class="text-decoration-none" th:href="@{/customer/history(page=${currentPage}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy='rentPrice', sortDir=${reverseSortDir})}">Giá ($) <span th:if="${sortBy == 'rentPrice'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
                     <th><a class="text-decoration-none" th:href="@{/customer/history(page=${currentPage}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy='status', sortDir=${reverseSortDir})}">Trạng thái <span th:if="${sortBy == 'status'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
@@ -49,10 +58,10 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="r : ${rentals}">
-                    <td th:text="${r.carRentID}"></td>
-                    <td th:text="${r.car.carName}"></td>
-                    <td th:text="${r.pickUpDate}"></td>
+                 <tr th:each="r, iterStat : ${rentals}">
+                     <td class="text-muted" th:text="${currentPage * pageSize + iterStat.count}"></td>
+                     <td th:text="${r.car.carName}"></td>
+                    <td th:text="${r.pickupDate}"></td>
                     <td th:text="${r.returnDate}"></td>
                     <td class="text-gold" th:text="${r.rentPrice}"></td>
                     <td>
@@ -63,18 +72,18 @@
                     </td>
                     <td>
                         <button type="button" class="btn btn-minimal btn-sm py-1 px-3"
-                                th:if="${r.status == 'Completed' and !#sets.contains(reviewedRentalIds, r.carRentID)}"
+                                th:if="${r.status == 'Completed' and !#sets.contains(reviewedRentalIds, r.carRenId)}"
                                 data-bs-toggle="modal"
                                 data-bs-target="#reviewModal"
-                                th:attr="data-rental-id=${r.carRentID}, onclick=|setReviewRentalId(${r.carRentID})|">
+                                th:attr="data-rental-id=${r.carRenId}, onclick=|setReviewRentalId(${r.carRenId})|">
                             Viết đánh giá
                         </button>
                         <button type="button" class="btn btn-outline-minimal btn-sm py-1 px-3"
-                                th:if="${r.status == 'Completed' and #sets.contains(reviewedRentalIds, r.carRentID)}"
+                                th:if="${r.status == 'Completed' and #sets.contains(reviewedRentalIds, r.carRenId)}"
                                 data-bs-toggle="modal"
                                 data-bs-target="#viewReviewModal"
-                                th:attr="data-star=${reviewsByRentalId[r.carRentID].reviewStar},
-                                         data-comment=${reviewsByRentalId[r.carRentID].comment},
+                                th:attr="data-star=${reviewsByRentalId[r.carRenId].reviewStar},
+                                         data-comment=${reviewsByRentalId[r.carRenId].comment},
                                          data-car=${r.car != null ? r.car.carName : '—'},
                                          onclick=|showMyReview(this)|">
                             Xem đánh giá
@@ -85,7 +94,7 @@
             </table>
         </div>
         
-        <div th:if="${totalPages > 1}" class="card-footer d-flex justify-content-between align-items-center py-3 px-0 border-top mt-3">
+        <div th:if="${rentals != null and !#lists.isEmpty(rentals) and totalPages > 1}" class="card-footer d-flex justify-content-between align-items-center py-3 px-0 border-top mt-3">
             <div class="text-muted small">
                 Đang hiển thị dòng <span th:text="${currentPage * 5 + 1}"></span> - <span th:text="${T(java.lang.Math).min((currentPage + 1) * 5L, totalItems)}"></span> của tổng số <span th:text="${totalItems}"></span> dòng
             </div>

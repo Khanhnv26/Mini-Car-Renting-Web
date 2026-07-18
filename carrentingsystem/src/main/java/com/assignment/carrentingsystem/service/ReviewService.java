@@ -12,17 +12,23 @@ import java.util.Optional;
 public interface ReviewService {
     Review save(ReviewDTO review);
 
-    Review save(ReviewDTO review, Long customerId);
+    Review save(ReviewDTO review, Integer customerId);
 
-    Optional<Review> findByCarRentalId(Long carRentalId);
+    Optional<Review> findByCarRentalId(Integer carRentalId);
 
-    boolean existsByCarRentalId(Long carRentalId);
+    boolean existsByCarRentalId(Integer carRentalId);
 
     List<Review> findAll();
 
     Page<Review> findAllPaginated(int page, int size);
 
-    Page<Review> findByCustomerIdPaginated(Long customerId, int page, int size);
+    Page<Review> findByCustomerIdPaginated(Integer customerId, int page, int size);
 
-    Map<Long, Review> findByCarRentalIds(Collection<Long> carRentalIds);
+    Page<Review> findAllFiltered(Integer star, String keyword, int page, int size);
+
+    Page<Review> findByCustomerFiltered(Integer customerId, Integer star, String keyword, int page, int size);
+
+    Map<Integer, Review> findByCarRentalIds(Collection<Integer> carRentalIds);
+
+    List<Review> findByCarId(Integer carId);
 }

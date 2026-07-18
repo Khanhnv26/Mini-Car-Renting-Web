@@ -9,7 +9,6 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter
@@ -20,9 +19,9 @@ public class Car {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "CarID")
-    private Long carId;
+    private Integer carId;
 
-    @Column(name = "CarName", length = 255,nullable = false)
+    @Column(name = "CarName", length = 200, nullable = false)
     private String carName;
 
     @Column(name = "CarModelYear", nullable = false)
@@ -40,14 +39,13 @@ public class Car {
     @Column(name = "ImportDate", nullable = false)
     private LocalDate importDate;
 
-    @Column(name = "Status", nullable = false, length = 20)
+    @Column(name = "Status", nullable = false, length = 10)
     private String status;
 
-    @Column(name = "RentPrice",nullable = false, precision = 18,scale = 2)
+    @Column(name = "RentPrice", nullable = false, precision = 10, scale = 0)
     private BigDecimal rentPrice;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ProducerID", nullable = false)
     private CarProducer carProducer;
-
 }

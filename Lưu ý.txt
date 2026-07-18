@@ -2,3 +2,11 @@ Project Name: SE2030-JV_StudentID_CarRentingSystem. Ex: SE2030-JV_DieuNTHE123456
 Database name: FUCarRentingSystem_DB
 Tạo sẵn tài khoản admin/admin
 Update ddl-auto: none
+
+--- Seed test ---
+1) Chạy CarRentingSystem_DB.sql (tạo DB + seed gốc)
+2) Chạy seed-extra-data.sql (thêm data test, không drop)
+
+Login (password đơn giản, BCrypt):
+  admin / admin
+  john, mary, david, anna, peter, lisa, tom, sophia / 123
