@@ -1,0 +1,209 @@
+package com.assignment.carrentingsystem.service.impl;
+
+import com.assignment.carrentingsystem.dto.RentalReportDTO;
+import com.assignment.carrentingsystem.dto.RentalRequest;
+import com.assignment.carrentingsystem.entity.Car;
+import com.assignment.carrentingsystem.entity.CarRental;
+import com.assignment.carrentingsystem.entity.Customer;
+import com.assignment.carrentingsystem.repository.CarRentalRepository;
+import com.assignment.carrentingsystem.repository.CarRepository;
+import com.assignment.carrentingsystem.repository.CustomerRepository;
+import com.assignment.carrentingsystem.service.CarRentalService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class CarRentalServiceImpl implements CarRentalService {
+
+    private final CustomerRepository customerRepository;
+    private final CarRepository carRepository;
+    private final CarRentalRepository carRentalRepository;
+
+    @Override
+    @Transactional
+    public void createCarRental(Integer customerId, RentalRequest request) {
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new RuntimeException("Khách hàng không tồn tại"));
+
+        if (request.getPickupDate() == null || request.getReturnDate() == null
+                || !request.getPickupDate().isBefore(request.getReturnDate())) {
+            throw new RuntimeException("Ngày nhận xe phải trước ngày trả xe");
+        }
+
+        LocalDate today = LocalDate.now();
+        if (request.getPickupDate().isBefore(today) || request.getReturnDate().isBefore(today)) {
+            throw new RuntimeException("Không được chọn ngày nhận/trả trong quá khứ");
+        }
+
+        long days = Math.max(1, ChronoUnit.DAYS.between(request.getPickupDate(), request.getReturnDate()));
+
+        for (Integer carId : request.getCarIds()) {
+            Car car = carRepository.findById(carId)
+                    .orElseThrow(() -> new RuntimeException("Xe không tồn tại: " + carId));
+
+            if (!"Available".equals(car.getStatus())) {
+                throw new RuntimeException("Xe " + car.getCarName() + " hiện không sẵn sàng cho thuê");
+            }
+
+            if (carRentalRepository.existsOverlappingRental(
+                    carId, request.getPickupDate(), request.getReturnDate())) {
+                throw new RuntimeException("Xe " + car.getCarName()
+                        + " đã có lịch thuê trùng khoảng thời gian đã chọn");
+            }
+
+            CarRental carRental = new CarRental();
+            carRental.setCustomer(customer);
+            carRental.setCar(car);
+            carRental.setPickupDate(request.getPickupDate());
+            carRental.setReturnDate(request.getReturnDate());
+            carRental.setRentPrice(car.getRentPrice().multiply(BigDecimal.valueOf(days)));
+            carRental.setStatus("Pending");
+            carRentalRepository.save(carRental);
+        }
+    }
+
+    @Override
+    public List<CarRental> findAll() {
+        return carRentalRepository.findAll();
+    }
+
+    @Override
+    public List<CarRental> findByCustomerId(Integer customerId) {
+        return carRentalRepository.findByCustomerId(customerId);
+    }
+
+    @Override
+    public CarRental findById(Integer id) {
+        return carRentalRepository.findById(id).orElse(null);
+    }
+
+    private static final Set<String> VALID_STATUSES = Set.of("Pending", "Renting", "Completed", "Cancelled");
+
+    @Override
+    @Transactional
+    public void updateStatus(Integer rentalId, String status) {
+        if (status == null || !VALID_STATUSES.contains(status)) {
+            throw new RuntimeException("Trạng thái không hợp lệ");
+        }
+
+        CarRental carRental = carRentalRepository.findById(rentalId)
+                .orElseThrow(() -> new RuntimeException("Giao dịch thuê không tồn tại"));
+        String currentStatus = carRental.getStatus();
+
+        if ("Cancelled".equals(currentStatus) || "Completed".equals(currentStatus)) {
+            throw new RuntimeException("Không thể đổi trạng thái giao dịch đã kết thúc");
+        }
+
+        if ("Pending".equals(currentStatus) && !"Renting".equals(status) && !"Cancelled".equals(status)) {
+            throw new RuntimeException("Giao dịch đang chờ chỉ có thể chuyển sang Renting hoặc Cancelled");
+        }
+
+        if ("Renting".equals(currentStatus)
+                && !"Completed".equals(status) && !"Cancelled".equals(status)) {
+            throw new RuntimeException("Giao dịch đang thuê chỉ có thể chuyển sang Completed hoặc Cancelled");
+        }
+
+        carRental.setStatus(status);
+
+        Car car = carRental.getCar();
+        if ("Renting".equals(status)) {
+            car.setStatus("Rented");
+            carRepository.save(car);
+        } else if ("Completed".equals(status) || "Cancelled".equals(status)) {
+            if (!carRentalRepository.existsOtherActiveRental(car.getCarId(), carRental.getCarRenId())) {
+                car.setStatus("Available");
+                carRepository.save(car);
+            }
+        }
+        carRentalRepository.save(carRental);
+    }
+
+    @Override
+    public List<CarRental> findByPickupDateBetween(LocalDate start, LocalDate end) {
+        return carRentalRepository.findCarRentalByPickupDate(start, end);
+    }
+
+    @Override
+    public List<RentalReportDTO> findRentalReportByPickupDateBetween(LocalDate start, LocalDate end) {
+        return carRentalRepository.findCarRentalByPickupDate(start, end)
+                .stream()
+                .map(this::toReportDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<RentalReportDTO> findRentalReportPaginated(LocalDate start, LocalDate end, String status, String keyword, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("rentPrice").descending());
+        return carRentalRepository.findReportFiltered(start, end, cleanText(status), cleanText(keyword), pageable)
+                .map(this::toReportDTO);
+    }
+
+    @Override
+    public BigDecimal sumRentPriceFiltered(LocalDate start, LocalDate end, String status, String keyword) {
+        BigDecimal total = carRentalRepository.sumRentPriceFiltered(start, end, cleanText(status), cleanText(keyword));
+        return total != null ? total : BigDecimal.ZERO;
+    }
+
+    @Override
+    public Map<String, Long> countByStatusFiltered(LocalDate start, LocalDate end, String status, String keyword) {
+        Map<String, Long> result = new HashMap<>();
+        result.put("Pending", 0L);
+        result.put("Renting", 0L);
+        result.put("Completed", 0L);
+        result.put("Cancelled", 0L);
+        for (Object[] row : carRentalRepository.countGroupByStatusFiltered(start, end, cleanText(status), cleanText(keyword))) {
+            if (row[0] != null && row[1] != null) {
+                result.put(String.valueOf(row[0]), ((Number) row[1]).longValue());
+            }
+        }
+        return result;
+    }
+
+    private String cleanText(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        return value.trim();
+    }
+
+    private RentalReportDTO toReportDTO(CarRental r) {
+        return new RentalReportDTO(
+                r.getCarRenId(),
+                r.getCustomer() != null ? r.getCustomer().getFullName() : "-",
+                r.getCar() != null ? r.getCar().getCarName() : "-",
+                r.getPickupDate(),
+                r.getReturnDate(),
+                r.getRentPrice(),
+                r.getStatus());
+    }
+
+    @Override
+    public Page<CarRental> findRentalsPaginated(Integer customerId, String status, LocalDate start, LocalDate end, String keyword, int page, int size, String sortBy, String sortDir) {
+        String safeSortBy = switch (sortBy == null ? "" : sortBy) {
+            case "pickupDate", "returnDate", "rentPrice", "status", "carRenId" -> sortBy;
+            default -> "carRenId";
+        };
+        Sort sort = "desc".equalsIgnoreCase(sortDir)
+                ? Sort.by(safeSortBy).descending()
+                : Sort.by(safeSortBy).ascending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        String cleanStatus = (status != null && !status.trim().isEmpty()) ? status.trim() : null;
+        String cleanKeyword = cleanText(keyword);
+        return carRentalRepository.findRentalsWithFilters(customerId, cleanStatus, start, end, cleanKeyword, pageable);
+    }
+}

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/customer-layout :: layout(title='Sửa hồ sơ', content=~{::content})}">
+<body>
+<div th:fragment="content" class="mx-auto" style="max-width: 600px; padding: 1rem 0;">
+    <div class="mb-4">
+        <a th:href="@{/customer/profile}" class="btn btn-ghost px-0 text-muted">&larr; Quay lại hồ sơ</a>
+    </div>
+    <div class="card card-flat p-5">
+        <h4 class="fw-light mb-4 text-white">Sửa thông tin cá nhân</h4>
+        <div th:if="${error}" class="alert alert-danger border-0 rounded-1 small" th:text="${error}"></div>
+        <form th:action="@{/customer/profile/edit}" th:object="${profileForm}" method="post" class="row g-4">
+            <div class="col-md-6">
+                <label class="form-label text-muted small mb-1">Họ tên</label>
+                <input th:field="*{fullName}" class="form-control input-minimal py-2">
+                <div th:errors="*{fullName}" class="text-danger small mt-1"></div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label text-muted small mb-1">Số điện thoại</label>
+                <input th:field="*{mobile}" class="form-control input-minimal py-2">
+                <div th:errors="*{mobile}" class="text-danger small mt-1"></div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label text-muted small mb-1">Ngày sinh</label>
+                <input type="date" th:field="*{birthday}" class="form-control input-minimal py-2"
+                       th:max="${today}">
+                <div th:errors="*{birthday}" class="text-danger small mt-1"></div>
+                <div th:errors="*{adult}" class="text-danger small mt-1"></div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label text-muted small mb-1">CCCD</label>
+                <input th:field="*{identityCard}" class="form-control input-minimal py-2">
+                <div th:errors="*{identityCard}" class="text-danger small mt-1"></div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label text-muted small mb-1">Bằng lái</label>
+                <input th:field="*{licenceNumber}" class="form-control input-minimal py-2">
+                <div th:errors="*{licenceNumber}" class="text-danger small mt-1"></div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label text-muted small mb-1">Ngày cấp</label>
+                <input type="date" th:field="*{licenceDate}" class="form-control input-minimal py-2"
+                       th:max="${today}">
+                <div th:errors="*{licenceDate}" class="text-danger small mt-1"></div>
+                <div th:errors="*{licenceOnOrAfterAdultAge}" class="text-danger small mt-1"></div>
+            </div>
+            <div class="col-12 mt-4">
+                <button type="submit" class="btn btn-minimal py-2 px-5">Lưu thay đổi</button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/admin-layout :: layout(title='Báo cáo giao dịch', content=~{::content})}">
+<body>
+<div th:fragment="content" class="px-2">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+        <div>
+            <h1 class="app-page-title mb-1">Báo cáo giao dịch</h1>
+            <p class="app-page-sub mb-0">Tìm kiếm, lọc và phân trang toàn bộ giao dịch thuê xe.</p>
+        </div>
+        <a th:href="@{/admin/rentals}" class="btn btn-ghost">&larr; Quay lại</a>
+    </div>
+
+    <div class="card card-flat p-4 mb-4">
+        <form th:action="@{/admin/rentals/report}" method="get" class="row g-3 align-items-end">
+            <div class="col-md-2">
+                <label class="form-label mb-1">Từ ngày</label>
+                <input type="date" name="startDate" class="form-control input-minimal" th:value="${startDate}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label mb-1">Đến ngày</label>
+                <input type="date" name="endDate" class="form-control input-minimal" th:value="${endDate}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label mb-1">Trạng thái</label>
+                <select name="status" class="form-select">
+                    <option value="" th:selected="${selectedStatus == null or selectedStatus == ''}">Tất cả</option>
+                    <option value="Pending" th:selected="${selectedStatus == 'Pending'}">Chờ xử lý</option>
+                    <option value="Renting" th:selected="${selectedStatus == 'Renting'}">Đang thuê</option>
+                    <option value="Completed" th:selected="${selectedStatus == 'Completed'}">Đã hoàn thành</option>
+                    <option value="Cancelled" th:selected="${selectedStatus == 'Cancelled'}">Đã hủy</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label mb-1">Tìm kiếm</label>
+                <input type="text" name="keyword" class="form-control input-minimal"
+                       placeholder="Tên khách hàng hoặc tên xe..." th:value="${keyword}">
+            </div>
+            <div class="col-md-1 d-grid">
+                <button type="submit" class="btn btn-minimal py-2">Lọc</button>
+            </div>
+            <div class="col-md-2 d-grid">
+                <a th:href="@{/admin/rentals/report}" class="btn btn-outline-minimal py-2 text-center">Xóa lọc</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="stat-grid">
+        <div class="stat-card">
+            <div class="stat-label">Tổng giao dịch (bảng)</div>
+            <div class="stat-value" th:text="${totalItems}">0</div>
+            <div class="stat-hint">Theo bộ lọc danh sách (ngày, trạng thái, từ khóa)</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Tổng doanh thu</div>
+            <div class="stat-value stat-value-gold">
+                <span th:text="${totalRevenue}">0</span>$
+            </div>
+            <div class="stat-hint">Chỉ giao dịch Completed · theo ngày &amp; từ khóa</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Trung bình / giao dịch hoàn thành</div>
+            <div class="stat-value stat-value-gold">
+                <span th:text="${averageRevenue}">0</span>$
+            </div>
+            <div class="stat-hint">Doanh thu ÷ số giao dịch Completed</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Đã hoàn thành</div>
+            <div class="stat-value" th:text="${completedCount}">0</div>
+            <div class="stat-hint">
+                Chờ: <span th:text="${pendingCount}">0</span>
+                · Thuê: <span th:text="${rentingCount}">0</span>
+                · Hủy: <span th:text="${cancelledCount}">0</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card card-flat p-0 overflow-hidden">
+        <div th:if="${rentals == null or #lists.isEmpty(rentals)}" class="empty-state">
+            <h5 class="fw-light"
+                th:text="${startDate != null or endDate != null or (selectedStatus != null and selectedStatus != '') or (keyword != null and !#strings.isEmpty(keyword))}
+                    ? 'Không tìm thấy giao dịch phù hợp' : 'Chưa có giao dịch nào'">Chưa có giao dịch nào</h5>
+            <p class="text-muted small mb-0"
+               th:text="${startDate != null or endDate != null or (selectedStatus != null and selectedStatus != '') or (keyword != null and !#strings.isEmpty(keyword))}
+                    ? 'Thử đổi bộ lọc hoặc xóa điều kiện tìm kiếm.' : 'Chưa có dữ liệu giao dịch để thống kê.'">…</p>
+        </div>
+
+        <div th:unless="${rentals == null or #lists.isEmpty(rentals)}" class="table-responsive">
+            <table class="table table-minimal mb-0">
+                <thead>
+                <tr>
+                     <th class="text-muted" style="width: 4rem;">STT</th>
+                     <th>Khách hàng</th>
+                     <th>Xe</th>
+                     <th>Ngày nhận</th>
+                     <th>Ngày trả</th>
+                     <th>Giá</th>
+                     <th>Trạng thái</th>
+                 </tr>
+                 </thead>
+                 <tbody>
+                 <tr th:each="r, iterStat : ${rentals}">
+                     <td class="text-muted" th:text="${currentPage * pageSize + iterStat.count}"></td>
+                    <td class="fw-medium" th:text="${r.customerName}"></td>
+                    <td th:text="${r.carName}"></td>
+                    <td th:text="${r.pickupDate}"></td>
+                    <td th:text="${r.returnDate}"></td>
+                    <td class="text-gold fw-medium" th:text="${r.rentPrice} + '$'"></td>
+                    <td>
+                        <span th:if="${r.status == 'Pending'}" class="badge badge-soft-gold py-2 px-3 rounded-pill">Chờ xử lý</span>
+                        <span th:if="${r.status == 'Renting'}" class="badge badge-soft-blue py-2 px-3 rounded-pill">Đang thuê</span>
+                        <span th:if="${r.status == 'Completed'}" class="badge badge-soft-green py-2 px-3 rounded-pill">Đã hoàn thành</span>
+                        <span th:if="${r.status == 'Cancelled'}" class="badge badge-soft-gray py-2 px-3 rounded-pill">Đã hủy</span>
+                        <span th:if="${r.status != 'Pending' and r.status != 'Renting' and r.status != 'Completed' and r.status != 'Cancelled'}"
+                              class="badge badge-soft-gray py-2 px-3 rounded-pill" th:text="${r.status}"></span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:if="${totalItems > 0}" class="card-footer d-flex flex-wrap justify-content-between align-items-center gap-2 py-3">
+            <div class="text-muted small">
+                Trang
+                <strong th:text="${currentPage + 1}">1</strong>
+                /
+                <strong th:text="${totalPages > 0 ? totalPages : 1}">1</strong>
+                · Dòng
+                <span th:text="${currentPage * pageSize + 1}">1</span>
+                -
+                <span th:text="${T(java.lang.Math).min((currentPage + 1L) * pageSize, totalItems)}">1</span>
+                /
+                <span th:text="${totalItems}">0</span>
+            </div>
+            <nav th:if="${totalPages > 1}" aria-label="Page navigation">
+                <ul class="pagination pagination-sm pagination-minimal mb-0 gap-1">
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link"
+                           th:href="@{/admin/rentals/report(page=0, startDate=${startDate}, endDate=${endDate}, status=${selectedStatus}, keyword=${keyword})}"
+                           aria-label="First">&laquo;</a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link"
+                           th:href="@{/admin/rentals/report(page=${currentPage - 1}, startDate=${startDate}, endDate=${endDate}, status=${selectedStatus}, keyword=${keyword})}"
+                           aria-label="Previous">&lsaquo;</a>
+                    </li>
+                    <li class="page-item"
+                        th:each="i : ${#numbers.sequence(T(java.lang.Math).max(0, currentPage - 2), T(java.lang.Math).min(totalPages - 1, currentPage + 2))}"
+                        th:classappend="${currentPage == i} ? 'active'">
+                        <a class="page-link"
+                           th:href="@{/admin/rentals/report(page=${i}, startDate=${startDate}, endDate=${endDate}, status=${selectedStatus}, keyword=${keyword})}"
+                           th:text="${i + 1}"></a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage >= totalPages - 1} ? 'disabled'">
+                        <a class="page-link"
+                           th:href="@{/admin/rentals/report(page=${currentPage + 1}, startDate=${startDate}, endDate=${endDate}, status=${selectedStatus}, keyword=${keyword})}"
+                           aria-label="Next">&rsaquo;</a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage >= totalPages - 1} ? 'disabled'">
+                        <a class="page-link"
+                           th:href="@{/admin/rentals/report(page=${totalPages - 1}, startDate=${startDate}, endDate=${endDate}, status=${selectedStatus}, keyword=${keyword})}"
+                           aria-label="Last">&raquo;</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+</body>
+</html>

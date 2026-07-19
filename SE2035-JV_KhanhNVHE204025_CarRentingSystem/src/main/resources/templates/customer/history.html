@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/customer-layout :: layout(title='Lịch sử thuê xe', content=~{::content})}">
+<body>
+<div th:fragment="content" class="max-w-5xl mx-auto py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="app-page-title mb-1">Lịch sử thuê xe</h1>
+            <p class="app-page-sub mb-0">Xem và đánh giá các giao dịch thuê xe của bạn</p>
+        </div>
+    </div>
+    
+    <div class="card card-flat p-4 mb-4">
+        <form th:action="@{/customer/history}" method="get" class="row g-3">
+            <div class="col-md-4">
+                <select name="status" class="form-select form-select-sm">
+                    <option value="">-- Trạng thái --</option>
+                    <option value="Pending" th:selected="${selectedStatus == 'Pending'}">Chờ xử lý</option>
+                    <option value="Renting" th:selected="${selectedStatus == 'Renting'}">Đang thuê</option>
+                    <option value="Completed" th:selected="${selectedStatus == 'Completed'}">Đã hoàn thành</option>
+                    <option value="Cancelled" th:selected="${selectedStatus == 'Cancelled'}">Đã hủy</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <input type="date" name="startDate" class="form-control form-control-sm" placeholder="Từ ngày..." th:value="${startDate}" />
+            </div>
+            <div class="col-md-3">
+                <input type="date" name="endDate" class="form-control form-control-sm" placeholder="Đến ngày..." th:value="${endDate}" />
+            </div>
+            <div class="col-md-2 d-grid">
+                <button type="submit" class="btn btn-minimal py-1">Lọc</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="card card-flat p-4">
+        <div th:if="${error}" class="alert alert-danger border-0 rounded-1 text-center small" th:text="${error}"></div>
+
+        <div th:if="${rentals == null or #lists.isEmpty(rentals)}" class="empty-state py-5 text-center">
+            <h5 class="fw-light"
+                th:text="${(selectedStatus != null and !#strings.isEmpty(selectedStatus)) or startDate != null or endDate != null}
+                    ? 'Không tìm thấy giao dịch phù hợp' : 'Chưa có giao dịch nào'">Chưa có giao dịch nào</h5>
+            <p class="text-muted small mb-0"
+               th:text="${(selectedStatus != null and !#strings.isEmpty(selectedStatus)) or startDate != null or endDate != null}
+                    ? 'Thử đổi bộ lọc hoặc xóa điều kiện tìm kiếm.' : 'Khi bạn đặt thuê xe, lịch sử sẽ hiển thị tại đây.'">…</p>
+        </div>
+        
+        <div th:unless="${rentals == null or #lists.isEmpty(rentals)}" class="table-responsive">
+            <table class="table table-minimal">
+                <thead>
+                <tr>
+                     <th class="text-muted" style="width: 4rem;">STT</th>
+                     <th>Xe</th>
+                    <th><a class="text-decoration-none" th:href="@{/customer/history(page=${currentPage}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy='pickupDate', sortDir=${reverseSortDir})}">Ngày nhận <span th:if="${sortBy == 'pickupDate'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
+                    <th><a class="text-decoration-none" th:href="@{/customer/history(page=${currentPage}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy='returnDate', sortDir=${reverseSortDir})}">Ngày trả <span th:if="${sortBy == 'returnDate'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
+                    <th><a class="text-decoration-none" th:href="@{/customer/history(page=${currentPage}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy='rentPrice', sortDir=${reverseSortDir})}">Giá ($) <span th:if="${sortBy == 'rentPrice'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
+                    <th><a class="text-decoration-none" th:href="@{/customer/history(page=${currentPage}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy='status', sortDir=${reverseSortDir})}">Trạng thái <span th:if="${sortBy == 'status'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
+                    <th>Đánh giá</th>
+                </tr>
+                </thead>
+                <tbody>
+                 <tr th:each="r, iterStat : ${rentals}">
+                     <td class="text-muted" th:text="${currentPage * pageSize + iterStat.count}"></td>
+                     <td th:text="${r.car.carName}"></td>
+                    <td th:text="${r.pickupDate}"></td>
+                    <td th:text="${r.returnDate}"></td>
+                    <td class="text-gold" th:text="${r.rentPrice}"></td>
+                    <td>
+                        <span th:if="${r.status == 'Pending'}" class="badge badge-soft-gold py-2 px-3 rounded-pill">Chờ xử lý</span>
+                        <span th:if="${r.status == 'Renting'}" class="badge badge-soft-gold py-2 px-3 rounded-pill">Đang thuê</span>
+                        <span th:if="${r.status == 'Completed'}" class="badge badge-soft-gray py-2 px-3 rounded-pill">Đã hoàn thành</span>
+                        <span th:if="${r.status == 'Cancelled'}" class="badge badge-soft-gray py-2 px-3 rounded-pill">Đã hủy</span>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-minimal btn-sm py-1 px-3"
+                                th:if="${r.status == 'Completed' and !#sets.contains(reviewedRentalIds, r.carRenId)}"
+                                data-bs-toggle="modal"
+                                data-bs-target="#reviewModal"
+                                th:attr="data-rental-id=${r.carRenId}, onclick=|setReviewRentalId(${r.carRenId})|">
+                            Viết đánh giá
+                        </button>
+                        <button type="button" class="btn btn-outline-minimal btn-sm py-1 px-3"
+                                th:if="${r.status == 'Completed' and #sets.contains(reviewedRentalIds, r.carRenId)}"
+                                data-bs-toggle="modal"
+                                data-bs-target="#viewReviewModal"
+                                th:attr="data-star=${reviewsByRentalId[r.carRenId].reviewStar},
+                                         data-comment=${reviewsByRentalId[r.carRenId].comment},
+                                         data-car=${r.car != null ? r.car.carName : '—'},
+                                         onclick=|showMyReview(this)|">
+                            Xem đánh giá
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div th:if="${rentals != null and !#lists.isEmpty(rentals) and totalPages > 1}" class="card-footer d-flex justify-content-between align-items-center py-3 px-0 border-top mt-3">
+            <div class="text-muted small">
+                Đang hiển thị dòng <span th:text="${currentPage * 5 + 1}"></span> - <span th:text="${T(java.lang.Math).min((currentPage + 1) * 5L, totalItems)}"></span> của tổng số <span th:text="${totalItems}"></span> dòng
+            </div>
+            <nav aria-label="Page navigation">
+                <ul class="pagination pagination-sm pagination-minimal mb-0 gap-1">
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{/customer/history(page=0, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy=${sortBy}, sortDir=${sortDir})}" aria-label="First">&laquo;</a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{/customer/history(page=${currentPage - 1}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy=${sortBy}, sortDir=${sortDir})}" aria-label="Previous">&lsaquo;</a>
+                    </li>
+                    <li class="page-item" th:each="i : ${#numbers.sequence(T(java.lang.Math).max(0, currentPage - 2), T(java.lang.Math).min(totalPages - 1, currentPage + 2))}" th:classappend="${currentPage == i} ? 'active'">
+                        <a class="page-link" th:href="@{/customer/history(page=${i}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy=${sortBy}, sortDir=${sortDir})}" th:text="${i + 1}"></a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/customer/history(page=${currentPage + 1}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy=${sortBy}, sortDir=${sortDir})}" aria-label="Next">&rsaquo;</a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/customer/history(page=${totalPages - 1}, status=${selectedStatus}, startDate=${startDate}, endDate=${endDate}, sortBy=${sortBy}, sortDir=${sortDir})}" aria-label="Last">&raquo;</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <div class="modal fade modal-glass" id="reviewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content p-4">
+                <h5 class="fw-light mb-4 text-white">Đánh giá dịch vụ</h5>
+                <form th:action="@{/customer/review}" method="post" id="reviewForm">
+                    <input type="hidden" name="carRentalId" id="modalRentalId" value="">
+                    <div class="mb-3">
+                        <label class="form-label text-muted small mb-1">Số sao</label>
+                        <select name="reviewStar" id="reviewStar" class="form-select input-minimal py-2" required>
+                            <option value="5" selected>5 sao</option>
+                            <option value="4">4 sao</option>
+                            <option value="3">3 sao</option>
+                            <option value="2">2 sao</option>
+                            <option value="1">1 sao</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label text-muted small mb-1">Nhận xét của bạn</label>
+                        <textarea name="comment" id="reviewComment" class="form-control input-minimal py-2" rows="3"
+                                  maxlength="500" required
+                                  placeholder="Nhập ý kiến đánh giá về chiếc xe và dịch vụ..."></textarea>
+                    </div>
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-ghost px-4" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-minimal px-4 py-2">Gửi đánh giá</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade modal-glass" id="viewReviewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content p-4">
+                <h5 class="fw-light mb-3 text-white">Đánh giá của bạn</h5>
+                <div class="mb-2">
+                    <span class="text-muted small">Xe</span>
+                    <div class="text-white" id="viewReviewCar">—</div>
+                </div>
+                <div class="mb-2">
+                    <span class="text-muted small">Số sao</span>
+                    <div class="text-gold fw-medium" id="viewReviewStar">—</div>
+                </div>
+                <div class="mb-4">
+                    <span class="text-muted small">Nhận xét</span>
+                    <p class="text-light mb-0 mt-1" id="viewReviewComment">—</p>
+                </div>
+                <div class="text-end">
+                    <button type="button" class="btn btn-minimal px-4 py-2" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/customer-review.js?v=8}"></script>
+</div>
+</body>
+</html>

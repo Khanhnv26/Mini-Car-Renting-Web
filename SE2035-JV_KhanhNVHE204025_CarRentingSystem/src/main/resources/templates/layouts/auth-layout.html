@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="layout(title, content)">
+<head th:replace="~{fragments/head :: head(title=${title})}"></head>
+<body class="bg-cinematic">
+    <div class="container d-flex justify-content-center align-items-center min-vh-100">
+        <div class="card card-glass" th:style="|width: 100%; max-width: ${title == 'Đăng nhập' ? '400px' : '650px'};|">
+            <div class="card-body p-4">
+                <div class="text-center mb-3">
+                    <a th:href="@{/}" class="sidebar-brand text-decoration-none d-inline-block">CarRenting</a>
+                </div>
+                <div th:replace="${content}"></div>
+            </div>
+        </div>
+    </div>
+    <div th:replace="~{fragments/toast :: toast}"></div>
+</body>
+</html>

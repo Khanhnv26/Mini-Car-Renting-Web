@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/customer-layout :: layout(title='Xe sẵn sàng', content=~{::content})}">
+<body>
+<div th:fragment="content">
+    <h1 class="app-page-title mb-1">Danh sách xe có thể thuê</h1>
+    <p class="app-page-sub mb-4">Lọc, sắp xếp và đặt thuê xe Available.</p>
+
+    <div class="card card-flat p-4 mb-4">
+        <form th:action="@{/customer/cars}" method="get" class="row g-3">
+            <div class="col-md-3">
+                <input type="text" name="name" class="form-control form-control-sm" placeholder="Tên xe..." th:value="${name}" />
+            </div>
+            <div class="col-md-3">
+                <select name="producerId" class="form-select form-select-sm">
+                    <option value="">-- Tất cả Hãng --</option>
+                    <option th:each="p : ${producers}" th:value="${p.producerId}" th:text="${p.producerName}" th:selected="${selectedProducerId != null && selectedProducerId == p.producerId}"></option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <div class="price-filter d-flex align-items-center gap-2">
+                    <div class="input-group input-group-sm price-filter-group flex-grow-1">
+                        <span class="input-group-text price-prefix">$</span>
+                        <input type="number" name="minPrice" step="1" min="0"
+                               class="form-control form-control-sm"
+                               placeholder="Từ" th:value="${minPrice}" />
+                    </div>
+                    <span class="price-filter-sep text-muted">–</span>
+                    <div class="input-group input-group-sm price-filter-group flex-grow-1">
+                        <span class="input-group-text price-prefix">$</span>
+                        <input type="number" name="maxPrice" step="1" min="0"
+                               class="form-control form-control-sm"
+                               placeholder="Đến" th:value="${maxPrice}" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2 d-grid">
+                <button type="submit" class="btn btn-minimal py-1">Lọc</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <span class="text-muted small">Tìm thấy <strong th:text="${totalItems}"></strong> xe</span>
+        <div class="d-flex gap-2">
+            <a class="btn btn-ghost btn-sm px-2 py-1 text-light text-decoration-none" th:href="@{/customer/cars(name=${name}, producerId=${selectedProducerId}, minPrice=${minPrice}, maxPrice=${maxPrice}, sortBy='rentPrice', sortDir='asc')}">Giá tăng dần ↑</a>
+            <a class="btn btn-ghost btn-sm px-2 py-1 text-light text-decoration-none" th:href="@{/customer/cars(name=${name}, producerId=${selectedProducerId}, minPrice=${minPrice}, maxPrice=${maxPrice}, sortBy='rentPrice', sortDir='desc')}">Giá giảm dần ↓</a>
+        </div>
+    </div>
+
+    <div th:if="${cars == null or #lists.isEmpty(cars)}" class="empty-state py-5 text-center card card-flat mb-4">
+        <h5 class="fw-light"
+            th:text="${(name != null and !#strings.isEmpty(name)) or selectedProducerId != null or minPrice != null or maxPrice != null}
+                ? 'Không tìm thấy xe phù hợp' : 'Chưa có xe sẵn sàng'">Chưa có xe sẵn sàng</h5>
+        <p class="text-muted small mb-0"
+           th:text="${(name != null and !#strings.isEmpty(name)) or selectedProducerId != null or minPrice != null or maxPrice != null}
+                ? 'Thử đổi bộ lọc hoặc xóa điều kiện tìm kiếm.' : 'Hiện chưa có xe Available để thuê.'">…</p>
+    </div>
+
+    <div th:unless="${cars == null or #lists.isEmpty(cars)}" class="row row-cols-1 row-cols-md-3 g-4">
+        <div th:each="car : ${cars}" class="col">
+            <div class="card card-flat h-100">
+                <div class="card-body">
+                    <h5 class="card-title fw-normal" th:text="${car.carName}"></h5>
+                    <p class="card-text small text-muted">
+                        <span class="d-block"><strong>Năm:</strong> <span th:text="${car.carModelYear}"></span></span>
+                        <span class="d-block"><strong>Màu:</strong> <span th:text="${car.color}"></span></span>
+                        <span class="d-block"><strong>Sức chứa:</strong> <span th:text="${car.capacity}"></span></span>
+                        <span class="d-block"><strong>Hãng:</strong> <span th:text="${car.carProducer.producerName}"></span></span>
+                    </p>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <span class="text-gold" th:text="${car.rentPrice + ' $/ngày'}"></span>
+                        <span class="badge badge-soft-gold rounded-0" th:text="${car.status}"></span>
+                    </div>
+                    <div class="d-grid gap-2 mt-3">
+                        <a th:href="@{/customer/rent(carId=${car.carId})}" class="btn btn-minimal py-2">Thuê ngay</a>
+                        <a th:href="@{/customer/cars/{id}/reviews(id=${car.carId})}" class="btn btn-ghost btn-sm py-1">Xem đánh giá</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${totalPages > 1}" class="fleet-pagination mt-4">
+        <div class="fleet-pagination-meta">
+            Trang <strong th:text="${currentPage + 1}">1</strong>
+            /
+            <strong th:text="${totalPages}">1</strong>
+            <span class="fleet-pagination-dot">·</span>
+            <span th:text="${totalItems}">0</span> xe
+        </div>
+        <nav aria-label="Page navigation">
+            <ul class="pagination pagination-sm pagination-minimal fleet-page-nav mb-0 gap-1">
+                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                    <a class="page-link" th:href="@{/customer/cars(page=0, name=${name}, producerId=${selectedProducerId}, minPrice=${minPrice}, maxPrice=${maxPrice}, sortBy=${sortBy}, sortDir=${sortDir})}" aria-label="First">&laquo;</a>
+                </li>
+                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                    <a class="page-link" th:href="@{/customer/cars(page=${currentPage - 1}, name=${name}, producerId=${selectedProducerId}, minPrice=${minPrice}, maxPrice=${maxPrice}, sortBy=${sortBy}, sortDir=${sortDir})}" aria-label="Previous">&lsaquo;</a>
+                </li>
+                <li class="page-item" th:each="i : ${#numbers.sequence(T(java.lang.Math).max(0, currentPage - 2), T(java.lang.Math).min(totalPages - 1, currentPage + 2))}" th:classappend="${currentPage == i} ? 'active'">
+                    <a class="page-link" th:href="@{/customer/cars(page=${i}, name=${name}, producerId=${selectedProducerId}, minPrice=${minPrice}, maxPrice=${maxPrice}, sortBy=${sortBy}, sortDir=${sortDir})}" th:text="${i + 1}"></a>
+                </li>
+                <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                    <a class="page-link" th:href="@{/customer/cars(page=${currentPage + 1}, name=${name}, producerId=${selectedProducerId}, minPrice=${minPrice}, maxPrice=${maxPrice}, sortBy=${sortBy}, sortDir=${sortDir})}" aria-label="Next">&rsaquo;</a>
+                </li>
+                <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                    <a class="page-link" th:href="@{/customer/cars(page=${totalPages - 1}, name=${name}, producerId=${selectedProducerId}, minPrice=${minPrice}, maxPrice=${maxPrice}, sortBy=${sortBy}, sortDir=${sortDir})}" aria-label="Last">&raquo;</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+</body>
+</html>

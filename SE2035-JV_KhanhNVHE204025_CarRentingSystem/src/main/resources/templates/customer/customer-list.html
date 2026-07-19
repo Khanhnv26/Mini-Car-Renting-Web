@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/admin-layout :: layout(title='Quản lý khách hàng', content=~{::content})}">
+<body>
+<div th:fragment="content" class="px-2">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="app-page-title mb-0">Quản lý khách hàng</h1>
+        <a th:href="@{/admin/customers/new}" class="btn btn-minimal py-2 px-4">+ Thêm mới</a>
+    </div>
+    <div th:if="${error}" class="alert alert-danger border-0 rounded-1 small mb-4" th:text="${error}"></div>
+
+    <div class="card card-flat p-4 mb-4">
+        <form th:action="@{/admin/customers}" method="get" class="row g-3">
+            <div class="col-md-6">
+                <input type="text" name="keyword" class="form-control form-control-sm" placeholder="Tìm theo tên hoặc số điện thoại..." th:value="${keyword}" />
+            </div>
+            <div class="col-md-2 d-grid">
+                <button type="submit" class="btn btn-minimal py-1">Tìm kiếm</button>
+            </div>
+        </form>
+    </div>
+    
+    <div class="card card-flat p-0 overflow-hidden">
+        <div th:if="${customers == null or #lists.isEmpty(customers)}" class="empty-state">
+            <h5 class="fw-light"
+                th:text="${keyword != null and !#strings.isEmpty(keyword)}
+                    ? 'Không tìm thấy khách hàng phù hợp' : 'Chưa có khách hàng nào'">Chưa có khách hàng nào</h5>
+            <p class="text-muted small mb-0"
+               th:text="${keyword != null and !#strings.isEmpty(keyword)}
+                    ? 'Thử đổi bộ lọc hoặc xóa điều kiện tìm kiếm.' : 'Hệ thống chưa ghi nhận tài khoản khách hàng nào.'">…</p>
+        </div>
+        
+        <div th:unless="${customers == null or #lists.isEmpty(customers)}" class="table-responsive">
+            <table class="table table-minimal mb-0">
+                <thead>
+                <tr>
+                     <th class="text-muted" style="width: 4rem;">STT</th>
+                     <th><a class="text-decoration-none text-dark" th:href="@{/admin/customers(page=${currentPage}, keyword=${keyword}, sortBy='fullName', sortDir=${reverseSortDir})}">Họ tên <span th:if="${sortBy == 'fullName'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
+                    <th><a class="text-decoration-none text-dark" th:href="@{/admin/customers(page=${currentPage}, keyword=${keyword}, sortBy='mobile', sortDir=${reverseSortDir})}">SĐT <span th:if="${sortBy == 'mobile'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
+                    <th><a class="text-decoration-none text-dark" th:href="@{/admin/customers(page=${currentPage}, keyword=${keyword}, sortBy='birthday', sortDir=${reverseSortDir})}">Ngày sinh <span th:if="${sortBy == 'birthday'}" th:text="${sortDir == 'asc' ? '↑' : '↓'}"></span></a></th>
+                    <th>Email</th>
+                    <th class="text-end">Hành động</th>
+                </tr>
+                </thead>
+                <tbody>
+                 <tr th:each="c, iterStat : ${customers}">
+                     <td class="text-muted" th:text="${currentPage * pageSize + iterStat.count}"></td>
+                    <td class="fw-medium" th:text="${c.fullName}"></td>
+                    <td th:text="${c.mobile}"></td>
+                    <td th:text="${c.birthday}"></td>
+                    <td th:text="${c.account.email}"></td>
+                    <td class="text-end">
+                        <a th:href="@{/admin/customers/edit/{id}(id=${c.customerId})}" class="btn btn-ghost px-2 text-muted">Sửa</a>
+                        <button type="button" class="btn btn-ghost px-2 text-danger" 
+                                data-bs-toggle="modal" data-bs-target="#deleteModal" 
+                                th:attr="data-delete-url=@{/admin/customers/delete/{id}(id=${c.customerId})}">
+                            Xóa
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div th:if="${totalPages > 1}" class="card-footer d-flex justify-content-between align-items-center py-3">
+            <div class="text-muted small">
+                Đang hiển thị dòng <span th:text="${currentPage * 5 + 1}"></span> - <span th:text="${T(java.lang.Math).min((currentPage + 1) * 5L, totalItems)}"></span> của tổng số <span th:text="${totalItems}"></span> dòng
+            </div>
+            <nav aria-label="Page navigation">
+                <ul class="pagination pagination-sm pagination-minimal mb-0 gap-1">
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{/admin/customers(page=0, keyword=${keyword}, sortBy=${sortBy}, sortDir=${sortDir})}" aria-label="First">&laquo;</a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{/admin/customers(page=${currentPage - 1}, keyword=${keyword}, sortBy=${sortBy}, sortDir=${sortDir})}" aria-label="Previous">&lsaquo;</a>
+                    </li>
+                    <li class="page-item" th:each="i : ${#numbers.sequence(T(java.lang.Math).max(0, currentPage - 2), T(java.lang.Math).min(totalPages - 1, currentPage + 2))}" th:classappend="${currentPage == i} ? 'active'">
+                        <a class="page-link" th:href="@{/admin/customers(page=${i}, keyword=${keyword}, sortBy=${sortBy}, sortDir=${sortDir})}" th:text="${i + 1}"></a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/admin/customers(page=${currentPage + 1}, keyword=${keyword}, sortBy=${sortBy}, sortDir=${sortDir})}" aria-label="Next">&rsaquo;</a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/admin/customers(page=${totalPages - 1}, keyword=${keyword}, sortBy=${sortBy}, sortDir=${sortDir})}" aria-label="Last">&raquo;</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <div class="modal fade modal-glass" id="deleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content p-3 text-center">
+                <div class="modal-body">
+                    <h5 class="fw-light mb-3">Xóa tài khoản?</h5>
+                    <p class="text-muted small">Hành động này không thể hoàn tác. Bạn có chắc chắn muốn xóa?</p>
+                </div>
+                <div class="d-flex justify-content-center gap-2 pb-2">
+                    <button type="button" class="btn btn-ghost px-4" data-bs-dismiss="modal">Hủy</button>
+                    <a href="#" id="confirmDeleteBtn" class="btn btn-minimal px-4 bg-danger">Xóa luôn</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+</body>
+</html>

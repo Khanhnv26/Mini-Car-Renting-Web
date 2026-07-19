@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/error-layout :: layout(title='404 - Không tìm thấy', content=~{::content})}">
+<body>
+<div th:fragment="content">
+    <h1 class="error-code">404</h1>
+    <h2 class="error-title">Trang không tồn tại</h2>
+    <p class="error-message">Trang bạn đang tìm kiếm không tồn tại hoặc đã được di chuyển.</p>
+    <a th:href="@{/}" class="btn btn-minimal px-4 py-2">Về trang chủ</a>
+</div>
+</body>
+</html>
