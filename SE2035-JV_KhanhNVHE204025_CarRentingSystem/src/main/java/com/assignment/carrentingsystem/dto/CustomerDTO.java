@@ -1,6 +1,7 @@
 package com.assignment.carrentingsystem.dto;
 
 import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
@@ -48,12 +49,18 @@ public class CustomerDTO {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate licenceDate;
 
-    @NotNull(message = "Tài khoản không được trống")
     private Integer accountId;
 
+    @NotBlank(message = "Tên đăng nhập không được để trống")
+    @Size(max = 100, message = "Tên đăng nhập tối đa 100 ký tự")
     private String accountName;
 
+    @NotBlank(message = "Email không được để trống")
+    @Email(message = "Email không hợp lệ")
+    @Size(max = 200, message = "Email tối đa 200 ký tự")
     private String accountEmail;
+
+    private String password;
 
     @AssertTrue(message = "Khách hàng phải đủ 18 tuổi")
     public boolean isAdult() {
@@ -63,5 +70,14 @@ public class CustomerDTO {
     @AssertTrue(message = "Ngày cấp bằng phải từ khi khách hàng đủ 18 tuổi")
     public boolean isLicenceOnOrAfterAdultAge() {
         return birthday == null || licenceDate == null || !licenceDate.isBefore(birthday.plusYears(18));
+    }
+
+    @AssertTrue(message = "Mật khẩu từ 6 đến 200 ký tự")
+    public boolean isPasswordValid() {
+        if (customerId != null) {
+            return password == null || password.isBlank()
+                    || (password.length() >= 6 && password.length() <= 200);
+        }
+        return password != null && password.length() >= 6 && password.length() <= 200;
     }
 }

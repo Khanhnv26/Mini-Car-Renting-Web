@@ -96,7 +96,7 @@
                 Đang hiển thị dòng
                 <span th:text="${currentPage * 5 + 1}"></span>
                 -
-                <span th:text="${T(java.lang.Math).min((currentPage + 1) * 5L, totalItems)}"></span>
+                <span th:text="${T(java.lang.Math).min((currentPage + 1) * 5, totalItems.intValue())}"></span>
                 của tổng số
                 <span th:text="${totalItems}"></span> dòng
             </div>

@@ -1,8 +1,6 @@
 package com.assignment.carrentingsystem.controller;
 
 import com.assignment.carrentingsystem.dto.CustomerDTO;
-import com.assignment.carrentingsystem.entity.Customer;
-import com.assignment.carrentingsystem.service.AccountService;
 import com.assignment.carrentingsystem.service.CustomerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +19,6 @@ import java.time.LocalDate;
 public class CustomerController {
 
     private final CustomerService customerService;
-    private final AccountService accountService;
 
     private void addDateBounds(Model model) {
         LocalDate today = LocalDate.now();
@@ -37,7 +34,8 @@ public class CustomerController {
             @RequestParam(name = "sortDir", defaultValue = "asc") String sortDir,
             Model model) {
         int pageSize = 5;
-        Page<Customer> customerPage = customerService.findPaginated(keyword, page, pageSize, sortBy, sortDir);
+        Page<com.assignment.carrentingsystem.entity.Customer> customerPage =
+                customerService.findPaginated(keyword, page, pageSize, sortBy, sortDir);
         model.addAttribute("customers", customerPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("pageSize", pageSize);
@@ -53,7 +51,6 @@ public class CustomerController {
     @GetMapping("/new")
     public String createForm(Model model) {
         model.addAttribute("customerDTO", new CustomerDTO());
-        model.addAttribute("accounts", accountService.findAvailableCustomerAccounts(null));
         addDateBounds(model);
         return "customer/customer-form";
     }
@@ -63,11 +60,7 @@ public class CustomerController {
                        BindingResult bindingResult,
                        Model model,
                        RedirectAttributes redirectAttributes) {
-        boolean isEdit = customerDTO.getCustomerId() != null;
         if (bindingResult.hasErrors()) {
-            if (!isEdit) {
-                model.addAttribute("accounts", accountService.findAvailableCustomerAccounts(null));
-            }
             addDateBounds(model);
             return "customer/customer-form";
         }
@@ -78,9 +71,6 @@ public class CustomerController {
             redirectAttributes.addFlashAttribute("toastType", "success");
             return "redirect:/admin/customers";
         } catch (Exception e) {
-            if (!isEdit) {
-                model.addAttribute("accounts", accountService.findAvailableCustomerAccounts(null));
-            }
             model.addAttribute("error", e.getMessage());
             addDateBounds(model);
             return "customer/customer-form";

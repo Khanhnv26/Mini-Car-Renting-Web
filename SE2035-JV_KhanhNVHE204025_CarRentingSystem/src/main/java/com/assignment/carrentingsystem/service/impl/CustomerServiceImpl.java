@@ -1,5 +1,6 @@
 package com.assignment.carrentingsystem.service.impl;
 
+import com.assignment.carrentingsystem.config.AppConfig;
 import com.assignment.carrentingsystem.dto.CustomerDTO;
 import com.assignment.carrentingsystem.entity.Account;
 import com.assignment.carrentingsystem.entity.Customer;
@@ -26,7 +27,6 @@ public class CustomerServiceImpl implements CustomerService {
     private final AccountRepository accountRepository;
     private final CarRentalRepository carRentalRepository;
 
-
     private CustomerDTO toDTO(Customer c) {
         CustomerDTO dto = new CustomerDTO();
         dto.setCustomerId(c.getCustomerId());
@@ -44,59 +44,112 @@ public class CustomerServiceImpl implements CustomerService {
         return dto;
     }
 
-    private Customer toEntity(CustomerDTO dto, Customer customer, boolean lockAccount) {
+    private void applyProfile(CustomerDTO dto, Customer customer) {
         customer.setFullName(dto.getFullName());
         customer.setMobile(dto.getMobile());
         customer.setBirthday(dto.getBirthday());
         customer.setIdentityCard(dto.getIdentityCard());
         customer.setLicenceNumber(dto.getLicenceNumber());
         customer.setLicenceDate(dto.getLicenceDate());
-        if (!lockAccount) {
-            Account account = accountRepository.findById(dto.getAccountId())
-                    .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
-            customer.setAccount(account);
+    }
+
+    private Account createCustomerAccount(CustomerDTO dto) {
+        String accountName = dto.getAccountName() == null ? "" : dto.getAccountName().trim();
+        String email = dto.getAccountEmail() == null ? "" : dto.getAccountEmail().trim();
+        String password = dto.getPassword();
+
+        if (accountName.isBlank()) {
+            throw new RuntimeException("Tên đăng nhập không được để trống");
         }
-        return customer;
+        if (email.isBlank()) {
+            throw new RuntimeException("Email không được để trống");
+        }
+        if (password == null || password.length() < 6) {
+            throw new RuntimeException("Mật khẩu từ 6 đến 200 ký tự");
+        }
+        if (accountRepository.existsByEmail(email)) {
+            throw new RuntimeException("Email đã tồn tại");
+        }
+        if (accountRepository.existsByAccountName(accountName)) {
+            throw new RuntimeException("Tên đăng nhập đã tồn tại");
+        }
+
+        Account account = new Account();
+        account.setAccountName(accountName);
+        account.setEmail(email);
+        account.setPassword(AppConfig.hashPassword(password));
+        account.setRole("Customer");
+        return accountRepository.save(account);
+    }
+
+    private void updateCustomerAccount(CustomerDTO dto, Account account) {
+        String accountName = dto.getAccountName() == null ? "" : dto.getAccountName().trim();
+        String email = dto.getAccountEmail() == null ? "" : dto.getAccountEmail().trim();
+        String password = dto.getPassword();
+
+        if (accountName.isBlank()) {
+            throw new RuntimeException("Tên đăng nhập không được để trống");
+        }
+        if (email.isBlank()) {
+            throw new RuntimeException("Email không được để trống");
+        }
+        if (password != null && !password.isBlank() && password.length() < 6) {
+            throw new RuntimeException("Mật khẩu từ 6 đến 200 ký tự");
+        }
+        if (accountRepository.existsByEmailAndAccountIdNot(email, account.getAccountId())) {
+            throw new RuntimeException("Email đã tồn tại");
+        }
+        if (accountRepository.existsByAccountNameAndAccountIdNot(accountName, account.getAccountId())) {
+            throw new RuntimeException("Tên đăng nhập đã tồn tại");
+        }
+
+        account.setAccountName(accountName);
+        account.setEmail(email);
+        if (password != null && !password.isBlank()) {
+            account.setPassword(AppConfig.hashPassword(password));
+        }
+        accountRepository.save(account);
     }
 
     @Override
     public List<Customer> findAll() {
         return customerRepository.findAll();
     }
+
     @Override
     public Customer findById(Integer id) {
         return customerRepository.findById(id).orElse(null);
     }
+
     @Override
     public CustomerDTO findDTOById(Integer id) {
         Customer c = customerRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Khách hàng không tồn tại"));
         return toDTO(c);
     }
+
     @Override
     @Transactional
     public Customer save(CustomerDTO customerDTO) {
-        Customer customer;
-        boolean lockAccount;
-        if (customerDTO.getCustomerId() != null) {
-            customer = customerRepository.findById(customerDTO.getCustomerId())
-                    .orElseThrow(() -> new RuntimeException("Khách hàng không tồn tại"));
-            lockAccount = true;
-            if (customer.getAccount() != null) {
-                customerDTO.setAccountId(customer.getAccount().getAccountId());
-            }
-        } else {
-            if (customerDTO.getAccountId() == null) {
-                throw new RuntimeException("Tài khoản không được trống");
-            }
-            if (customerRepository.existsByAccount_AccountId(customerDTO.getAccountId())) {
-                throw new RuntimeException("Tài khoản này đã có hồ sơ khách hàng");
-            }
-            customer = new Customer();
-            lockAccount = false;
-        }
         CustomerDateRules.validate(customerDTO.getBirthday(), customerDTO.getLicenceDate());
-        return customerRepository.save(toEntity(customerDTO, customer, lockAccount));
+
+        if (customerDTO.getCustomerId() != null) {
+            Customer customer = customerRepository.findById(customerDTO.getCustomerId())
+                    .orElseThrow(() -> new RuntimeException("Khách hàng không tồn tại"));
+            Account account = customer.getAccount();
+            if (account == null) {
+                throw new RuntimeException("Khách hàng chưa có tài khoản");
+            }
+            updateCustomerAccount(customerDTO, account);
+            applyProfile(customerDTO, customer);
+            return customerRepository.save(customer);
+        }
+
+        Account account = createCustomerAccount(customerDTO);
+        Customer customer = new Customer();
+        applyProfile(customerDTO, customer);
+        customer.setAccount(account);
+        return customerRepository.save(customer);
     }
 
     @Override
@@ -121,6 +174,7 @@ public class CustomerServiceImpl implements CustomerService {
         current.setLicenceDate(updatedData.getLicenceDate());
         customerRepository.save(current);
     }
+
     @Override
     @Transactional
     public void deleteById(Integer id) {
@@ -129,6 +183,7 @@ public class CustomerServiceImpl implements CustomerService {
         }
         customerRepository.deleteById(id);
     }
+
     @Override
     public Customer findByAccountId(Integer accountId) {
         return customerRepository.findByAccountId(accountId);

@@ -128,7 +128,7 @@
                 · Dòng
                 <span th:text="${currentPage * pageSize + 1}">1</span>
                 -
-                <span th:text="${T(java.lang.Math).min((currentPage + 1L) * pageSize, totalItems)}">1</span>
+                <span th:text="${T(java.lang.Math).min((currentPage + 1) * pageSize, totalItems.intValue())}">1</span>
                 /
                 <span th:text="${totalItems}">0</span>
             </div>
